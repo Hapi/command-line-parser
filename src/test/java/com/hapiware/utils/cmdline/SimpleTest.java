@@ -1,9 +1,9 @@
 package com.hapiware.utils.cmdline;
 
+import static junit.framework.Assert.assertEquals;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import static junit.framework.Assert.assertEquals;
 
 import com.hapiware.utils.cmdline.annotation.Id;
 import com.hapiware.utils.cmdline.constraint.AnnotatedFieldSetException;
@@ -11,8 +11,8 @@ import com.hapiware.utils.cmdline.constraint.CommandNotFoundException;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
 import com.hapiware.utils.cmdline.constraint.Enumeration;
 import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
-import com.hapiware.utils.cmdline.element.Argument;
 import com.hapiware.utils.cmdline.element.Option;
+import com.hapiware.utils.cmdline.element.OptionArgument;
 
 public class SimpleTest
 {
@@ -35,25 +35,27 @@ public class SimpleTest
 	public void normalCase()
 	{
 		CommandLineParser p = new CommandLineParser();
-		p.add(new Option() {{
-			name("v").alternatives("verbose").id("ver");
+		p.add(new Option("v") {{
+			alternatives("verbose").id("ver");
+			description("Description");
 		}});
-		p.add(new Option() {{
-			name("n").alternatives("number");
-			set(Integer.class, new Argument() {{
+		p.add(new Option("n") {{
+			alternatives("number");
+			description("Description");
+			set(Integer.class, new OptionArgument() {{
 				minValue(1);
 				maxValue(1000);
 			}});
 		}});
-		p.add(new Option() {{
-			name("s");
-			set(String.class, new Argument() {{
+		p.add(new Option("s") {{
+			description("Description");
+			set(String.class, new OptionArgument() {{
 				maxLength(5);
 			}});
 		}});
-		p.add(new Option() {{
-			name("d");
-			set(String.class, new Argument() {{
+		p.add(new Option("d") {{
+			description("Description");
+			set(String.class, new OptionArgument() {{
 				constraint(new Enumeration() {{
 					value("J").ignoreCase();
 					value("x");
@@ -99,16 +101,16 @@ public class SimpleTest
 	public void defaultValuesForOptionalArguments()
 	{
 		CommandLineParser p = new CommandLineParser();
-		p.add(new Option() {{
-			name("n");
-			set(Integer.class, new Argument() {{
+		p.add(new Option("n") {{
+			description("Description");
+			set(Integer.class, new OptionArgument() {{
 				optional(13);
 				minValue(1);
 				maxValue(1000);
 			}});
 		}});
-		p.add(new Option() {{
-			name("d");
+		p.add(new Option("d") {{
+			description("Description");
 		}});
 		
 		try {
@@ -143,9 +145,10 @@ public class SimpleTest
 	public void settingAnnotatedArray()
 	{
 		CommandLineParser p = new CommandLineParser();
-		p.add(new Option() {{
-			name("nums").multiple().id("intarray");
-			set(Integer.class, new Argument() {{
+		p.add(new Option("nums") {{
+			multiple().id("intarray");
+			description("Description");
+			set(Integer.class, new OptionArgument() {{
 				minValue(1);
 				maxValue(10);
 			}});

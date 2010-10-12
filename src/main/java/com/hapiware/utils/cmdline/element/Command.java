@@ -1,6 +1,7 @@
 package com.hapiware.utils.cmdline.element;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -26,7 +27,9 @@ public class Command
 	private boolean _mandatoryArguments;
 	private int _numOfOptionalArguments;
 	private List<Option.Inner> _cmdLineOptions = new ArrayList<Option.Inner>(); 
-	private List<Argument.Inner<?>> _cmdLineArguments = new ArrayList<Argument.Inner<?>>(); 
+	private List<Argument.Inner<?>> _cmdLineArguments = new ArrayList<Argument.Inner<?>>();
+	private boolean _useAnnotations;
+	
 	
 	private Command(Command command)
 	{
@@ -36,6 +39,7 @@ public class Command
 		_cmdLineOptions.addAll(command._cmdLineOptions);
 		_cmdLineArguments.addAll(command._cmdLineArguments);
 		_numOfOptionalArguments = command._numOfOptionalArguments;
+		_useAnnotations = command._useAnnotations;
 		
 		// References are ok here.
 		_definedOptions = command._definedOptions;
@@ -43,26 +47,27 @@ public class Command
 		_definedArguments = command._definedArguments;
 	}
 	
-	public Command()
-	{
-		_commandExecutor = null;
-	}
-	
-	public Command(CommandExecutor commandExecutor)
-	{
-		if(commandExecutor == null)
-			throw new ConfigurationException("'commandExecutor' must have a value.");
-		
-		_commandExecutor = commandExecutor;
-	}
-	
-	public Command name(String name)
+	public Command(String name)
 	{
 		if(name == null || name.trim().length() == 0)
 			throw new ConfigurationException("'name' must have a value.");
 		
 		_command.name(name);
-		return this;
+		_commandExecutor = null;
+		_useAnnotations = true;
+	}
+	
+	public Command(String name, CommandExecutor commandExecutor)
+	{
+		if(name == null || name.trim().length() == 0)
+			throw new ConfigurationException("'name' must have a value.");
+		
+		if(commandExecutor == null)
+			throw new ConfigurationException("'commandExecutor' must have a value.");
+		
+		_command.name(name);
+		_commandExecutor = commandExecutor;
+		_useAnnotations = true;
 	}
 	
 	public Command alternatives(String...alternatives)
@@ -115,6 +120,16 @@ public class Command
 		if(inner.name() == null || inner.name().trim().length() == 0)
 			throw new ConfigurationException("'argument' must have a name.");
 		
+		if(inner.description().size() == 0)
+			throw new ConfigurationException("'argument' must have a description.");
+		
+		if(_useAnnotations && inner.optional() && !inner.hasDefaultValueForOptional()) {
+			String msg =
+				"When annotations are used then optional arguments must have a default value. "
+					+ "Use Argument.optional(T) instead of Argument.optional().";
+			throw new ConfigurationException(msg);
+		}
+		
 		_definedArguments.put(inner.name(), inner);
 		if(!inner.optional()) {
 			_mandatoryArguments = true;
@@ -129,17 +144,18 @@ public class Command
 			_numOfOptionalArguments++;
 		return this;
 	}
+	
 	public Command add(Option option)
 	{
-		if(option == null)
-			throw new ConfigurationException("'option' must have a value.");
-		
 		if(option == null)
 			throw new ConfigurationException("'option' must have a value.");
 		
 		Option.Inner inner = new Option.Inner(option);
 		if(inner.name() == null || inner.name().trim().length() == 0)
 			throw new ConfigurationException("'option' must have a name.");
+		
+		if(inner.description().size() == 0)
+			throw new ConfigurationException("'option' must have a description.");
 		
 		_definedOptions.put(inner.name(), inner);
 		_definedOptionAlternatives.put(inner.name(), inner.name());
@@ -149,7 +165,7 @@ public class Command
 		return this;
 	}
 	
-	public static class Inner
+	public static final class Inner
 		implements
 			Parser
 	{
@@ -158,9 +174,10 @@ public class Command
 		{
 			_outer = new Command(inner._outer);
 		}
-		public Inner(Command outer)
+		public Inner(Command outer, boolean useAnnotations)
 		{
 			_outer = outer;
+			_outer._useAnnotations = useAnnotations;
 		}
 		public String name()
 		{
@@ -172,7 +189,7 @@ public class Command
 		}
 		public Set<String> alternatives()
 		{
-			return _outer._command.alternatives();
+			return Collections.unmodifiableSet(_outer._command.alternatives());
 		}
 		public String id()
 		{
@@ -188,12 +205,57 @@ public class Command
 		}
 		public List<Option.Inner> cmdLineOptions()
 		{
-			return _outer._cmdLineOptions;
+			return Collections.unmodifiableList(_outer._cmdLineOptions);
 		}
 		public List<Argument.Inner<?>> cmdLineArguments()
 		{
-			return _outer._cmdLineArguments;
+			return Collections.unmodifiableList(_outer._cmdLineArguments);
 		}
+		
+		public boolean optionExists(String name)
+		{
+			for(Option.Inner option : _outer._cmdLineOptions)
+				if(option.name().equals(_outer._definedOptionAlternatives.get(name)))
+					return true;
+			
+			return false;
+		}
+		
+		@SuppressWarnings("unchecked")
+		public <T> T optionValue(String name)
+		{
+			try {
+				Option.Inner option = options(name)[0];
+				if(option.argument() != null)
+					return (T)option.argument().value();
+				else
+					return null;
+			}
+			catch(IndexOutOfBoundsException e) {
+				return null;
+			}
+		}
+		
+		public Option.Inner[] options(String name)
+		{
+			List<Option.Inner> options = new ArrayList<Option.Inner>();
+			for(Option.Inner option : _outer._cmdLineOptions)
+				if(option.name().equals(_outer._definedOptionAlternatives.get(name)))
+					options.add(new Option.Inner(option));
+			
+			return options.toArray(new Option.Inner[0]);
+		}
+		
+		public Argument.Inner<?> argument(String name)
+		{
+			for(Argument.Inner<?> argument : _outer._cmdLineArguments)
+				if(argument.name().equals(name))
+					return argument.clone();
+
+			return null;
+		}
+		
+		
 		public boolean parse(List<String> arguments)
 			throws
 				ConstraintException,

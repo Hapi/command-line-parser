@@ -1,5 +1,6 @@
 package com.hapiware.utils.cmdline.element;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,24 +29,24 @@ public class Argument
 		_constraints.addAll(argument._constraints);
 	}
 	
-	public Argument()
+	protected Argument()
 	{
 		// Does nothing.
 	}
 	
-	public Argument name(String name)
+	public Argument(String name)
 	{
 		if(name == null || name.trim().length() == 0)
-			throw new ConfigurationException("'name' must have a value.");
+			throw new NullPointerException("'name' must have a value.");
 		
 		_argument.name(name);
-		return this;
 	}
 	
 	public Argument id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
 			throw new ConfigurationException("'id' must have a value.");
+		
 		_argument.id(id);
 		return this;
 	}
@@ -72,6 +73,9 @@ public class Argument
 	
 	public <T> Argument optional(T defaultValue)
 	{
+		if(defaultValue == null || defaultValue.toString().length() == 0)
+			throw new NullPointerException("'defaultValue' must have a value.");
+		
 		_defaultForOptional = defaultValue.toString();
 		_optional = true;
 		return this;
@@ -104,7 +108,7 @@ public class Argument
 	}
 	
 	
-	public static class Inner<T>
+	public static final class Inner<T>
 		implements
 			Parser,
 			Cloneable
@@ -144,15 +148,15 @@ public class Argument
 		}
 		public List<Constraint> constraints()
 		{
-			return _outer._constraints;
+			return Collections.unmodifiableList(_outer._constraints);
 		}
 		public boolean optional()
 		{
 			return _outer._optional;
 		}
-		public T defaultValue() throws IllegalCommandLineArgumentException
+		public boolean hasDefaultValueForOptional()
 		{
-			return _argumentTypeClass.cast(valueOf(_outer._defaultForOptional, _argumentTypeClass));
+			return _outer._defaultForOptional != null;
 		}
 		public boolean parse(List<String> arguments)
 			throws
@@ -161,9 +165,13 @@ public class Argument
 		{
 			boolean defaultValueAdded = false;
 			if(arguments.size() == 0)
-				if(optional() && defaultValue() != null) {
-					((LinkedList<String>)arguments).addFirst(defaultValue().toString());
-					defaultValueAdded = true;
+				if(optional()) {
+					if(defaultValue() != null) {
+						((LinkedList<String>)arguments).addFirst(defaultValue().toString());
+						defaultValueAdded = true;
+					}
+					else
+						return true;
 				}
 				else
 					return false;
@@ -175,8 +183,12 @@ public class Argument
 				if(defaultValueAdded)
 					throw e;
 				else {
-					((LinkedList<String>)arguments).addFirst(defaultValue().toString());
-					value(_argumentTypeClass.cast(valueOf(arguments.get(0), _argumentTypeClass)));
+					if(defaultValue() != null) {
+						((LinkedList<String>)arguments).addFirst(defaultValue().toString());
+						value(_argumentTypeClass.cast(valueOf(arguments.get(0), _argumentTypeClass)));
+					}
+					else
+						return true;
 				}
 			}
 			arguments.remove(0);
@@ -191,7 +203,9 @@ public class Argument
 		@Override
 		public Inner<T> clone()
 		{
-			return new Inner<T>(new Argument(_outer), _argumentTypeClass);
+			Inner<T> inner = new Inner<T>(new Argument(_outer), _argumentTypeClass);
+			inner._value = _value;
+			return inner;
 		}
 		
 		@Override
@@ -222,6 +236,10 @@ public class Argument
 			return str;
 		}
 		
+		private T defaultValue() throws IllegalCommandLineArgumentException
+		{
+			return _argumentTypeClass.cast(valueOf(_outer._defaultForOptional, _argumentTypeClass));
+		}
 		private Object valueOf(String valueAsString, Class<?> argumentTypeClass)
 			throws
 				IllegalCommandLineArgumentException

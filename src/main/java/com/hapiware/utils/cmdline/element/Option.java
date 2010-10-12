@@ -1,5 +1,6 @@
 package com.hapiware.utils.cmdline.element;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -22,12 +23,7 @@ public class Option
 		_multiple = option._multiple;
 	}
 	
-	public Option()
-	{
-		// Does nothing.
-	}
-	
-	public Option name(String name)
+	public Option(String name)
 	{
 		if(name == null || name.trim().length() == 0)
 			throw new ConfigurationException("'name' must have a value.");
@@ -35,7 +31,6 @@ public class Option
 			throw new ConfigurationException("'name' must not start with minus (-).");
 		
 		_option.name(addOptionMinus(name));
-		return this;
 	}
 	
 	public Option alternatives(String...alternatives)
@@ -72,7 +67,7 @@ public class Option
 		return this;
 	}
 
-	public <T> Option set(Class<T> argumentType, Argument argument)
+	public <T> Option set(Class<T> argumentType, OptionArgument argument)
 	{
 		if(argumentType == null)
 			throw new ConfigurationException("'argumentType' must have a value.");
@@ -81,8 +76,18 @@ public class Option
 		
 		argument.id(removeOptionMinusFromId(_option.id()));
 		_definedArgument = new Argument.Inner<T>(argument, argumentType);
+		if(_definedArgument.name() != null)
+			throw
+				new ConfigurationException(
+					"Only the option can have a name. 'argument' must not have a name."
+				);
 		if(_definedArgument.id() == null || _definedArgument.id().trim().length() == 0)
 			throw new ConfigurationException("'argument' must have an id.");
+		if(_definedArgument.description().size() > 0)
+			throw
+				new ConfigurationException(
+					"Only the option can have a description. 'argument' must not have a description."
+				);
 		
 		return this;
 	}
@@ -107,7 +112,7 @@ public class Option
 	}
 	
 	
-	public static class Inner
+	public static final class Inner
 		implements
 			Parser
 	{
@@ -130,7 +135,7 @@ public class Option
 		}
 		public Set<String> alternatives()
 		{
-			return _outer._option.alternatives();
+			return Collections.unmodifiableSet(_outer._option.alternatives());
 		}
 		public String id()
 		{

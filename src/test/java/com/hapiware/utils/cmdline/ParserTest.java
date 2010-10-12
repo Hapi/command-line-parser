@@ -5,6 +5,7 @@ import com.hapiware.utils.cmdline.constraint.Enumeration;
 import com.hapiware.utils.cmdline.element.Argument;
 import com.hapiware.utils.cmdline.element.Command;
 import com.hapiware.utils.cmdline.element.Option;
+import com.hapiware.utils.cmdline.element.OptionArgument;
 
 public class ParserTest
 {
@@ -27,27 +28,29 @@ public class ParserTest
 	public static void main(String[] args)
 	{
 		CommandLineParser p = new CommandLineParser();
-		p.add(new Option() {{
-			name("m").alternatives("moi").id("miu");
+		p.add(new Option("m") {{
+			alternatives("moi").id("miu");
 			description("dfšlasjdfa lsfj");
 		}});
-		p.add(new Option() {{
-			name("n").alternatives("number");
-			set(Integer.class, new Argument() {{
+		p.add(new Option("n") {{
+			alternatives("number");
+			description("Description");
+			set(Integer.class, new OptionArgument() {{
 				optional(5);
 				minValue(1);
 				maxValue(1000);
 			}});
 		}});
-		p.add(new Option() {{
-			name("s").multiple();
-			set(String.class, new Argument() {{
+		p.add(new Option("s") {{
+			multiple();
+			description("Description");
+			set(String.class, new OptionArgument() {{
 				maxLength(5);
 			}});
 		}});
-		p.add(new Option() {{
-			name("d");
-			set(String.class, new Argument() {{
+		p.add(new Option("d") {{
+			description("Description");
+			set(String.class, new OptionArgument() {{
 				//maxLength(5);
 				constraint(new Enumeration() {{
 					value("J").ignoreCase();
@@ -56,15 +59,15 @@ public class ParserTest
 			}});
 		}});
 		
-		p.add(new Command() {{
-			name("set").alternatives("s").id("cmd");
-			add(Integer.class, new Argument() {{
-				name("PID");
+		p.add(new Command("set") {{
+			alternatives("s").id("cmd");
+			description("Description");
+			shortDescription("Desc.");
+			add(Integer.class, new Argument("PID") {{
 				description("Process ID for JVM.");
 			}});
-			add(Integer.class, new Argument() {{
+			add(Integer.class, new Argument("TYPE") {{
 				optional(4);
-				name("TYPE");
 				//maxLength(5);
 				minValue(3);
 				maxValue(6);
@@ -74,16 +77,14 @@ public class ParserTest
 				}});*/
 				description("....");
 			}});
-			add(Integer.class, new Argument() {{
-				name("RE");
+			add(Integer.class, new Argument("RE") {{
 				description("Regular expression.");
 			}});
-			add(String.class, new Argument() {{
-				name("LEVEL");
+			add(String.class, new Argument("LEVEL") {{
 				description("New logging level.");
 			}});
-			add(new Option() {{
-				name("v");
+			add(new Option("v") {{
+				description("Description");
 			}});
 		}});
 		

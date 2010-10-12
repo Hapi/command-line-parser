@@ -32,8 +32,18 @@ public class CommandLineParser
 	private int _numOfOptionalArguments;
 	private List<Option.Inner> _cmdLineOptions = new ArrayList<Option.Inner>(); 
 	private Command.Inner _cmdLineCommand;
-	private List<Argument.Inner<?>> _cmdLineArguments = new ArrayList<Argument.Inner<?>>(); 
+	private List<Argument.Inner<?>> _cmdLineArguments = new ArrayList<Argument.Inner<?>>();
+	private final boolean _useAnnotations;
 
+	public CommandLineParser()
+	{
+		_useAnnotations = true;
+	}
+	
+	public CommandLineParser(boolean useAnnotations)
+	{
+		_useAnnotations = useAnnotations;
+	}
 	
 	public void add(Option option)
 	{
@@ -43,6 +53,9 @@ public class CommandLineParser
 		Option.Inner inner = new Option.Inner(option);
 		if(inner.name() == null || inner.name().trim().length() == 0)
 			throw new ConfigurationException("'option' must have a name.");
+		
+		if(inner.description().size() == 0)
+			throw new ConfigurationException("'option' must have a description.");
 		
 		_definedGlobalOptions.put(inner.name(), inner);
 		_definedOptionGlobalAlternatives.put(inner.name(), inner.name());
@@ -62,9 +75,15 @@ public class CommandLineParser
 		if(command == null)
 			throw new ConfigurationException("'command' must have a value.");
 		
-		Command.Inner inner = new Command.Inner(command);
+		Command.Inner inner = new Command.Inner(command, _useAnnotations);
 		if(inner.name() == null || inner.name().trim().length() == 0)
 			throw new ConfigurationException("'command' must have a name.");
+		
+		if(inner.shortDescription() == null || inner.shortDescription().length() == 0)
+			throw new ConfigurationException("'command' must have a short description.");
+		
+		if(inner.description().size() == 0)
+			throw new ConfigurationException("'command' must have a description.");
 		
 		_definedCommands.put(inner.name(), inner);
 		_definedCommandAlternatives.put(inner.name(), inner.name());
@@ -86,6 +105,16 @@ public class CommandLineParser
 		Argument.Inner<T> inner = new Argument.Inner<T>(argument, argumentType);
 		if(inner.name() == null || inner.name().trim().length() == 0)
 			throw new ConfigurationException("'argument' must have a name.");
+		
+		if(inner.description().size() == 0)
+			throw new ConfigurationException("'argument' must have a description.");
+		
+		if(_useAnnotations && inner.optional() && !inner.hasDefaultValueForOptional()) {
+			String msg =
+				"When annotations are used then optional arguments must have a default value. "
+					+ "Use Argument.optional(T) instead of Argument.optional().";
+			throw new ConfigurationException(msg);
+		}
 		
 		_definedArguments.put(inner.name(), inner);
 		if(!inner.optional()) {
@@ -130,9 +159,18 @@ public class CommandLineParser
 		List<Option.Inner> options = new ArrayList<Option.Inner>();
 		for(Option.Inner option : _cmdLineOptions)
 			if(option.name().equals(_definedOptionGlobalAlternatives.get(name)))
-				options.add(option);
+				options.add(new Option.Inner(option));
 		
 		return options.toArray(new Option.Inner[0]);
+	}
+	
+	public Argument.Inner<?> argument(String name)
+	{
+		for(Argument.Inner<?> argument : _cmdLineArguments)
+			if(argument.name().equals(name))
+				return argument.clone();
+
+		return null;
 	}
 	
 	public boolean commandExists(String name)
@@ -140,6 +178,10 @@ public class CommandLineParser
 		return _definedCommandAlternatives.containsKey(name);
 	}
 	
+	public Command.Inner getCommand()
+	{
+		return new Command.Inner(_cmdLineCommand);
+	}
 	
 	public void parse(String[] args)
 		throws
