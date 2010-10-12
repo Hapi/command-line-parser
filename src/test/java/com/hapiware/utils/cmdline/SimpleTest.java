@@ -10,10 +10,11 @@ import com.hapiware.utils.cmdline.constraint.AnnotatedFieldSetException;
 import com.hapiware.utils.cmdline.constraint.CommandNotFoundException;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
 import com.hapiware.utils.cmdline.constraint.Enumeration;
+import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
 import com.hapiware.utils.cmdline.element.Argument;
 import com.hapiware.utils.cmdline.element.Option;
 
-public class OptionTest
+public class SimpleTest
 {
 	@Id("ver")
 	private boolean _ver;
@@ -89,6 +90,9 @@ public class OptionTest
 		catch(CommandNotFoundException e) {
 			Assert.fail("Unexpected command related exception thrown. " + e.getMessage(), e);
 		}
+		catch(IllegalCommandLineArgumentException e) {
+			Assert.fail("Unexpected command line argument exception thrown. " + e.getMessage(), e);
+		}
 	}
 	
 	@Test
@@ -130,6 +134,9 @@ public class OptionTest
 		catch(CommandNotFoundException e) {
 			Assert.fail("Unexpected command related exception thrown. " + e.getMessage(), e);
 		}
+		catch(IllegalCommandLineArgumentException e) {
+			Assert.fail("Unexpected command line argument exception thrown. " + e.getMessage(), e);
+		}
 	}
 	
 	@Test
@@ -159,6 +166,9 @@ public class OptionTest
 		}
 		catch(CommandNotFoundException e) {
 			Assert.fail("Unexpected command related exception thrown. " + e.getMessage(), e);
+		}
+		catch(IllegalCommandLineArgumentException e) {
+			Assert.fail("Unexpected command line argument exception thrown. " + e.getMessage(), e);
 		}
 	}
 }

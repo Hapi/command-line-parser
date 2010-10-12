@@ -12,7 +12,9 @@ import java.util.regex.Pattern;
 
 import com.hapiware.utils.cmdline.constraint.AnnotatedFieldSetException;
 import com.hapiware.utils.cmdline.constraint.CommandNotFoundException;
+import com.hapiware.utils.cmdline.constraint.ConfigurationException;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
+import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
 import com.hapiware.utils.cmdline.element.Argument;
 import com.hapiware.utils.cmdline.element.Command;
 import com.hapiware.utils.cmdline.element.Option;
@@ -36,11 +38,12 @@ public class CommandLineParser
 	public void add(Option option)
 	{
 		if(option == null)
-			throw new NullPointerException("'option' must have a value.");
+			throw new ConfigurationException("'option' must have a value.");
 		
 		Option.Inner inner = new Option.Inner(option);
 		if(inner.name() == null || inner.name().trim().length() == 0)
-			throw new NullPointerException("'option' must have a name.");
+			throw new ConfigurationException("'option' must have a name.");
+		
 		_definedGlobalOptions.put(inner.name(), inner);
 		_definedOptionGlobalAlternatives.put(inner.name(), inner.name());
 		for(String alternative : inner.alternatives())
@@ -49,12 +52,20 @@ public class CommandLineParser
 	
 	public void add(Command command)
 	{
+		if(_definedArguments.size() > 0)
+			throw
+				new ConfigurationException(
+					"Both bare command line arguments and commands cannot be used at the same time."
+						+ " Use either one of them."
+				);
+		
 		if(command == null)
-			throw new NullPointerException("'command' must have a value.");
+			throw new ConfigurationException("'command' must have a value.");
 		
 		Command.Inner inner = new Command.Inner(command);
 		if(inner.name() == null || inner.name().trim().length() == 0)
-			throw new NullPointerException("'command' must have a name.");
+			throw new ConfigurationException("'command' must have a name.");
+		
 		_definedCommands.put(inner.name(), inner);
 		_definedCommandAlternatives.put(inner.name(), inner.name());
 		for(String alternative : inner.alternatives())
@@ -63,20 +74,27 @@ public class CommandLineParser
 	
 	public <T> void add(Class<T> argumentType, Argument argument)
 	{
+		if(_definedCommands.size() > 0)
+			throw
+				new ConfigurationException(
+					"Both bare command line arguments and commands cannot be used at the same time."
+						+ " Use either one of them."
+				);
 		if(argument == null)
-			throw new NullPointerException("'argument' must have a value.");
+			throw new ConfigurationException("'argument' must have a value.");
 		
 		Argument.Inner<T> inner = new Argument.Inner<T>(argument, argumentType);
 		if(inner.name() == null || inner.name().trim().length() == 0)
-			throw new NullPointerException("'argument' must have a name.");
+			throw new ConfigurationException("'argument' must have a name.");
 		
 		_definedArguments.put(inner.name(), inner);
 		if(!inner.optional()) {
 			_mandatoryArguments = true;
 			if(_numOfOptionalArguments >= 2) {
 				String msg =
-					"If there is more than one optional argument they must be the last arguments.";
-				throw new IllegalStateException(msg);
+					"If there are more than one optional argument they must be the last arguments."
+						+ " A single optional argument can have any position.";
+				throw new ConfigurationException(msg);
 			}
 		}
 		else
@@ -122,13 +140,139 @@ public class CommandLineParser
 		return _definedCommandAlternatives.containsKey(name);
 	}
 	
+	
 	public void parse(String[] args)
 		throws
 			ConstraintException,
 			AnnotatedFieldSetException,
-			CommandNotFoundException
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
 	{
 		String className = Thread.currentThread().getStackTrace()[2].getClassName();
+		parse(className, args);
+	}
+
+	
+	public void parse(Object callerObject, String[] args)
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		if(callerObject == null)
+			throw new NullPointerException("'callerObject' must have a value.");
+		parse(callerObject, null, args);
+	}
+	
+	
+	public void parse(Class<?> callerClass, String[] args)
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		if(callerClass == null)
+			throw new NullPointerException("'callerClass' must have a value.");
+		parse(null, callerClass, args);
+	}
+
+	
+	public void parsePrintAndExitOnError(String[] args)
+	{
+		try {
+			String className = Thread.currentThread().getStackTrace()[2].getClassName();
+			parse(className, args);
+		}
+		catch(ConstraintException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(AnnotatedFieldSetException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(CommandNotFoundException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(IllegalCommandLineArgumentException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(Throwable t) {
+			System.out.println(t.getMessage());
+			t.printStackTrace();
+			System.exit(-2);
+		}
+	}
+
+	
+	public void parsePrintAndExitOnError(Object callerObject, String[] args)
+	{
+		try {
+			parse(callerObject, args);
+		}
+		catch(ConstraintException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(AnnotatedFieldSetException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(CommandNotFoundException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(IllegalCommandLineArgumentException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(Throwable t) {
+			System.out.println(t.getMessage());
+			t.printStackTrace();
+			System.exit(-2);
+		}
+	}
+	
+	public void parsePrintAndExitOnError(Class<?> callerClass, String[] args)
+	{
+		try {
+			parse(callerClass, args);
+		}
+		catch(ConstraintException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(AnnotatedFieldSetException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(CommandNotFoundException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(IllegalCommandLineArgumentException e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+		catch(Throwable t) {
+			System.out.println(t.getMessage());
+			t.printStackTrace();
+			System.exit(-2);
+		}
+	}
+	
+
+	private void parse(String className, String[] args)
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
 		try {
 			parse(
 				null, 
@@ -137,44 +281,23 @@ public class CommandLineParser
 			);
 		}
 		catch(ClassNotFoundException e) {
-			String msg = "'" + className + "' was not found. Use other parse() method call.";
+			String msg = 
+				"'" + className + "' was not found. An attempt to find automatically a defining "
+					+ "class for the annotated fields failed. Use other parse() method call.";
 			throw new RuntimeException(msg, e);
 		}
 	}
-	public void parse(Object callerObject, String[] args)
-		throws
-			ConstraintException,
-			AnnotatedFieldSetException,
-			CommandNotFoundException
-	{
-		if(callerObject == null)
-			throw new NullPointerException("'callerObject' must have a value.");
-		parse(callerObject, null, args);
-	}
-	public void parse(Class<?> callerClass, String[] args)
-		throws
-			ConstraintException,
-			AnnotatedFieldSetException,
-			CommandNotFoundException
-	{
-		if(callerClass == null)
-			throw new NullPointerException("'callerClass' must have a value.");
-		parse(null, callerClass, args);
-	}
+	
+	
 	private void parse(Object callerObject, Class<?> callerClass, String[] args)
 		throws
 			ConstraintException,
 			AnnotatedFieldSetException,
-			CommandNotFoundException
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
 	{
 		assert callerObject != null || callerClass != null;
 
-		if(_definedCommands.size() > 0 && _definedArguments.size() > 0)
-			throw
-				new ConstraintException(
-					"Both bare command line arguments and commands are not allowed."
-				);
-		
 		// Adds a space character after a short option if missing.
 		List<String> cmdLineArgs = new LinkedList<String>();
 		Pattern p = Pattern.compile("^-\\p{Alpha}\\p{Alnum}+");
@@ -205,7 +328,7 @@ public class CommandLineParser
 			else
 				if(_cmdLineCommand != null)
 					throw
-						new ConstraintException(
+						new IllegalCommandLineArgumentException(
 							"'" + arg + "' cannot be interpreted as a proper command line parameter."
 						);
 					
@@ -229,25 +352,30 @@ public class CommandLineParser
 			
 			// If this point is reached then it means that
 			// the command line argument is undefined.
-			throw new ConstraintException("'" + arg + "' not defined.");
+			throw new IllegalCommandLineArgumentException("'" + arg + "' not defined.");
 		}
 		if(_mandatoryArguments && _cmdLineArguments.size() == 0)
-			throw new ConstraintException("A mandatory command line argument is missing.");
+			throw new IllegalCommandLineArgumentException("A mandatory command line argument is missing.");
 		if(_definedCommands.size() > 0 && _cmdLineCommand == null)
 			throw new CommandNotFoundException("No command found from the command line.");
 
 		// Global options.
 		Util.setAnnotatedOptions(callerObject, callerClass, _cmdLineOptions);
 		
-		// Command, command options and command arguments.
-		Util.setAnnotatedValue(callerObject, callerClass, _cmdLineCommand.name(), _cmdLineCommand.id());
-		Util.setAnnotatedOptions(callerObject, callerClass, _cmdLineCommand.cmdLineOptions());
-		Util.setAnnotatedArguments(callerObject, callerClass, _cmdLineCommand.cmdLineArguments());
-		
 		// Global arguments.
 		Util.setAnnotatedArguments(callerObject, callerClass, _cmdLineArguments);
 		
-		if(_cmdLineCommand != null)
+		// Command, command options, command arguments and excutors.
+		if(_cmdLineCommand != null) {
+			Util.setAnnotatedValue(
+				callerObject,
+				callerClass,
+				_cmdLineCommand.name(),
+				_cmdLineCommand.id()
+			);
+			Util.setAnnotatedOptions(callerObject, callerClass, _cmdLineCommand.cmdLineOptions());
+			Util.setAnnotatedArguments(callerObject, callerClass, _cmdLineCommand.cmdLineArguments());
 			_cmdLineCommand.execute(_cmdLineOptions);
+		}
 	}
 }

@@ -4,8 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.hapiware.utils.cmdline.Util;
+import com.hapiware.utils.cmdline.constraint.ConfigurationException;
 import com.hapiware.utils.cmdline.constraint.Constraint;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
+import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
 import com.hapiware.utils.cmdline.constraint.MaxLength;
 import com.hapiware.utils.cmdline.constraint.MaxValue;
 import com.hapiware.utils.cmdline.constraint.MinLength;
@@ -34,7 +36,8 @@ public class Argument
 	public Argument name(String name)
 	{
 		if(name == null || name.trim().length() == 0)
-			throw new NullPointerException("'name' must have a value.");
+			throw new ConfigurationException("'name' must have a value.");
+		
 		_argument.name(name);
 		return this;
 	}
@@ -42,7 +45,7 @@ public class Argument
 	public Argument id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
-			throw new NullPointerException("'id' must have a value.");
+			throw new ConfigurationException("'id' must have a value.");
 		_argument.id(id);
 		return this;
 	}
@@ -50,7 +53,8 @@ public class Argument
 	public Argument description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
-			throw new NullPointerException("'description' must have a value.");
+			throw new ConfigurationException("'description' must have a value.");
+		
 		_argument.description(description);
 		return this;
 	}
@@ -146,13 +150,14 @@ public class Argument
 		{
 			return _outer._optional;
 		}
-		public T defaultValue() throws ConstraintException
+		public T defaultValue() throws IllegalCommandLineArgumentException
 		{
 			return _argumentTypeClass.cast(valueOf(_outer._defaultForOptional, _argumentTypeClass));
 		}
 		public boolean parse(List<String> arguments)
 			throws
-				ConstraintException
+				ConstraintException,
+				IllegalCommandLineArgumentException
 		{
 			boolean defaultValueAdded = false;
 			if(arguments.size() == 0)
@@ -166,7 +171,7 @@ public class Argument
 			try {
 				value(_argumentTypeClass.cast(valueOf(arguments.get(0), _argumentTypeClass)));
 			}
-			catch(ConstraintException e) {
+			catch(IllegalCommandLineArgumentException e) {
 				if(defaultValueAdded)
 					throw e;
 				else {
@@ -219,7 +224,7 @@ public class Argument
 		
 		private Object valueOf(String valueAsString, Class<?> argumentTypeClass)
 			throws
-				ConstraintException
+				IllegalCommandLineArgumentException
 		{
 			try {
 				return Util.valueOf(valueAsString, argumentTypeClass);
@@ -229,7 +234,7 @@ public class Argument
 					"[" + valueAsString + "] cannot be interpreted as "
 						+ argumentTypeClass.getCanonicalName()
 						+ " for '" + name() + "'";
-				throw new ConstraintException(msg, ex);
+				throw new IllegalCommandLineArgumentException(msg, ex);
 			}
 		}
 	}

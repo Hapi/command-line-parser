@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.hapiware.utils.cmdline.Util;
+import com.hapiware.utils.cmdline.constraint.ConfigurationException;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
+import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
 
 public class Command
 {
@@ -48,13 +50,17 @@ public class Command
 	
 	public Command(CommandExecutor commandExecutor)
 	{
+		if(commandExecutor == null)
+			throw new ConfigurationException("'commandExecutor' must have a value.");
+		
 		_commandExecutor = commandExecutor;
 	}
 	
 	public Command name(String name)
 	{
 		if(name == null || name.trim().length() == 0)
-			throw new NullPointerException("'name' must have a value.");
+			throw new ConfigurationException("'name' must have a value.");
+		
 		_command.name(name);
 		return this;
 	}
@@ -62,7 +68,8 @@ public class Command
 	public Command alternatives(String...alternatives)
 	{
 		if(alternatives == null || alternatives.length == 0)
-			throw new NullPointerException("'alternatives' must have a value.");
+			throw new ConfigurationException("'alternatives' must have a value.");
+		
 		_command.alternatives(alternatives);
 		return this;
 	}
@@ -70,7 +77,8 @@ public class Command
 	public Command id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
-			throw new NullPointerException("'id' must have a value.");
+			throw new ConfigurationException("'id' must have a value.");
+		
 		_command.id(id);
 		return this;
 	}
@@ -78,7 +86,7 @@ public class Command
 	public Command shortDescription(String shortDescription)
 	{
 		if(shortDescription == null || shortDescription.trim().length() == 0)
-			throw new NullPointerException("'shortDescription' must have a value.");
+			throw new ConfigurationException("'shortDescription' must have a value.");
 
 		_shortDescription = shortDescription;
 		return this;
@@ -87,7 +95,8 @@ public class Command
 	public Command description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
-			throw new NullPointerException("'description' must have a value.");
+			throw new ConfigurationException("'description' must have a value.");
+		
 		_command.description(description);
 		return this;
 	}
@@ -100,18 +109,20 @@ public class Command
 	public <T> Command add(Class<T> argumentType, Argument argument)
 	{
 		if(argument == null)
-			throw new NullPointerException("'argument' must have a value.");
+			throw new ConfigurationException("'argument' must have a value.");
 		
 		Argument.Inner<T> inner = new Argument.Inner<T>(argument, argumentType);
 		if(inner.name() == null || inner.name().trim().length() == 0)
-			throw new NullPointerException("'argument' must have a name.");
+			throw new ConfigurationException("'argument' must have a name.");
+		
 		_definedArguments.put(inner.name(), inner);
 		if(!inner.optional()) {
 			_mandatoryArguments = true;
 			if(_numOfOptionalArguments >= 2) {
 				String msg =
-					"If there is more than one optional argument they must be the last arguments.";
-				throw new IllegalStateException(msg);
+					"If there are more than one optional argument they must be the last arguments."
+						+ " A single optional argument can have any position.";
+				throw new ConfigurationException(msg);
 			}
 		}
 		else
@@ -121,14 +132,15 @@ public class Command
 	public Command add(Option option)
 	{
 		if(option == null)
-			throw new NullPointerException("'option' must have a value.");
+			throw new ConfigurationException("'option' must have a value.");
 		
 		if(option == null)
-			throw new NullPointerException("'option' must have a value.");
+			throw new ConfigurationException("'option' must have a value.");
 		
 		Option.Inner inner = new Option.Inner(option);
 		if(inner.name() == null || inner.name().trim().length() == 0)
-			throw new NullPointerException("'option' must have a name.");
+			throw new ConfigurationException("'option' must have a name.");
+		
 		_definedOptions.put(inner.name(), inner);
 		_definedOptionAlternatives.put(inner.name(), inner.name());
 		for(String alternative : inner.alternatives())
@@ -184,7 +196,8 @@ public class Command
 		}
 		public boolean parse(List<String> arguments)
 			throws
-				ConstraintException
+				ConstraintException,
+				IllegalCommandLineArgumentException
 		{
 			if(arguments.size() == 0)
 				return false;

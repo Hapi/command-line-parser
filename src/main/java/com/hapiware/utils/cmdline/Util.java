@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import com.hapiware.utils.cmdline.annotation.Id;
 import com.hapiware.utils.cmdline.constraint.AnnotatedFieldSetException;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
+import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
 import com.hapiware.utils.cmdline.element.Argument;
 import com.hapiware.utils.cmdline.element.Option;
 
@@ -35,7 +36,7 @@ public class Util
 		Map<String, String> definedOptionAlternatives,
 		Set<Option.Inner> nonMultipleOptionCheckSet,
 		List<Option.Inner> cmdLineOptions
-	) throws ConstraintException
+	) throws ConstraintException, IllegalCommandLineArgumentException
 	{
 		Option.Inner option = definedOptions.get(definedOptionAlternatives.get(arg));
 		if(option != null)
@@ -62,7 +63,7 @@ public class Util
 		List<String> cmdLineArgs,
 		Map<String, Argument.Inner<?>> definedArguments,
 		List<Argument.Inner<?>> outputArguments
-	) throws ConstraintException
+	) throws ConstraintException, IllegalCommandLineArgumentException
 	{
 		int numberOfOptionalArguments = 0;
 		Set<Entry<String, Argument.Inner<?>>> entrySet = definedArguments.entrySet();

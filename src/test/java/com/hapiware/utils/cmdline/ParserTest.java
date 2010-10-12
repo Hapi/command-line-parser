@@ -1,9 +1,6 @@
 package com.hapiware.utils.cmdline;
 
 import com.hapiware.utils.cmdline.annotation.Id;
-import com.hapiware.utils.cmdline.constraint.AnnotatedFieldSetException;
-import com.hapiware.utils.cmdline.constraint.CommandNotFoundException;
-import com.hapiware.utils.cmdline.constraint.ConstraintException;
 import com.hapiware.utils.cmdline.constraint.Enumeration;
 import com.hapiware.utils.cmdline.element.Argument;
 import com.hapiware.utils.cmdline.element.Command;
@@ -90,30 +87,11 @@ public class ParserTest
 			}});
 		}});
 		
-		/**p.add(new Argument<Integer>() {{
-			name("ID");
-			description("mui").endParagraph();
-			description("mui");
-		}});*/
 		
 		
-		try {
-			p.parse(
-				new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "1000" }
-			);
-		}
-		catch(ConstraintException e) {
-			System.out.println(e.getMessage());
-			System.exit(-1);
-		}
-		catch(AnnotatedFieldSetException e) {
-			System.out.println(e.getMessage());
-			System.exit(-1);
-		}
-		catch(CommandNotFoundException e) {
-			System.out.println(e.getMessage());
-			System.exit(-1);
-		}
+		p.parsePrintAndExitOnError(
+			new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "1000" }
+		);
 		
 		System.out.println(p.optionExists("-m"));
 		System.out.println(p.optionExists("-a"));

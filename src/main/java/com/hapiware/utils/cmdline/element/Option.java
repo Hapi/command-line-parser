@@ -3,7 +3,9 @@ package com.hapiware.utils.cmdline.element;
 import java.util.List;
 import java.util.Set;
 
+import com.hapiware.utils.cmdline.constraint.ConfigurationException;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
+import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
 
 
 public class Option
@@ -28,9 +30,9 @@ public class Option
 	public Option name(String name)
 	{
 		if(name == null || name.trim().length() == 0)
-			throw new NullPointerException("'name' must have a value.");
+			throw new ConfigurationException("'name' must have a value.");
 		if(name.startsWith("-"))
-			throw new IllegalArgumentException("'name' must not start with minus (-).");
+			throw new ConfigurationException("'name' must not start with minus (-).");
 		
 		_option.name(addOptionMinus(name));
 		return this;
@@ -39,7 +41,8 @@ public class Option
 	public Option alternatives(String...alternatives)
 	{
 		if(alternatives == null || alternatives.length == 0)
-			throw new NullPointerException("'alternatives' must have a value.");
+			throw new ConfigurationException("'alternatives' must have a value.");
+		
 		for(int i = 0; i < alternatives.length; i++)
 			alternatives[i] = addOptionMinus(alternatives[i]);
 		_option.alternatives(alternatives);
@@ -49,7 +52,8 @@ public class Option
 	public Option id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
-			throw new NullPointerException("'id' must have a value.");
+			throw new ConfigurationException("'id' must have a value.");
+		
 		_option.id(id);
 		return this;
 	}
@@ -57,7 +61,8 @@ public class Option
 	public Option description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
-			throw new NullPointerException("'description' must have a value.");
+			throw new ConfigurationException("'description' must have a value.");
+		
 		_option.description(description);
 		return this;
 	}
@@ -70,14 +75,15 @@ public class Option
 	public <T> Option set(Class<T> argumentType, Argument argument)
 	{
 		if(argumentType == null)
-			throw new NullPointerException("'argumentType' must have a value.");
+			throw new ConfigurationException("'argumentType' must have a value.");
 		if(argument == null)
-			throw new NullPointerException("'argument' must have a value.");
+			throw new ConfigurationException("'argument' must have a value.");
 		
 		argument.id(removeOptionMinusFromId(_option.id()));
 		_definedArgument = new Argument.Inner<T>(argument, argumentType);
 		if(_definedArgument.id() == null || _definedArgument.id().trim().length() == 0)
-			throw new NullPointerException("'argument' must have an id.");
+			throw new ConfigurationException("'argument' must have an id.");
+		
 		return this;
 	}
 	
@@ -145,7 +151,8 @@ public class Option
 		}
 		public boolean parse(List<String> arguments)
 			throws
-				ConstraintException
+				ConstraintException,
+				IllegalCommandLineArgumentException
 		{
 			if(arguments.size() == 0)
 				return false;
