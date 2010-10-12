@@ -45,7 +45,7 @@ public class Argument
 	public Argument id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
-			throw new ConfigurationException("'id' must have a value.");
+			throw new ConfigurationException("'id' for '" + _argument.name() + "' must have a value.");
 		
 		_argument.id(id);
 		return this;
@@ -54,7 +54,10 @@ public class Argument
 	public Argument description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
-			throw new ConfigurationException("'description' must have a value.");
+			throw
+				new ConfigurationException(
+					"'description' for '" + _argument.name() + "' must have a value."
+				);
 		
 		_argument.description(description);
 		return this;
@@ -74,7 +77,10 @@ public class Argument
 	public <T> Argument optional(T defaultValue)
 	{
 		if(defaultValue == null || defaultValue.toString().length() == 0)
-			throw new NullPointerException("'defaultValue' must have a value.");
+			throw
+				new ConfigurationException(
+					"'defaultValue' for '" + _argument.name() + "' must have a value."
+				);
 		
 		_defaultForOptional = defaultValue.toString();
 		_optional = true;

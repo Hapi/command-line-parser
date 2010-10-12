@@ -63,7 +63,10 @@ public class Command
 			throw new ConfigurationException("'name' must have a value.");
 		
 		if(commandExecutor == null)
-			throw new ConfigurationException("'commandExecutor' must have a value.");
+			throw
+				new ConfigurationException(
+					"'commandExecutor' for command '" + name + "' must have a value."
+				);
 		
 		_command.name(name);
 		_commandExecutor = commandExecutor;
@@ -73,7 +76,10 @@ public class Command
 	public Command alternatives(String...alternatives)
 	{
 		if(alternatives == null || alternatives.length == 0)
-			throw new ConfigurationException("'alternatives' must have a value.");
+			throw
+				new ConfigurationException(
+					"'alternatives' for command '" + _command.name() + "' must have a value."
+				);
 		
 		_command.alternatives(alternatives);
 		return this;
@@ -82,7 +88,10 @@ public class Command
 	public Command id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
-			throw new ConfigurationException("'id' must have a value.");
+			throw
+				new ConfigurationException(
+					"'id' for command '" + _command.name() + "' must have a value."
+				);
 		
 		_command.id(id);
 		return this;
@@ -91,7 +100,10 @@ public class Command
 	public Command shortDescription(String shortDescription)
 	{
 		if(shortDescription == null || shortDescription.trim().length() == 0)
-			throw new ConfigurationException("'shortDescription' must have a value.");
+			throw
+				new ConfigurationException(
+					"'shortDescription' for command '" + _command.name() + "' must have a value."
+				);
 
 		_shortDescription = shortDescription;
 		return this;
@@ -100,7 +112,10 @@ public class Command
 	public Command description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
-			throw new ConfigurationException("'description' must have a value.");
+			throw
+				new ConfigurationException(
+					"'description' for command '" + _command.name() + "'  must have a value."
+				);
 		
 		_command.description(description);
 		return this;
@@ -114,18 +129,29 @@ public class Command
 	public <T> Command add(Class<T> argumentType, Argument argument)
 	{
 		if(argument == null)
-			throw new ConfigurationException("'argument' must have a value.");
+			throw
+				new ConfigurationException(
+					"'argument' for command '" + _command.name() + "' must have a value."
+				);
 		
 		Argument.Inner<T> inner = new Argument.Inner<T>(argument, argumentType);
 		if(inner.name() == null || inner.name().trim().length() == 0)
-			throw new ConfigurationException("'argument' must have a name.");
+			throw
+				new ConfigurationException(
+					"'argument' for command '" + _command.name() + "' must have a name."
+				);
 		
 		if(inner.description().size() == 0)
-			throw new ConfigurationException("'argument' must have a description.");
+			throw
+				new ConfigurationException(
+					"Argument '" + inner.name() + "' for command '" 
+						+ _command.name() + "' must have a description."
+				);
 		
 		if(_useAnnotations && inner.optional() && !inner.hasDefaultValueForOptional()) {
 			String msg =
-				"When annotations are used then optional arguments must have a default value. "
+				"When annotations are used then optional arguments must have a default value "
+					+ "(Command '" + _command.name() + "', argument '" + inner.name() + "'). "
 					+ "Use Argument.optional(T) instead of Argument.optional().";
 			throw new ConfigurationException(msg);
 		}
@@ -135,8 +161,9 @@ public class Command
 			_mandatoryArguments = true;
 			if(_numOfOptionalArguments >= 2) {
 				String msg =
-					"If there are more than one optional argument they must be the last arguments."
-						+ " A single optional argument can have any position.";
+					"If there are more than one optional argument they must be the last arguments. "
+						+ "(Command '" + _command.name() + "', argument '" + inner.name() + "'). "
+						+ "A single optional argument can have any position.";
 				throw new ConfigurationException(msg);
 			}
 		}
@@ -148,14 +175,24 @@ public class Command
 	public Command add(Option option)
 	{
 		if(option == null)
-			throw new ConfigurationException("'option' must have a value.");
+			throw
+				new ConfigurationException(
+					"'option' for command '" + _command.name() + "' must have a value."
+				);
 		
 		Option.Inner inner = new Option.Inner(option);
 		if(inner.name() == null || inner.name().trim().length() == 0)
-			throw new ConfigurationException("'option' must have a name.");
+			throw
+				new ConfigurationException(
+					"'option' for command '" + _command.name() + "' must have a name."
+				);
 		
 		if(inner.description().size() == 0)
-			throw new ConfigurationException("'option' must have a description.");
+			throw
+				new ConfigurationException(
+					"Option '" + inner.name() + "' for command '" 
+						+ _command.name() + "' must have a description."
+				);
 		
 		_definedOptions.put(inner.name(), inner);
 		_definedOptionAlternatives.put(inner.name(), inner.name());

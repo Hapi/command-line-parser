@@ -55,7 +55,8 @@ public class CommandLineParser
 			throw new ConfigurationException("'option' must have a name.");
 		
 		if(inner.description().size() == 0)
-			throw new ConfigurationException("'option' must have a description.");
+			throw
+				new ConfigurationException("Option '" + inner.name() + "' must have a description.");
 		
 		_definedGlobalOptions.put(inner.name(), inner);
 		_definedOptionGlobalAlternatives.put(inner.name(), inner.name());
@@ -80,10 +81,14 @@ public class CommandLineParser
 			throw new ConfigurationException("'command' must have a name.");
 		
 		if(inner.shortDescription() == null || inner.shortDescription().length() == 0)
-			throw new ConfigurationException("'command' must have a short description.");
+			throw
+				new ConfigurationException(
+					"Command '" + inner.name() + "' must have a short description."
+				);
 		
 		if(inner.description().size() == 0)
-			throw new ConfigurationException("'command' must have a description.");
+			throw
+				new ConfigurationException("Command '" + inner.name() + "' must have a description.");
 		
 		_definedCommands.put(inner.name(), inner);
 		_definedCommandAlternatives.put(inner.name(), inner.name());
@@ -107,11 +112,13 @@ public class CommandLineParser
 			throw new ConfigurationException("'argument' must have a name.");
 		
 		if(inner.description().size() == 0)
-			throw new ConfigurationException("'argument' must have a description.");
+			throw
+				new ConfigurationException("Argument '" + inner.name() + "' must have a description.");
 		
 		if(_useAnnotations && inner.optional() && !inner.hasDefaultValueForOptional()) {
 			String msg =
-				"When annotations are used then optional arguments must have a default value. "
+				"When annotations are used then optional arguments must have a default value "
+					+ "('" + inner.name() + "'). "
 					+ "Use Argument.optional(T) instead of Argument.optional().";
 			throw new ConfigurationException(msg);
 		}
@@ -121,7 +128,8 @@ public class CommandLineParser
 			_mandatoryArguments = true;
 			if(_numOfOptionalArguments >= 2) {
 				String msg =
-					"If there are more than one optional argument they must be the last arguments."
+					"If there are more than one optional argument they must be the last arguments "
+						+ "('" + inner.name() + "'). "
 						+ " A single optional argument can have any position.";
 				throw new ConfigurationException(msg);
 			}
@@ -204,6 +212,7 @@ public class CommandLineParser
 	{
 		if(callerObject == null)
 			throw new NullPointerException("'callerObject' must have a value.");
+		
 		parse(callerObject, null, args);
 	}
 	
@@ -217,6 +226,7 @@ public class CommandLineParser
 	{
 		if(callerClass == null)
 			throw new NullPointerException("'callerClass' must have a value.");
+		
 		parse(null, callerClass, args);
 	}
 

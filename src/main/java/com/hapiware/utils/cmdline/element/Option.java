@@ -28,7 +28,10 @@ public class Option
 		if(name == null || name.trim().length() == 0)
 			throw new ConfigurationException("'name' must have a value.");
 		if(name.startsWith("-"))
-			throw new ConfigurationException("'name' must not start with minus (-).");
+			throw
+				new ConfigurationException(
+					"'name' for option '" + name + "' must not start with minus (-)."
+				);
 		
 		_option.name(addOptionMinus(name));
 	}
@@ -36,7 +39,10 @@ public class Option
 	public Option alternatives(String...alternatives)
 	{
 		if(alternatives == null || alternatives.length == 0)
-			throw new ConfigurationException("'alternatives' must have a value.");
+			throw
+				new ConfigurationException(
+					"'alternatives' for option '" + _option.name() + "' must have a value."
+				);
 		
 		for(int i = 0; i < alternatives.length; i++)
 			alternatives[i] = addOptionMinus(alternatives[i]);
@@ -47,7 +53,10 @@ public class Option
 	public Option id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
-			throw new ConfigurationException("'id' must have a value.");
+			throw
+				new ConfigurationException(
+					"'id' for option '" + _option.name() + "' must have a value."
+				);
 		
 		_option.id(id);
 		return this;
@@ -56,7 +65,10 @@ public class Option
 	public Option description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
-			throw new ConfigurationException("'description' must have a value.");
+			throw
+				new ConfigurationException(
+					"'description' for option '" + _option.name() + "' must have a value."
+				);
 		
 		_option.description(description);
 		return this;
@@ -79,14 +91,20 @@ public class Option
 		if(_definedArgument.name() != null)
 			throw
 				new ConfigurationException(
-					"Only the option can have a name. 'argument' must not have a name."
+					"Only the option '" + _option.name() + "' can have a name. "
+						+"'argument' must not have a name." 
 				);
 		if(_definedArgument.id() == null || _definedArgument.id().trim().length() == 0)
-			throw new ConfigurationException("'argument' must have an id.");
+			throw 
+				new ConfigurationException(
+					"'argument' for option '" + _option.name() + "' must have an id."
+				);
+		
 		if(_definedArgument.description().size() > 0)
 			throw
 				new ConfigurationException(
-					"Only the option can have a description. 'argument' must not have a description."
+					"Only the option '" + _option.name() + "' can have a description. "
+						+ "'argument' must not have a description."
 				);
 		
 		return this;
