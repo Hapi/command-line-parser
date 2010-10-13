@@ -1,18 +1,15 @@
 package com.hapiware.utils.cmdline.element;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class ElementBase
 {
-	public final static String END_PARAGRAPH = "\n\n";
-	
 	private String _name;
 	private Set<String> _alternatives = new HashSet<String>();
 	private String _id;
-	private List<String> _description = new ArrayList<String>();
+	private Description _description = new Description();
 	
 
 	public ElementBase()
@@ -47,11 +44,11 @@ public class ElementBase
 	
 	public void description(String description)
 	{
-		_description.add(description);
+		_description.description(description);
 	}
 	public void p()
 	{
-		_description.add(END_PARAGRAPH);
+		_description.p();
 	}
 	
 	public String name()
@@ -76,7 +73,7 @@ public class ElementBase
 	
 	public List<String> description()
 	{
-		return _description;
+		return _description.toParagraphs();
 	}
 
 	@Override

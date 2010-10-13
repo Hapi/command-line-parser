@@ -3,6 +3,8 @@ package com.hapiware.utils.cmdline.constraint;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.hapiware.utils.cmdline.element.Description;
+
 
 public class Enumeration
 	implements
@@ -22,7 +24,7 @@ public class Enumeration
 		String str = (String)value;
 		boolean isOk = false;
 		for(Enum e : _enumerations) {
-			if(e.isIgnoreCase()) {
+			if(e._ignoreCase) {
 				if(e.value().equalsIgnoreCase(str)) {
 					isOk = true;
 					break;
@@ -44,6 +46,17 @@ public class Enumeration
 		}
 	}
 
+
+	public Description description()
+	{
+		Description description = new Description();
+		for(Enum e : _enumerations) {
+			if(e._description == null || e._description.trim().length() == 0)
+				return null;
+			description.strong(e.value()).description(e._description).p();
+		}
+		return description;
+	}
 	
 	public static class Enum {
 		private String _value;
@@ -71,15 +84,6 @@ public class Enumeration
 			return _value;
 		}
 		
-		public boolean isIgnoreCase()
-		{
-			return _ignoreCase;
-		}
-		
-		public String description()
-		{
-			return _description;
-		}
 		
 		@Override
 		public boolean equals(Object obj)

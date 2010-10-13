@@ -11,6 +11,7 @@ import com.hapiware.utils.cmdline.constraint.CommandNotFoundException;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
 import com.hapiware.utils.cmdline.constraint.Enumeration;
 import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
+import com.hapiware.utils.cmdline.element.Description;
 import com.hapiware.utils.cmdline.element.Option;
 import com.hapiware.utils.cmdline.element.OptionArgument;
 
@@ -34,7 +35,11 @@ public class SimpleTest
 	@Test
 	public void normalCase()
 	{
-		CommandLineParser p = new CommandLineParser();
+		CommandLineParser p =
+			new CommandLineParser(
+				ParserTest.class,
+				new Description().description("Main description.")
+			);
 		p.add(new Option("v") {{
 			alternatives("verbose").id("ver");
 			description("Description");
@@ -100,7 +105,11 @@ public class SimpleTest
 	@Test
 	public void defaultValuesForOptionalArguments()
 	{
-		CommandLineParser p = new CommandLineParser();
+		CommandLineParser p =
+			new CommandLineParser(
+				ParserTest.class,
+				new Description().description("Main description.")
+			);
 		p.add(new Option("n") {{
 			description("Description");
 			set(Integer.class, new OptionArgument() {{
@@ -144,7 +153,11 @@ public class SimpleTest
 	@Test
 	public void settingAnnotatedArray()
 	{
-		CommandLineParser p = new CommandLineParser();
+		CommandLineParser p =
+			new CommandLineParser(
+				ParserTest.class,
+				new Description().description("Main description.")
+			);
 		p.add(new Option("nums") {{
 			multiple().id("intarray");
 			description("Description");

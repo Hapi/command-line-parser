@@ -4,8 +4,10 @@ import com.hapiware.utils.cmdline.annotation.Id;
 import com.hapiware.utils.cmdline.constraint.Enumeration;
 import com.hapiware.utils.cmdline.element.Argument;
 import com.hapiware.utils.cmdline.element.Command;
+import com.hapiware.utils.cmdline.element.Description;
 import com.hapiware.utils.cmdline.element.Option;
 import com.hapiware.utils.cmdline.element.OptionArgument;
+import com.hapiware.utils.cmdline.writer.ScreenWriter;
 
 public class ParserTest
 {
@@ -27,7 +29,11 @@ public class ParserTest
 	
 	public static void main(String[] args)
 	{
-		CommandLineParser p = new CommandLineParser();
+		CommandLineParser p =
+			new CommandLineParser(
+				ParserTest.class,
+				new Description().description("Main description.").p().description("Something else.")
+			);
 		p.add(new Option("m") {{
 			alternatives("moi").id("miu");
 			description("dfšlasjdfa lsfj");
@@ -53,8 +59,8 @@ public class ParserTest
 			set(String.class, new OptionArgument() {{
 				//maxLength(5);
 				constraint(new Enumeration() {{
-					value("J").ignoreCase();
-					value("4");
+					value("J").ignoreCase().description("For Java loggers.");
+					value("4").description("For log4j loggers.");
 				}});
 			}});
 		}});
@@ -88,6 +94,7 @@ public class ParserTest
 			}});
 		}});
 		
+		p.printHelp(new ScreenWriter(80));
 		
 		
 		p.parsePrintAndExitOnError(

@@ -291,7 +291,7 @@ public class Util
 		return valueAsString;
 	}
 
-
+	
 	public static void write(String text, int column, int width, OutputStream out)
 	{
 		if(column >= width)
@@ -321,7 +321,8 @@ public class Util
 			pos += token.length() + 1;
 			toWrite += token + " ";
 		}
-		toWrite += CR;
+		if(toWrite.trim().length() > 0)
+			toWrite += CR;
 		try {
 			out.write(toWrite.getBytes());
 		}

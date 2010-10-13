@@ -3,6 +3,8 @@ package com.hapiware.utils.cmdline.constraint;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import com.hapiware.utils.cmdline.element.Description;
+
 
 public class MaxValue
 	implements
@@ -42,5 +44,10 @@ public class MaxValue
 					+ _maxValue + " allowed for '" + argumentName + "'"; 
 			throw new ConstraintException(str);
 		}
+	}
+
+	public Description description()
+	{
+		return new Description().description("Maximum value is " + _maxValue);
 	}
 }

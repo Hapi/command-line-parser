@@ -1,5 +1,7 @@
 package com.hapiware.utils.cmdline.constraint;
 
+import com.hapiware.utils.cmdline.element.Description;
+
 
 public class MinLength
 	implements
@@ -20,5 +22,10 @@ public class MinLength
 					+ _minLength + " allowed for '" + argumentName + "'"; 
 			throw new ConstraintException(str);
 		}
+	}
+
+	public Description description()
+	{
+		return new Description().description("Minimum length is " + _minLength + " characters.");
 	}
 }

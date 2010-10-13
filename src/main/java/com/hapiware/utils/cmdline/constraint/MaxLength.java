@@ -1,5 +1,7 @@
 package com.hapiware.utils.cmdline.constraint;
 
+import com.hapiware.utils.cmdline.element.Description;
+
 
 public class MaxLength
 	implements
@@ -20,5 +22,10 @@ public class MaxLength
 					+ _maxLength + " allowed for '" + argumentName + "'"; 
 			throw new ConstraintException(str);
 		}
+	}
+
+	public Description description()
+	{
+		return new Description().description("Maximum length is " + _maxLength + " characters.");
 	}
 }

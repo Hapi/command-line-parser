@@ -8,6 +8,7 @@ import com.hapiware.utils.cmdline.Util;
 import com.hapiware.utils.cmdline.constraint.ConfigurationException;
 import com.hapiware.utils.cmdline.constraint.Constraint;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
+import com.hapiware.utils.cmdline.constraint.Enumeration;
 import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
 import com.hapiware.utils.cmdline.constraint.MaxLength;
 import com.hapiware.utils.cmdline.constraint.MaxValue;
@@ -18,6 +19,7 @@ public class Argument
 {
 	private ElementBase _argument = new ElementBase();
 	private List<Constraint> _constraints = new LinkedList<Constraint>();
+	private boolean _hasEnumConstraint = false;
 	private boolean _optional;
 	private String _defaultForOptional;
 	
@@ -89,6 +91,19 @@ public class Argument
 	
 	public Argument constraint(Constraint constraint)
 	{
+		String forName = _argument.name() == null ? "" : " for " + _argument.name();
+		if(constraint == null)
+			throw new ConfigurationException("'constraint'" + forName + " must have a value.");
+		if(_hasEnumConstraint)
+			throw
+				new ConfigurationException(
+					"Only one Enumeration constraint can be defined" + forName + "."
+				);
+		if(constraint instanceof Enumeration)
+			_hasEnumConstraint = true;
+		if(constraint.description() == null || constraint.description().toParagraphs().size() == 0)
+			throw new ConfigurationException("A missing constraint description" + forName + ".");
+		
 		_constraints.add(constraint);
 		return this;
 	}
