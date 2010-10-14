@@ -21,7 +21,7 @@ public class Enumeration
 
 	public void evaluate(String argumentName, Object value) throws ConstraintException
 	{
-		String str = (String)value;
+		String str = value.toString();
 		boolean isOk = false;
 		for(Enum e : _enumerations) {
 			if(e._ignoreCase) {

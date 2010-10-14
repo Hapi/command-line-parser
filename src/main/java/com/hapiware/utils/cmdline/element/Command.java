@@ -28,7 +28,6 @@ public class Command
 	private int _numOfOptionalArguments;
 	private List<Option.Inner> _cmdLineOptions = new ArrayList<Option.Inner>(); 
 	private List<Argument.Inner<?>> _cmdLineArguments = new ArrayList<Argument.Inner<?>>();
-	private boolean _useAnnotations;
 	
 	
 	private Command(Command command)
@@ -39,7 +38,6 @@ public class Command
 		_cmdLineOptions.addAll(command._cmdLineOptions);
 		_cmdLineArguments.addAll(command._cmdLineArguments);
 		_numOfOptionalArguments = command._numOfOptionalArguments;
-		_useAnnotations = command._useAnnotations;
 		_shortDescription = command._shortDescription;
 		
 		// References are ok here.
@@ -67,7 +65,6 @@ public class Command
 
 		_command.name(name);
 		_commandExecutor = null;
-		_useAnnotations = true;
 		_shortDescription = shortDescription;
 	}
 	
@@ -96,7 +93,6 @@ public class Command
 		
 		_command.name(name);
 		_commandExecutor = commandExecutor;
-		_useAnnotations = true;
 		_shortDescription = shortDescription;
 	}
 	
@@ -180,12 +176,17 @@ public class Command
 					"Argument '" + inner.name() + "' for command '" 
 						+ _command.name() + "' must have a description."
 				);
-		
-		if(_useAnnotations && inner.optional() && !inner.hasDefaultValueForOptional()) {
+		if(_definedArguments.containsKey(inner.name()))
+			throw
+				new ConfigurationException(
+					"Argument name '" + inner.name() + "' for command '" 
+						+ _command.name() +"' must be unique."
+				);
+
+		if(inner.optional() && !inner.hasDefaultValueForOptional()) {
 			String msg =
 				"When annotations are used then optional arguments must have a default value "
-					+ "(Command '" + _command.name() + "', argument '" + inner.name() + "'). "
-					+ "Use Argument.optional(T) instead of Argument.optional().";
+					+ "(Command '" + _command.name() + "', argument '" + inner.name() + "').";
 			throw new ConfigurationException(msg);
 		}
 		
@@ -226,11 +227,22 @@ public class Command
 					"Option '" + inner.name() + "' for command '" 
 						+ _command.name() + "' must have a description."
 				);
+		if(_definedOptionAlternatives.containsKey(inner.name()))
+			throw
+				new ConfigurationException(
+					"Option name '" + inner.name() + "' for command '" 
+						+ _command.name() + "'must be unique."
+				);
 		
 		_definedOptions.put(inner.name(), inner);
 		_definedOptionAlternatives.put(inner.name(), inner.name());
 		for(String alternative : inner.alternatives())
-			_definedOptionAlternatives.put(alternative, inner.name());
+			if(_definedOptionAlternatives.put(alternative, inner.name()) != null)
+				throw
+					new ConfigurationException(
+						"Option alternative name '" + alternative + "' for command '" 
+							+ _command.name() + "'must be unique."
+					);
 		
 		return this;
 	}
@@ -244,10 +256,9 @@ public class Command
 		{
 			_outer = new Command(inner._outer);
 		}
-		public Inner(Command outer, boolean useAnnotations)
+		public Inner(Command outer)
 		{
 			_outer = outer;
-			_outer._useAnnotations = useAnnotations;
 		}
 		public String name()
 		{

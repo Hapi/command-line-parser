@@ -96,18 +96,12 @@ public class Argument
 		return this;
 	}
 	
-	public Argument optional()
-	{
-		_optional = true;
-		return this;
-	}
-	
 	public <T> Argument optional(T defaultValue)
 	{
-		if(defaultValue == null || defaultValue.toString().length() == 0)
+		if(defaultValue == null)
 			throw
 				new ConfigurationException(
-					"'defaultValue' for '" + _argument.name() + "' must have a value."
+					"'defaultValue' for '" + _argument.name() + "' cannot be null."
 				);
 		
 		_defaultForOptional = defaultValue.toString();
@@ -241,7 +235,7 @@ public class Argument
 				value(_argumentTypeClass.cast(valueOf(arguments.get(0), _argumentTypeClass)));
 			}
 			catch(IllegalCommandLineArgumentException e) {
-				if(defaultValueAdded)
+				if(!optional() || defaultValueAdded)
 					throw e;
 				else {
 					if(defaultValue() != null) {

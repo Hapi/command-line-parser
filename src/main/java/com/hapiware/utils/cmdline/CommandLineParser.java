@@ -39,7 +39,7 @@ public class CommandLineParser
 	
 	private final Description _description;
 	private Map<String, Option.Inner> _definedGlobalOptions = new LinkedHashMap<String, Option.Inner>();
-	private Map<String, String> _definedOptionGlobalAlternatives = new HashMap<String, String>();
+	private Map<String, String> _definedGlobalOptionAlternatives = new HashMap<String, String>();
 	private Map<String, Command.Inner> _definedCommands = new LinkedHashMap<String, Command.Inner>();
 	private Map<String, String> _definedCommandAlternatives = new HashMap<String, String>();
 	private Map<String, Argument.Inner<?>> _definedArguments =
@@ -49,7 +49,6 @@ public class CommandLineParser
 	private List<Option.Inner> _cmdLineOptions = new ArrayList<Option.Inner>(); 
 	private Command.Inner _cmdLineCommand;
 	private List<Argument.Inner<?>> _cmdLineArguments = new ArrayList<Argument.Inner<?>>();
-	private final boolean _useAnnotations;
 	private final Class<?> _mainClass;
 	private final String _javaCommand;
 	private Set<HelpType> _definedArgumentTypes = new HashSet<HelpType>();
@@ -68,7 +67,6 @@ public class CommandLineParser
 		if(description == null)
 			throw new NullPointerException("'description' must have a value.");
 		
-		_useAnnotations = true;
 		_mainClass = mainClass;
 		_writer = new ScreenWriter(screenWidth);
 		_javaCommand = "java -jar " + _mainClass.getPackage().getImplementationTitle() + ".jar";
@@ -78,7 +76,6 @@ public class CommandLineParser
 	public CommandLineParser(
 		Class<?> mainClass,
 		Writer writer,
-		boolean useAnnotations,
 		Description description
 	)
 	{
@@ -89,7 +86,6 @@ public class CommandLineParser
 		if(description == null)
 			throw new NullPointerException("'description' must have a value.");
 		
-		_useAnnotations = useAnnotations;
 		_mainClass = mainClass;
 		_writer = writer;
 		_javaCommand = "java -jar " + _mainClass.getPackage().getImplementationTitle() + ".jar";
@@ -108,11 +104,18 @@ public class CommandLineParser
 		if(inner.description().size() == 0)
 			throw
 				new ConfigurationException("Option '" + inner.name() + "' must have a description.");
+		if(_definedGlobalOptionAlternatives.containsKey(inner.name()))
+			throw
+				new ConfigurationException("Option name '" + inner.name() + "' must be unique.");
 		
 		_definedGlobalOptions.put(inner.name(), inner);
-		_definedOptionGlobalAlternatives.put(inner.name(), inner.name());
+		_definedGlobalOptionAlternatives.put(inner.name(), inner.name());
 		for(String alternative : inner.alternatives())
-			_definedOptionGlobalAlternatives.put(alternative, inner.name());
+			if(_definedGlobalOptionAlternatives.put(alternative, inner.name()) != null)
+				throw
+					new ConfigurationException(
+						"Option alternative name '" + alternative + "' must be unique."
+					);
 		
 		_definedArgumentTypes.add(HelpType.OPTIONS);
 	}
@@ -129,7 +132,7 @@ public class CommandLineParser
 		if(command == null)
 			throw new ConfigurationException("'command' must have a value.");
 		
-		Command.Inner inner = new Command.Inner(command, _useAnnotations);
+		Command.Inner inner = new Command.Inner(command);
 		if(inner.name() == null || inner.name().trim().length() == 0)
 			throw new ConfigurationException("'command' must have a name.");
 		
@@ -142,11 +145,18 @@ public class CommandLineParser
 		if(inner.description().size() == 0)
 			throw
 				new ConfigurationException("Command '" + inner.name() + "' must have a description.");
-		
+		if(_definedCommandAlternatives.containsKey(inner.name()))
+			throw
+				new ConfigurationException("Command name '" + inner.name() + "' must be unique.");
+
 		_definedCommands.put(inner.name(), inner);
 		_definedCommandAlternatives.put(inner.name(), inner.name());
 		for(String alternative : inner.alternatives())
-			_definedCommandAlternatives.put(alternative, inner.name());
+			if(_definedCommandAlternatives.put(alternative, inner.name()) != null)
+				throw
+					new ConfigurationException(
+						"Command alternative name '" + alternative + "' must be unique."
+					);
 		
 		_definedArgumentTypes.add(HelpType.COMMANDS);
 		if(inner.definedOptions().size() > 0)
@@ -173,12 +183,15 @@ public class CommandLineParser
 		if(inner.description().size() == 0)
 			throw
 				new ConfigurationException("Argument '" + inner.name() + "' must have a description.");
+		if(_definedArguments.containsKey(inner.name()))
+			throw
+				new ConfigurationException("Argument name '" + inner.name() + "' must be unique.");
+
 		
-		if(_useAnnotations && inner.optional() && !inner.hasDefaultValueForOptional()) {
+		if(inner.optional() && !inner.hasDefaultValueForOptional()) {
 			String msg =
 				"When annotations are used then optional arguments must have a default value "
-					+ "('" + inner.name() + "'). "
-					+ "Use Argument.optional(T) instead of Argument.optional().";
+					+ "('" + inner.name() + "').";
 			throw new ConfigurationException(msg);
 		}
 		
@@ -210,7 +223,7 @@ public class CommandLineParser
 	public boolean optionExists(String name)
 	{
 		for(Option.Inner option : _cmdLineOptions)
-			if(option.name().equals(_definedOptionGlobalAlternatives.get(name)))
+			if(option.name().equals(_definedGlobalOptionAlternatives.get(name)))
 				return true;
 		
 		return false;
@@ -235,7 +248,7 @@ public class CommandLineParser
 	{
 		List<Option.Inner> options = new ArrayList<Option.Inner>();
 		for(Option.Inner option : _cmdLineOptions)
-			if(option.name().equals(_definedOptionGlobalAlternatives.get(name)))
+			if(option.name().equals(_definedGlobalOptionAlternatives.get(name)))
 				options.add(new Option.Inner(option));
 		
 		return options.toArray(new Option.Inner[0]);
@@ -495,7 +508,7 @@ public class CommandLineParser
 					arg,
 					cmdLineArgs,
 					_definedGlobalOptions,
-					_definedOptionGlobalAlternatives,
+					_definedGlobalOptionAlternatives,
 					nonMultipleOptionCheckSet,
 					_cmdLineOptions
 				)

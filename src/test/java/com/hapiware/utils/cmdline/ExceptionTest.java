@@ -59,7 +59,11 @@ public class ExceptionTest
 		}});
 	}
 
-	@Test(expectedExceptions = {AnnotatedFieldSetException.class})
+	@Test(
+		expectedExceptions = {AnnotatedFieldSetException.class},
+		expectedExceptionsMessageRegExp =
+			".*\\[2\\] is an illegal argument for the field annotated 'type-mismatch'.*"
+	)
 	public void annotatedSetFailure()
 		throws
 			ConstraintException,
@@ -70,7 +74,11 @@ public class ExceptionTest
 		_parser.parse(this, new String[] { "--type-mismatch", "2", "set", "-a", "abc", "123" });
 	}
 	
-	@Test(expectedExceptions = {CommandNotFoundException.class})
+	@Test(
+		expectedExceptions = {CommandNotFoundException.class},
+		expectedExceptionsMessageRegExp =
+			"A command was expected but 'missing-command' cannot be interpreted as a command."
+	)
 	public void missingCommand()
 		throws
 			ConstraintException,
@@ -81,7 +89,11 @@ public class ExceptionTest
 		_parser.parse(this, new String[] { "missing-command", "-a", "abc", "123" });
 	}
 	
-	@Test(expectedExceptions = {ConstraintException.class})
+	@Test(
+		expectedExceptions = {ConstraintException.class},
+		expectedExceptionsMessageRegExp =
+			"Length of \\[ab\\] is shorter than the minimum length 3 allowed for '-a'"
+	)
 	public void tooShortStringLength()
 		throws
 			ConstraintException,
@@ -92,7 +104,11 @@ public class ExceptionTest
 		_parser.parse(this, new String[] { "set", "-a", "ab", "123" });
 	}
 
-	@Test(expectedExceptions = {ConstraintException.class})
+	@Test(
+		expectedExceptions = {ConstraintException.class},
+		expectedExceptionsMessageRegExp =
+			"Length of \\[abcdefg\\] is longer than the maximum length 6 allowed for '-a'"
+	)
 	public void tooLongStringLength()
 		throws
 			ConstraintException,
@@ -103,7 +119,11 @@ public class ExceptionTest
 		_parser.parse(this, new String[] { "set", "-a", "abcdefg", "123" });
 	}
 
-	@Test(expectedExceptions = {IllegalCommandLineArgumentException.class})
+	@Test(
+		expectedExceptions = {IllegalCommandLineArgumentException.class},
+		expectedExceptionsMessageRegExp =
+			"\\[123a\\] cannot be interpreted as java.lang.Integer for 'PID'"
+	)
 	public void wrongCommandArgument()
 		throws
 			ConstraintException,
@@ -114,7 +134,11 @@ public class ExceptionTest
 		_parser.parse(this, new String[] { "set", "-a", "abc", "123a" });
 	}
 	
-	@Test(expectedExceptions = {ConstraintException.class})
+	@Test(
+		expectedExceptions = {ConstraintException.class},
+		expectedExceptionsMessageRegExp =
+			"\\[-31\\] is smaller than the minimum value -2 allowed for 'PID'"
+	)
 	public void tooSmallValue()
 		throws
 			ConstraintException,
@@ -125,7 +149,11 @@ public class ExceptionTest
 		_parser.parse(this, new String[] { "set", "-31" });
 	}
 
-	@Test(expectedExceptions = {ConstraintException.class})
+	@Test(
+		expectedExceptions = {ConstraintException.class},
+		expectedExceptionsMessageRegExp =
+			"\\[1234\\] is greater than the maximum value 150 allowed for 'PID'"
+	)
 	public void tooBigValue()
 		throws
 			ConstraintException,
