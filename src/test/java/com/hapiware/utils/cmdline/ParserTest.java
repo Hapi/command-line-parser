@@ -7,7 +7,6 @@ import com.hapiware.utils.cmdline.element.Command;
 import com.hapiware.utils.cmdline.element.Description;
 import com.hapiware.utils.cmdline.element.Option;
 import com.hapiware.utils.cmdline.element.OptionArgument;
-import com.hapiware.utils.cmdline.writer.ScreenWriter;
 
 public class ParserTest
 {
@@ -39,6 +38,7 @@ public class ParserTest
 			description("dfšlasjdfa lsfj");
 		}});
 		p.add(new Option("n") {{
+			//multiple();
 			alternatives("number");
 			description("Description");
 			set(Integer.class, new OptionArgument() {{
@@ -59,8 +59,8 @@ public class ParserTest
 			set(String.class, new OptionArgument() {{
 				//maxLength(5);
 				constraint(new Enumeration() {{
-					value("J").ignoreCase().description("For Java loggers.");
-					value("4").description("For log4j loggers.");
+					value("J").ignoreCase().description("for Java loggers.");
+					value("4").description("for log4j loggers.");
 				}});
 			}});
 		}});
@@ -68,7 +68,7 @@ public class ParserTest
 		p.add(new Command("set") {{
 			alternatives("s").id("cmd");
 			description("Description");
-			shortDescription("Desc.");
+			shortDescription("Short desc.");
 			add(Integer.class, new Argument("PID") {{
 				description("Process ID for JVM.");
 			}});
@@ -93,12 +93,28 @@ public class ParserTest
 				description("Description");
 			}});
 		}});
+		p.addExampleArguments("set 1234 j ^.+ INFO");
 		
-		p.printHelp(new ScreenWriter(80));
+		//p.printCompleteHelp();
+		//p.printShortHelp();
+		//p.printGlobalOptionsHelp();
+		//p.printCommandsHelp();
+		//p.printCommandHelp("set");
+		/*System.out.println();
+		System.out.println("-----------------------------------");
+		System.out.println();*/
 		
 		
 		p.parsePrintAndExitOnError(
 			new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "1000" }
+			//new String[] { "--help", "cmd=set" }
+			
+			// TODO: Create a test case for these.
+			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--numbe", "1000" }
+			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "-10001" }
+			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number"}
+			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "2", "level", "--number", "1000" }
+			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "2", "level", "--number" }
 		);
 		
 		System.out.println(p.optionExists("-m"));

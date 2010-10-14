@@ -62,9 +62,9 @@ public class SimpleTest
 			description("Description");
 			set(String.class, new OptionArgument() {{
 				constraint(new Enumeration() {{
-					value("J").ignoreCase();
-					value("x");
-					value("4");
+					value("J").ignoreCase().description("Desc J.");
+					value("x").description("Desc x.");
+					value("4").description("Desc 4.");
 				}});
 			}});
 		}});

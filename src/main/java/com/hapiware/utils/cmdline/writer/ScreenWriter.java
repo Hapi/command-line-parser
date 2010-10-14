@@ -15,11 +15,19 @@ public class ScreenWriter
 		Writer
 {
 	private final static int TAB_SIZE = 4;
+	private final static int MIN_SCREEN_WIDTH = 40;
+	private final static int MAX_SCREEN_WIDTH = 250;
 	private final int _screenWidth;
 	private HeadingLevel _headingLevelForListItems;
 	
 	public ScreenWriter(int screenWidth)
 	{
+		if(screenWidth < 40)
+			throw
+				new IllegalArgumentException(
+					screenWidth + " is not an appropriate value for 'screenWidth'. "
+						+ " Value must be " + MIN_SCREEN_WIDTH + " - " + MAX_SCREEN_WIDTH + "."
+				);
 		_screenWidth = screenWidth;
 	}
 

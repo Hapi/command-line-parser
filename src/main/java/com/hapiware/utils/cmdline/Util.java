@@ -11,6 +11,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +24,7 @@ import com.hapiware.utils.cmdline.constraint.ConstraintException;
 import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
 import com.hapiware.utils.cmdline.element.Argument;
 import com.hapiware.utils.cmdline.element.Option;
+
 
 public class Util
 {
@@ -44,13 +46,15 @@ public class Util
 		if(option != null && !option.multiple()) {
 			if(nonMultipleOptionCheckSet.contains(option)) {
 				String msg = "Option '" + option.name() + "' can occur only once.";
-				throw new ConstraintException(msg);
+				throw new IllegalCommandLineArgumentException(msg);
 			}
 			else
 				nonMultipleOptionCheckSet.add(option);
 		}
 		if(option != null && option.parse(cmdLineArgs)) {
 			// Option found.
+			if(option.argument() != null)
+				option.argument().checkConstraints();
 			cmdLineOptions.add(option);
 			return true;
 		}
@@ -91,14 +95,14 @@ public class Util
 				"Too few command line arguments for command '" + commandName + "'. "
 					+ "Expected min: " + numberOfMandatoryArguments
 					+ " but was: " + numberOfCmdLineArguments;
-			throw new ConstraintException(msg);
+			throw new IllegalCommandLineArgumentException(msg);
 		}
 		if(numberOfCmdLineArguments > numberOfMaximumArguments) {
 			String msg =
 				"Too many command line arguments for command '" + commandName + "'. "
 					+ "Expected max: " + numberOfMaximumArguments
 					+ " but was: " + numberOfCmdLineArguments;
-			throw new ConstraintException(msg);
+			throw new IllegalCommandLineArgumentException(msg);
 		}
 
 		for(Iterator<?> it = entrySet.iterator(); it.hasNext();) {
@@ -106,16 +110,18 @@ public class Util
 			Argument.Inner<?> argument = entry.getValue();
 			if(argument.optional() && numberOfCmdLineArguments < entrySet.size())
 				if(mandatoryOptionalDiff == 1) {
-					// Skip one optional argument.
+					// Adds a default value to one optional argument.
 					if(it.hasNext())
-						argument = ((Entry<String, Argument.Inner<?>>)it.next()).getValue();
+						//argument = ((Entry<String, Argument.Inner<?>>)it.next()).getValue();
+						((LinkedList<String>)cmdLineArgs).addFirst(argument.defaultValueAsString());
 					else
 						break;
 				}
 				else
-					// Skips the rest of the optional arguments
+					// Adds default values to the rest of the optional arguments
 					// (which must be at end of the command definition).
-					break;
+					//break;
+					((LinkedList<String>)cmdLineArgs).addFirst(argument.defaultValueAsString());
 			
 			if(argument.parse(cmdLineArgs)) {
 				argument.checkConstraints();

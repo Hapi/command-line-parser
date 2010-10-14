@@ -292,6 +292,15 @@ public class Command
 			return null;
 		}
 		
+		public Map<String, Option.Inner>definedOptions()
+		{
+			return Collections.unmodifiableMap(_outer._definedOptions);
+		}
+		
+		public Map<String, Argument.Inner<?>> definedArguments()
+		{
+			return Collections.unmodifiableMap(_outer._definedArguments);
+		}
 		
 		public boolean parse(List<String> arguments)
 			throws

@@ -22,6 +22,7 @@ import com.hapiware.utils.cmdline.element.Argument;
 import com.hapiware.utils.cmdline.element.Command;
 import com.hapiware.utils.cmdline.element.Description;
 import com.hapiware.utils.cmdline.element.Option;
+import com.hapiware.utils.cmdline.writer.ScreenWriter;
 import com.hapiware.utils.cmdline.writer.Writer;
 import com.hapiware.utils.cmdline.writer.Writer.HeadingLevel;
 
@@ -29,6 +30,11 @@ import com.hapiware.utils.cmdline.writer.Writer.HeadingLevel;
 public class CommandLineParser
 {
 	private enum HelpType { OPTIONS, ARGUMENTS, COMMANDS, COMMAND_OPTIONS, COMMAND_ARGUMENTS };
+	private static final String COMPLETE_HELP_COMMAND = "all";
+	private static final String OPTS_HELP_COMMAND = "opts";
+	private static final String CMDS_HELP_COMMAND = "cmds";
+	private static final String CMD_HELP_COMMAND = "cmd=";
+	private static final String ARGS_HELP_COMMAND = "args";
 	
 	
 	private final Description _description;
@@ -45,10 +51,17 @@ public class CommandLineParser
 	private List<Argument.Inner<?>> _cmdLineArguments = new ArrayList<Argument.Inner<?>>();
 	private final boolean _useAnnotations;
 	private final Class<?> _mainClass;
+	private final String _javaCommand;
 	private Set<HelpType> _definedArgumentTypes = new HashSet<HelpType>();
+	private List<String> _exampleArguments = new LinkedList<String>();
+	private final Writer _writer;
 	
 	
 	public CommandLineParser(Class<?> mainClass, Description description)
+	{
+		this(mainClass, 80, description);
+	}
+	public CommandLineParser(Class<?> mainClass, int screenWidth, Description description)
 	{
 		if(mainClass == null)
 			throw new NullPointerException("'mainClass' must have a value.");
@@ -57,18 +70,29 @@ public class CommandLineParser
 		
 		_useAnnotations = true;
 		_mainClass = mainClass;
+		_writer = new ScreenWriter(screenWidth);
+		_javaCommand = "java -jar " + _mainClass.getPackage().getImplementationTitle() + ".jar";
 		_description = description;
 	}
 	
-	public CommandLineParser(Class<?> mainClass, boolean useAnnotations, Description description)
+	public CommandLineParser(
+		Class<?> mainClass,
+		Writer writer,
+		boolean useAnnotations,
+		Description description
+	)
 	{
 		if(mainClass == null)
 			throw new NullPointerException("'mainClass' must have a value.");
+		if(writer == null)
+			throw new NullPointerException("'writer' must have a value.");
 		if(description == null)
 			throw new NullPointerException("'description' must have a value.");
 		
 		_useAnnotations = useAnnotations;
 		_mainClass = mainClass;
+		_writer = writer;
+		_javaCommand = "java -jar " + _mainClass.getPackage().getImplementationTitle() + ".jar";
 		_description = description;
 	}
 	
@@ -125,9 +149,9 @@ public class CommandLineParser
 			_definedCommandAlternatives.put(alternative, inner.name());
 		
 		_definedArgumentTypes.add(HelpType.COMMANDS);
-		if(inner.cmdLineOptions().size() > 0)
+		if(inner.definedOptions().size() > 0)
 			_definedArgumentTypes.add(HelpType.COMMAND_OPTIONS);
-		if(inner.cmdLineArguments().size() > 0)
+		if(inner.definedArguments().size() > 0)
 			_definedArgumentTypes.add(HelpType.COMMAND_ARGUMENTS);
 	}
 	
@@ -175,6 +199,14 @@ public class CommandLineParser
 		_definedArgumentTypes.add(HelpType.ARGUMENTS);
 	}
 
+	public void addExampleArguments(String exampleArguments)
+	{
+		if(exampleArguments == null || exampleArguments.trim().length() == 0)
+			throw new NullPointerException("'exampleArguments' must have a value.");
+		
+		_exampleArguments.add(exampleArguments);
+	}
+	
 	public boolean optionExists(String name)
 	{
 		for(Option.Inner option : _cmdLineOptions)
@@ -275,24 +307,23 @@ public class CommandLineParser
 			parse(className, args);
 		}
 		catch(ConstraintException e) {
-			System.out.println(e.getMessage());
+			printErrorWithShortHelp(e);
 			System.exit(-1);
 		}
 		catch(AnnotatedFieldSetException e) {
-			System.out.println(e.getMessage());
+			printErrorMessageWithoutHelp(e);
 			System.exit(-1);
 		}
 		catch(CommandNotFoundException e) {
-			System.out.println(e.getMessage());
+			printErrorWithCommandsHelp(e);
 			System.exit(-1);
 		}
 		catch(IllegalCommandLineArgumentException e) {
-			System.out.println(e.getMessage());
+			printErrorWithShortHelp(e);
 			System.exit(-1);
 		}
 		catch(Throwable t) {
-			System.out.println(t.getMessage());
-			t.printStackTrace();
+			printThrowable(t);
 			System.exit(-2);
 		}
 	}
@@ -304,24 +335,23 @@ public class CommandLineParser
 			parse(callerObject, args);
 		}
 		catch(ConstraintException e) {
-			System.out.println(e.getMessage());
+			printErrorWithShortHelp(e);
 			System.exit(-1);
 		}
 		catch(AnnotatedFieldSetException e) {
-			System.out.println(e.getMessage());
+			printErrorMessageWithoutHelp(e);
 			System.exit(-1);
 		}
 		catch(CommandNotFoundException e) {
-			System.out.println(e.getMessage());
+			printErrorWithCommandsHelp(e);
 			System.exit(-1);
 		}
 		catch(IllegalCommandLineArgumentException e) {
-			System.out.println(e.getMessage());
+			printErrorWithShortHelp(e);
 			System.exit(-1);
 		}
 		catch(Throwable t) {
-			System.out.println(t.getMessage());
-			t.printStackTrace();
+			printThrowable(t);
 			System.exit(-2);
 		}
 	}
@@ -332,24 +362,23 @@ public class CommandLineParser
 			parse(callerClass, args);
 		}
 		catch(ConstraintException e) {
-			System.out.println(e.getMessage());
+			printErrorWithShortHelp(e);
 			System.exit(-1);
 		}
 		catch(AnnotatedFieldSetException e) {
-			System.out.println(e.getMessage());
+			printErrorMessageWithoutHelp(e);
 			System.exit(-1);
 		}
 		catch(CommandNotFoundException e) {
-			System.out.println(e.getMessage());
+			printErrorWithCommandsHelp(e);
 			System.exit(-1);
 		}
 		catch(IllegalCommandLineArgumentException e) {
-			System.out.println(e.getMessage());
+			printErrorWithShortHelp(e);
 			System.exit(-1);
 		}
 		catch(Throwable t) {
-			System.out.println(t.getMessage());
-			t.printStackTrace();
+			printThrowable(t);
 			System.exit(-2);
 		}
 	}
@@ -378,6 +407,62 @@ public class CommandLineParser
 	}
 	
 	
+	private void checkInternalCommand(String args[])
+	{
+		if(args.length == 1 && args[0].equals("--version"))
+			showVersionAndExit();
+
+		if(
+			(
+				args.length == 1 
+				|| args.length == 2
+			)
+			&& (
+				args[0].equals("-?")
+				|| args[0].equalsIgnoreCase("--help")
+			)
+		) {
+			if(args.length == 1) {
+				printShortHelp();
+				System.exit(0);
+			}
+			
+			String helpCommand = args[1];
+			if(helpCommand.equals(COMPLETE_HELP_COMMAND)) {
+				printCompleteHelp();
+				System.exit(0);
+			}
+			if(_definedGlobalOptions.size() > 0 && helpCommand.equals(OPTS_HELP_COMMAND)) {
+				printGlobalOptionsHelp();
+				System.exit(0);
+			}
+			if(_definedCommands.size() > 0 && helpCommand.equals(CMDS_HELP_COMMAND)) {
+				printCommandsHelp();
+				System.exit(0);
+			}
+			if(_definedCommands.size() > 0 && helpCommand.startsWith(CMD_HELP_COMMAND)) {
+				String[] afterSplit = helpCommand.split("=");
+				if(afterSplit.length > 1)
+					printCommandHelp(afterSplit[1]);
+				else
+					printCommandHelp("");
+				System.exit(0);
+			}
+			if(_definedArguments.size() > 0 && helpCommand.equals(ARGS_HELP_COMMAND)) {
+				printGlobalArgumentsHelp();
+				System.exit(0);
+			}
+
+			_writer.header();
+			_writer.h1("Help error:");
+			_writer.line(HeadingLevel.H1, "'" + helpCommand + "' is not a valid help command.");
+			_writer.line(HeadingLevel.H1, "");
+			printUsage();
+			_writer.footer();
+			System.exit(0);
+		}
+	}
+	
 	private void parse(Object callerObject, Class<?> callerClass, String[] args)
 		throws
 			ConstraintException,
@@ -387,10 +472,7 @@ public class CommandLineParser
 	{
 		assert callerObject != null || callerClass != null;
 
-		// TODO: Handle all the help commands.
-		
-		if(args.length == 1 && args[0].equals("--version"))
-			showVersionAndExit();
+		checkInternalCommand(args);
 		
 		// Adds a space character after a short option if missing.
 		List<String> cmdLineArgs = new LinkedList<String>();
@@ -419,13 +501,18 @@ public class CommandLineParser
 				)
 			)
 				continue;
-			else
+			else {
+				if(arg.startsWith("-")) {
+					String msg = "'" + arg + "' is not a valid option.";
+					throw new IllegalCommandLineArgumentException(msg);
+				}
+				
 				if(_cmdLineCommand != null)
 					throw
 						new IllegalCommandLineArgumentException(
 							"'" + arg + "' cannot be interpreted as a proper command line parameter."
 						);
-					
+			}
 					
 			if(_definedCommands.size() > 0) {
 				Command.Inner command = _definedCommands.get(_definedCommandAlternatives.get(arg));
@@ -476,83 +563,210 @@ public class CommandLineParser
 	
 	private void showVersionAndExit()
 	{
-		System.out.println(
-			"  Version: " + _mainClass.getPackage().getImplementationVersion()
-		);
+		_writer.header();
+		_writer.h1("Version: " + _mainClass.getPackage().getImplementationVersion());
+		_writer.footer();
 		System.exit(0);
 	}
 
 	
-	public void printHelp(Writer writer)
+	public void printCompleteHelp()
 	{
-		final String javaCommand = 
-			"java -jar " + _mainClass.getPackage().getImplementationTitle() + ".jar";
-		
-		writer.header();
-		printUsage(writer, javaCommand);
-		printDescription(writer);
-		printGlobalOptions(writer);
-		// TODO: Print Commands
-		// TODO: Print Command options
-		// TODO: Print Command arguments
-		// TODO: Print Arguments
-		// TODO: Print Examples (add method to add examples).
-		writer.footer();
+		_writer.header();
+		printUsage();
+		printDescription();
+		printGlobalOptions();
+		printCommands();
+		printGlobalArguments();
+		printExamples();
+		_writer.footer();
 	}
 	
-	private String changeStrong(Writer writer, String inputText)
+	public void printShortHelp()
+	{
+		_writer.header();
+		printShortHelpWithoutHeaders();
+		_writer.footer();
+	}
+	
+	private void printShortHelpWithoutHeaders()
+	{
+		printUsage();
+		printDescription();
+		printShortCommands();
+		printGlobalArguments();
+		_writer.line(HeadingLevel.H1, "");
+		_writer.h1("Notice:");
+		_writer.line(
+			HeadingLevel.H1,
+			"This is a short help. To get a complete help run:"
+		);
+		_writer.line(HeadingLevel.H1, _javaCommand + " -? " + COMPLETE_HELP_COMMAND);
+	}
+	
+	public void printGlobalOptionsHelp()
+	{
+		_writer.header();
+		printUsage();
+		printGlobalOptions();
+		_writer.footer();
+	}
+	
+	public void printGlobalArgumentsHelp()
+	{
+		_writer.header();
+		printUsage();
+		printGlobalArguments();
+		_writer.footer();
+	}
+	
+	public void printThrowable(Throwable t)
+	{
+		_writer.header();
+		_writer.h1(t.getClass().getName());
+		_writer.paragraph(HeadingLevel.H1, t.getCause().getClass().getName());
+		_writer.paragraph(HeadingLevel.H1, t.getMessage());
+		for(StackTraceElement stackTraceElement : t.getStackTrace())
+			_writer.paragraph(HeadingLevel.H1, stackTraceElement.toString());
+		_writer.footer();
+	}
+
+	public void printErrorWithShortHelp(Throwable cause)
+	{
+		_writer.header();
+		//_writer.h1(cause.getClass().getName());
+		_writer.h1("Error:");
+		_writer.paragraph(HeadingLevel.H1, cause.getMessage());
+		printShortHelpWithoutHeaders();
+		_writer.footer();
+	}
+	
+	public void printErrorWithCommandsHelp(Throwable cause)
+	{
+		_writer.header();
+		//_writer.h1(cause.getClass().getName());
+		_writer.h1("Error:");
+		_writer.paragraph(HeadingLevel.H1, cause.getMessage());
+		printShortCommands();
+		_writer.footer();
+	}
+	
+	public void printErrorMessageWithoutHelp(Throwable cause)
+	{
+		_writer.header();
+		//_writer.h1(cause.getClass().getName());
+		_writer.h1("Error:");
+		_writer.paragraph(HeadingLevel.H1, cause.getMessage());
+		_writer.footer();
+	}
+	
+	public void printCommandsHelp()
+	{
+		_writer.header();
+		printShortCommands();
+		_writer.footer();
+	}
+	
+	public void printCommandHelp(String commandName)
+	{
+		Command.Inner command = _definedCommands.get(_definedCommandAlternatives.get(commandName));
+		_writer.header();
+		if(command != null) {
+			_writer.h1("CMD:");
+			printCommand(command);
+		}
+		else {
+			_writer.h1("Help error:");
+			_writer.line(HeadingLevel.H1, "'" + commandName + "' is not a valid command.");
+			_writer.line(HeadingLevel.H1, "");
+			printShortCommands();
+		}
+		_writer.footer();
+	}
+	
+	private String replaceStrong(String inputText)
 	{
 		return
 			inputText.replaceAll(
 				Description.STRONG_BEGIN_TAG,
-				writer.strongEnd()
-			).replaceAll(Description.STRONG_END_TAG, writer.strongEnd());
+				_writer.strongEnd()
+			).replaceAll(Description.STRONG_END_TAG, _writer.strongEnd());
 	}
 	
-	private void printUsage(Writer writer, String javaCommand)
+	private void printUsage()
 	{
-		String helpCommand = " -? | --help ['full'";
-		helpCommand += _definedArgumentTypes.contains(HelpType.OPTIONS) ? " | 'opts'" : "";
-		helpCommand += _definedArgumentTypes.contains(HelpType.COMMANDS) ? " | 'cmds'" : "";
-		helpCommand += _definedArgumentTypes.contains(HelpType.OPTIONS) ? " | OPT" : "";
-		helpCommand += _definedArgumentTypes.contains(HelpType.COMMANDS) ? " | CMD" : "";
+		String helpCommand = " -? | --help ['" + COMPLETE_HELP_COMMAND + "'";
+		helpCommand +=
+			_definedArgumentTypes.contains(HelpType.OPTIONS) ? " | '" + OPTS_HELP_COMMAND + "'" : "";
+		helpCommand +=
+			_definedArgumentTypes.contains(HelpType.ARGUMENTS) ? " | '" + ARGS_HELP_COMMAND + "'" : "";
+		helpCommand +=
+			_definedArgumentTypes.contains(HelpType.COMMANDS) ? " | '" + CMDS_HELP_COMMAND + "'" : "";
+		helpCommand +=
+			_definedArgumentTypes.contains(HelpType.COMMANDS) ? " | " + CMD_HELP_COMMAND + "CMD" : "";
 		helpCommand += "]";
 		String command = "";
-		command += _definedArgumentTypes.contains(HelpType.OPTIONS) ? " OPTS" : "";
+		command += _definedArgumentTypes.contains(HelpType.OPTIONS) ? " [OPTS]" : "";
 		command += _definedArgumentTypes.contains(HelpType.COMMANDS) ? " CMD" : "";
-		command += _definedArgumentTypes.contains(HelpType.COMMAND_OPTIONS) ? " CMD-OPTS" : "";
+		command += _definedArgumentTypes.contains(HelpType.COMMAND_OPTIONS) ? " [CMD-OPTS]" : "";
 		command += _definedArgumentTypes.contains(HelpType.COMMAND_ARGUMENTS) ? " CMD-ARGS" : "";
-		command += _definedArgumentTypes.contains(HelpType.ARGUMENTS) ? " OPTS" : " ARGS";
-		writer.h1("Usage:");
-		writer.line(HeadingLevel.H1, javaCommand + helpCommand);
-		writer.line(HeadingLevel.H1, javaCommand + " --version");
-		writer.line(HeadingLevel.H1, javaCommand + command);
-		writer.line(HeadingLevel.H1, "");
+		command += _definedArgumentTypes.contains(HelpType.ARGUMENTS) ? " ARGS" : "";
+		_writer.h1("Usage:");
+		_writer.line(HeadingLevel.H1, _javaCommand + helpCommand);
+		_writer.line(HeadingLevel.H1, _javaCommand + " --version");
+		_writer.line(HeadingLevel.H1, _javaCommand + command);
+		_writer.line(HeadingLevel.H1, "");
 	}
 	
-	private void printDescription(Writer writer)
+	private void printDescription()
 	{
-		writer.h1("Description:");
+		_writer.h1("Description:");
 		for(String paragraph : _description.toParagraphs())
-			writer.paragraph(HeadingLevel.H1, changeStrong(writer, paragraph));
+			_writer.paragraph(HeadingLevel.H1, replaceStrong(paragraph));
 	}
-	
-	private void printGlobalOptions(Writer writer)
+
+	private void printOptions(
+		Map<String, Option.Inner> options,
+		boolean isCommand
+	)
 	{
-		if(_definedGlobalOptions.size() == 0)
+		if(options.size() == 0)
 			return;
 		
-		writer.h1("OPTS:");
-		for(Entry<String, Option.Inner> optionSet : _definedGlobalOptions.entrySet()) {
-			Option.Inner option = optionSet.getValue();
+		if(isCommand)
+			_writer.h3("CMD-OPTS:");
+		else
+			_writer.h1("OPTS:");
+		for(Entry<String, Option.Inner> optionEntry : options.entrySet()) {
+			Option.Inner option = optionEntry.getValue();
 			
-			// TODO: Add alternatives also to header.
-			writer.h2(option.name());
+			// Adds option names.
+			String optionNames = option.name();
+			for(String alternative : option.alternatives())
+				optionNames += ", " + alternative;
+			if(isCommand)
+				_writer.h4(optionNames);
+			else
+				_writer.h2(optionNames);
+
+			// Adds description and handles optional arguments and possible default values.
+			boolean isFirstParagraph = true;
+			HeadingLevel headingLevel = isCommand ? HeadingLevel.H4 : HeadingLevel.H2;
+			for(String paragraph : option.description()) {
+				if(isFirstParagraph) {
+					if(option.argument() != null && option.argument().optional())
+						paragraph = 
+							"Argument is optional. " 
+								+ option.argument().defaultValueDescription() 
+								+ paragraph;
+					if(option.multiple())
+						paragraph = "This option can occur several times. " + paragraph;
+					
+					isFirstParagraph = false;
+				}
+				_writer.paragraph(headingLevel, replaceStrong(paragraph));
+			}
 			
-			for(String paragraph : option.description())
-				writer.paragraph(HeadingLevel.H2, changeStrong(writer, paragraph));
-			
-			// TODO: Add restriction descriptions
 			boolean hasEnumConstraint = false;
 			boolean hasOtherConstraints = false;
 			if(option.argument() != null)
@@ -563,31 +777,191 @@ public class CommandLineParser
 						hasOtherConstraints = true;
 				}
 			
+			headingLevel = isCommand ? HeadingLevel.H5 : HeadingLevel.H3;
 			if(hasOtherConstraints) {
-				writer.h3("Constraints:");
-				writer.listBegin(HeadingLevel.H3);
+				if(isCommand)
+					_writer.h5("Constraints:");
+				else
+					_writer.h3("Constraints:");
+				_writer.listBegin(headingLevel);
 				for(Constraint constraint : option.argument().constraints()) {
 					if(constraint instanceof Enumeration)
 						hasEnumConstraint = true;
 					else
 						for(String constraintDesc : constraint.description().toParagraphs())
-							writer.listItem(changeStrong(writer, constraintDesc));
+							_writer.listItem(replaceStrong(constraintDesc));
 				}
-				writer.listEnd();
+				_writer.listEnd();
 			}
 				
 			if(hasEnumConstraint) {
-				writer.h3("Values:");
-				writer.listBegin(HeadingLevel.H3);
+				if(isCommand)
+					_writer.h5("Values:");
+				else
+					_writer.h3("Values:");
+				_writer.listBegin(headingLevel);
 				for(Constraint constraint : option.argument().constraints()) {
 					if(constraint instanceof Enumeration)
 						for(String constraintDesc : constraint.description().toParagraphs())
-							writer.listItem(changeStrong(writer, constraintDesc));
+							_writer.listItem(replaceStrong(constraintDesc));
 				}
-				writer.listEnd();
+				_writer.listEnd();
 			}
 		}
 	}
+
 	
+	private void printArguments(
+		Map<String, Argument.Inner<?>> arguments,
+		boolean isCommand
+	)
+	{
+		if(arguments.size() == 0)
+			return;
+		
+		if(isCommand)
+			_writer.h3("CMD-ARGS:");
+		else
+			_writer.h1("ARGS:");
+		for(Entry<String, Argument.Inner<?>> argumentEntry : arguments.entrySet()) {
+			Argument.Inner<?> argument = argumentEntry.getValue();
+			
+			// Adds argument name.
+			if(isCommand)
+				_writer.h4(argument.name());
+			else
+				_writer.h2(argument.name());
+
+			// Adds description and handles optional arguments and possible default values.
+			boolean isFirstParagraph = true;
+			HeadingLevel headingLevel = isCommand ? HeadingLevel.H4 : HeadingLevel.H2;
+			for(String paragraph : argument.description()) {
+				if(isFirstParagraph && argument.optional()) {
+					paragraph = 
+						"Argument is optional. " 
+							+ argument.defaultValueDescription() 
+							+ paragraph;
+					isFirstParagraph = false;
+				}
+				_writer.paragraph(headingLevel, replaceStrong(paragraph));
+			}
+			
+			boolean hasEnumConstraint = false;
+			boolean hasOtherConstraints = false;
+			for(Constraint constraint : argument.constraints()) {
+				if(constraint instanceof Enumeration)
+					hasEnumConstraint = true;
+				else
+					hasOtherConstraints = true;
+			}
+			
+			headingLevel = isCommand ? HeadingLevel.H5 : HeadingLevel.H3;
+			if(hasOtherConstraints) {
+				if(isCommand)
+					_writer.h5("Constraints:");
+				else
+					_writer.h3("Constraints:");
+				_writer.listBegin(headingLevel);
+				for(Constraint constraint : argument.constraints()) {
+					if(constraint instanceof Enumeration)
+						hasEnumConstraint = true;
+					else
+						for(String constraintDesc : constraint.description().toParagraphs())
+							_writer.listItem(replaceStrong(constraintDesc));
+				}
+				_writer.listEnd();
+			}
+				
+			if(hasEnumConstraint) {
+				if(isCommand)
+					_writer.h5("Values:");
+				else
+					_writer.h3("Values:");
+				_writer.listBegin(headingLevel);
+				for(Constraint constraint : argument.constraints()) {
+					if(constraint instanceof Enumeration)
+						for(String constraintDesc : constraint.description().toParagraphs())
+							_writer.listItem(replaceStrong(constraintDesc));
+				}
+				_writer.listEnd();
+			}
+		}
+	}
+
 	
+	private void printGlobalOptions()
+	{
+		printOptions(_definedGlobalOptions, false);
+	}
+
+	
+	private void printCommand(Command.Inner command)
+	{
+		// Adds command names.
+		String commandNames = command.name();
+		for(String alternative : command.alternatives())
+			commandNames += ", " + alternative;
+		commandNames +=
+			_definedArgumentTypes.contains(HelpType.COMMAND_OPTIONS) ? " [CMD-OPTS]" : "";
+		for(Entry<String, Argument.Inner<?>> argumentEntry : command.definedArguments().entrySet()) {
+			Argument.Inner<?> argument = argumentEntry.getValue();
+			if(argument.optional())
+				commandNames += " [" + argument.name() + "]";
+			else
+				commandNames += " " + argument.name();
+		}
+		_writer.h2(commandNames);
+		
+		for(String paragraph : command.description())
+			_writer.paragraph(HeadingLevel.H2, replaceStrong(paragraph));
+		
+		printOptions(command.definedOptions(), true);
+		
+		printArguments(command.definedArguments(), true);
+	}
+	
+	private void printCommands()
+	{
+		if(_definedCommands.size() == 0)
+			return;
+		
+		_writer.h1("CMD:");
+		for(Entry<String, Command.Inner> commandEntry : _definedCommands.entrySet())
+			printCommand(commandEntry.getValue());
+	}
+	
+	private void printShortCommands()
+	{
+		if(_definedCommands.size() == 0)
+			return;
+		
+		_writer.h1("Commands:");
+		for(Entry<String, Command.Inner> commandEntry : _definedCommands.entrySet()) {
+			Command.Inner command = commandEntry.getValue();
+			String shortDescription = command.name();
+			for(String alternative : command.alternatives())
+				shortDescription += ", " + alternative;
+			_writer.line(HeadingLevel.H1, shortDescription + ": " + command.shortDescription());
+		}
+	}
+
+	private void printGlobalArguments()
+	{
+		printArguments(_definedArguments, false);
+	}
+	
+	private void printExamples()
+	{
+		_writer.h1("Examples:");
+		_writer.line(HeadingLevel.H1, _javaCommand + " -? " + COMPLETE_HELP_COMMAND);
+		if(_definedCommands.size() > 0)
+			_writer.line(
+				HeadingLevel.H1,
+				_javaCommand + " --help cmd=" + _definedCommands.keySet().iterator().next()
+			);
+		_writer.line(HeadingLevel.H1, _javaCommand + " --version");
+		
+		for(String example : _exampleArguments)
+			_writer.line(HeadingLevel.H1, _javaCommand + " " + example);
+	}
 }

@@ -179,6 +179,20 @@ public class Argument
 		{
 			return _outer._defaultForOptional != null;
 		}
+		public String defaultValueAsString()
+		{
+			return _outer._defaultForOptional;
+		}
+		public String defaultValueDescription()
+		{
+			if(hasDefaultValueForOptional())
+				return 
+					"Default value for the optional argument is " 
+						+ _outer._defaultForOptional 
+						+ ". ";
+			else
+				return "";
+		}
 		public boolean parse(List<String> arguments)
 			throws
 				ConstraintException,
