@@ -46,9 +46,15 @@ public class ElementBase
 	{
 		_description.description(description);
 	}
+	
 	public void p()
 	{
 		_description.p();
+	}
+	
+	public void strong(String text)
+	{
+		_description.strong(text);
 	}
 	
 	public String name()

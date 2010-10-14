@@ -40,7 +40,7 @@ public class ParserTest
 		p.add(new Option("n") {{
 			//multiple();
 			alternatives("number");
-			description("Description");
+			description("Description for ").strong("number").description(" option.");
 			set(Integer.class, new OptionArgument() {{
 				optional(5);
 				minValue(1);
@@ -65,10 +65,9 @@ public class ParserTest
 			}});
 		}});
 		
-		p.add(new Command("set") {{
+		p.add(new Command("set", "Short desc.") {{
 			alternatives("s").id("cmd");
 			description("Description");
-			shortDescription("Short desc.");
 			add(Integer.class, new Argument("PID") {{
 				description("Process ID for JVM.");
 			}});
@@ -95,7 +94,7 @@ public class ParserTest
 		}});
 		p.addExampleArguments("set 1234 j ^.+ INFO");
 		
-		//p.printCompleteHelp();
+		p.printCompleteHelp();
 		//p.printShortHelp();
 		//p.printGlobalOptionsHelp();
 		//p.printCommandsHelp();

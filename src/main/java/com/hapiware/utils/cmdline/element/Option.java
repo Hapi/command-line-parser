@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import com.hapiware.utils.cmdline.Util;
 import com.hapiware.utils.cmdline.constraint.ConfigurationException;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
 import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
@@ -23,6 +24,15 @@ public class Option
 		_multiple = option._multiple;
 	}
 	
+	/**
+	 * Creates new {@code Option}. {@code name} must match this RE pattern:
+	 * <code>^\p{Alpha}\p{Alnum}*$</code>.
+	 * 
+	 * @param name
+	 * 
+	 * @throws ConfigurationException
+	 * 		If {@code name} is incorrectly formed.
+	 */
 	public Option(String name)
 	{
 		if(name == null || name.trim().length() == 0)
@@ -31,6 +41,11 @@ public class Option
 			throw
 				new ConfigurationException(
 					"'name' for option '" + name + "' must not start with minus (-)."
+				);
+		if(!Util.checkName(name))
+			throw
+				new ConfigurationException(
+					"'name' for option is incorrect ('" + name + "')."
 				);
 		
 		_option.name(addOptionMinus(name));
@@ -44,8 +59,15 @@ public class Option
 					"'alternatives' for option '" + _option.name() + "' must have a value."
 				);
 		
-		for(int i = 0; i < alternatives.length; i++)
+		for(int i = 0; i < alternatives.length; i++) {
+			if(!Util.checkName(alternatives[i]))
+				throw
+					new ConfigurationException(
+						"Alternative name for option '" + _option.name() 
+							+ "' is incorrect ('" + alternatives[i] + "')."
+					);
 			alternatives[i] = addOptionMinus(alternatives[i]);
+		}
 		_option.alternatives(alternatives);
 		return this;
 	}
@@ -56,6 +78,11 @@ public class Option
 			throw
 				new ConfigurationException(
 					"'id' for option '" + _option.name() + "' must have a value."
+				);
+		if(!Util.checkName(id))
+			throw
+				new ConfigurationException(
+					"'id' for option '" + _option.name() + "' is incorrect ('" + id + "')."
 				);
 		
 		_option.id(id);
@@ -73,9 +100,16 @@ public class Option
 		_option.description(description);
 		return this;
 	}
+	
 	public Option p()
 	{
 		_option.p();
+		return this;
+	}
+	
+	public Option strong(String text)
+	{
+		_option.strong(text);
 		return this;
 	}
 

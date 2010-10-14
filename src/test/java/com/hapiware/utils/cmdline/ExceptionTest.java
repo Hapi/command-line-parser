@@ -42,8 +42,7 @@ public class ExceptionTest
 				maxValue(10);
 			}});
 		}});
-		_parser.add(new Command("set") {{
-			shortDescription("set");
+		_parser.add(new Command("set", "set description") {{
 			description("Description");
 			add(Integer.class, new Argument("PID") {{
 				description("PID");

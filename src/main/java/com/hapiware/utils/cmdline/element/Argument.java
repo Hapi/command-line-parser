@@ -36,10 +36,24 @@ public class Argument
 		// Does nothing.
 	}
 	
+	/**
+	 * Creates new {@code Option}. {@code name} must match this RE pattern:
+	 * <code>^\p{Alpha}\p{Alnum}*$</code>.
+	 * 
+	 * @param name
+	 * 
+	 * @throws ConfigurationException
+	 * 		If {@code name} is incorrectly formed.
+	 */
 	public Argument(String name)
 	{
 		if(name == null || name.trim().length() == 0)
 			throw new NullPointerException("'name' must have a value.");
+		if(!Util.checkName(name))
+			throw
+				new ConfigurationException(
+					"'name' for argument is incorrect ('" + name + "')."
+				);
 		
 		_argument.name(name);
 	}
@@ -48,6 +62,11 @@ public class Argument
 	{
 		if(id == null || id.trim().length() == 0)
 			throw new ConfigurationException("'id' for '" + _argument.name() + "' must have a value.");
+		if(!Util.checkName(id))
+			throw
+				new ConfigurationException(
+					"'id' for argument '" + _argument.name() + "' is incorrect ('" + id + "')."
+				);
 		
 		_argument.id(id);
 		return this;
@@ -64,9 +83,16 @@ public class Argument
 		_argument.description(description);
 		return this;
 	}
+	
 	public Argument p()
 	{
 		_argument.p();
+		return this;
+	}
+	
+	public Argument strong(String text)
+	{
+		_argument.strong(text);
 		return this;
 	}
 	

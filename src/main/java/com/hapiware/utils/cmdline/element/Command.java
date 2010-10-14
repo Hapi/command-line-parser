@@ -17,7 +17,7 @@ import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException
 public class Command
 {
 	private ElementBase _command = new ElementBase();
-	private String _shortDescription;
+	private final String _shortDescription;
 	private final CommandExecutor _commandExecutor;
 
 	private Map<String, Option.Inner> _definedOptions = new LinkedHashMap<String, Option.Inner>();
@@ -40,6 +40,7 @@ public class Command
 		_cmdLineArguments.addAll(command._cmdLineArguments);
 		_numOfOptionalArguments = command._numOfOptionalArguments;
 		_useAnnotations = command._useAnnotations;
+		_shortDescription = command._shortDescription;
 		
 		// References are ok here.
 		_definedOptions = command._definedOptions;
@@ -47,21 +48,46 @@ public class Command
 		_definedArguments = command._definedArguments;
 	}
 	
-	public Command(String name)
+	public Command(String name, String shortDescription)
 	{
 		if(name == null || name.trim().length() == 0)
 			throw new ConfigurationException("'name' must have a value.");
 		
+		if(!Util.checkName(name))
+			throw
+				new ConfigurationException(
+					"'name' for the command is incorrect ('" + name + "')."
+				);
+		
+		if(shortDescription == null || shortDescription.trim().length() == 0)
+			throw
+				new ConfigurationException(
+					"'shortDescription' for command '" + name + "' must have a value."
+				);
+
 		_command.name(name);
 		_commandExecutor = null;
 		_useAnnotations = true;
+		_shortDescription = shortDescription;
 	}
 	
-	public Command(String name, CommandExecutor commandExecutor)
+	public Command(String name, String shortDescription, CommandExecutor commandExecutor)
 	{
 		if(name == null || name.trim().length() == 0)
 			throw new ConfigurationException("'name' must have a value.");
+
+		if(!Util.checkName(name))
+			throw
+				new ConfigurationException(
+					"'name' for the command is incorrect ('" + name + "')."
+				);
 		
+		if(shortDescription == null || shortDescription.trim().length() == 0)
+			throw
+				new ConfigurationException(
+					"'shortDescription' for command '" + name + "' must have a value."
+				);
+
 		if(commandExecutor == null)
 			throw
 				new ConfigurationException(
@@ -71,6 +97,7 @@ public class Command
 		_command.name(name);
 		_commandExecutor = commandExecutor;
 		_useAnnotations = true;
+		_shortDescription = shortDescription;
 	}
 	
 	public Command alternatives(String...alternatives)
@@ -80,6 +107,13 @@ public class Command
 				new ConfigurationException(
 					"'alternatives' for command '" + _command.name() + "' must have a value."
 				);
+		for(int i = 0; i < alternatives.length; i++)
+			if(!Util.checkName(alternatives[i]))
+				throw
+					new ConfigurationException(
+						"Alternative name for command '" + _command.name() 
+							+ "' is incorrect ('" + alternatives[i] + "')."
+					);
 		
 		_command.alternatives(alternatives);
 		return this;
@@ -92,20 +126,13 @@ public class Command
 				new ConfigurationException(
 					"'id' for command '" + _command.name() + "' must have a value."
 				);
-		
-		_command.id(id);
-		return this;
-	}
-	
-	public Command shortDescription(String shortDescription)
-	{
-		if(shortDescription == null || shortDescription.trim().length() == 0)
+		if(!Util.checkName(id))
 			throw
 				new ConfigurationException(
-					"'shortDescription' for command '" + _command.name() + "' must have a value."
+					"'id' for command '" + _command.name() + "' is incorrect ('" + id + "')."
 				);
-
-		_shortDescription = shortDescription;
+		
+		_command.id(id);
 		return this;
 	}
 	
@@ -123,6 +150,12 @@ public class Command
 	public Command p()
 	{
 		_command.p();
+		return this;
+	}
+	
+	public Command strong(String text)
+	{
+		_command.strong(text);
 		return this;
 	}
 	

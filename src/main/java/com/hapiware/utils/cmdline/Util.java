@@ -32,6 +32,11 @@ public class Util
 	private static final String CR = "\n";
 	
 	
+	public static boolean checkName(String name)
+	{
+		return Pattern.matches("^\\p{Alpha}[-\\p{Alnum}]*$", name);
+	}
+	
 	public static boolean checkOption(
 		String arg,
 		List<String> cmdLineArgs,
