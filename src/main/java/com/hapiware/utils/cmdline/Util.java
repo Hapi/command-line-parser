@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import com.hapiware.utils.cmdline.annotation.Id;
 import com.hapiware.utils.cmdline.constraint.AnnotatedFieldSetException;
@@ -84,11 +85,15 @@ public class Util
 		
 		// There cannot be options between command arguments. Only before or after
 		// all the command arguments.
-		for(String cmdLineArg : cmdLineArgs)
+		for(String cmdLineArg : cmdLineArgs) {
 			if(cmdLineArg.startsWith("-"))
-				break;
+				if(Pattern.matches("^-\\p{Digit}+$", cmdLineArg))
+					numberOfCmdLineArguments++;
+				else
+					break;
 			else
 				numberOfCmdLineArguments++;
+		}
 		
 		if(numberOfCmdLineArguments < numberOfMandatoryArguments) {
 			String msg =

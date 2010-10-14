@@ -18,7 +18,7 @@ public class MinLength
 	{
 		if(((String)value).length() < _minLength) {
 			String str =
-				"[" + value + "] is smaller than the minimum length "
+				"Length of [" + value + "] is shorter than the minimum length "
 					+ _minLength + " allowed for '" + argumentName + "'"; 
 			throw new ConstraintException(str);
 		}

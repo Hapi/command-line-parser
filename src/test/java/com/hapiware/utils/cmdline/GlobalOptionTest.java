@@ -15,7 +15,8 @@ import com.hapiware.utils.cmdline.element.Description;
 import com.hapiware.utils.cmdline.element.Option;
 import com.hapiware.utils.cmdline.element.OptionArgument;
 
-public class SimpleTest
+
+public class GlobalOptionTest
 {
 	@Id("ver")
 	private boolean _ver;
@@ -31,10 +32,6 @@ public class SimpleTest
 	
 	@Id("intarray")
 	private int[] _nums;
-	
-	@SuppressWarnings("unused")
-	@Id("type-mismatch")
-	private byte _typeMismatch;
 	
 	@Test
 	public void normalCase()
@@ -192,28 +189,5 @@ public class SimpleTest
 		catch(IllegalCommandLineArgumentException e) {
 			Assert.fail("Unexpected command line argument exception thrown. " + e.getMessage(), e);
 		}
-	}
-	
-	@Test(expectedExceptions = {AnnotatedFieldSetException.class})
-	public void annotatedSetFailure()
-		throws
-			ConstraintException,
-			AnnotatedFieldSetException,
-			CommandNotFoundException,
-			IllegalCommandLineArgumentException
-	{
-		CommandLineParser p =
-			new CommandLineParser(
-				ParserTest.class,
-				new Description().description("Main description.")
-			);
-		p.add(new Option("type-mismatch") {{
-			description("Description");
-			set(Integer.class, new OptionArgument() {{
-				minValue(1);
-				maxValue(10);
-			}});
-		}});
-		p.parse(this, new String[] { "--type-mismatch", "2" });
 	}
 }
