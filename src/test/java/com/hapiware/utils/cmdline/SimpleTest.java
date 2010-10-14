@@ -32,6 +32,10 @@ public class SimpleTest
 	@Id("intarray")
 	private int[] _nums;
 	
+	@SuppressWarnings("unused")
+	@Id("type-mismatch")
+	private byte _typeMismatch;
+	
 	@Test
 	public void normalCase()
 	{
@@ -135,6 +139,8 @@ public class SimpleTest
 			assertEquals(13, _n);
 			p.parse(this, new String[] { "-d", "-n", "1000" });
 			assertEquals(1000, _n);
+			p.parse(this, new String[] { "-n", "1000", "-d" });
+			assertEquals(1000, _n);
 		}
 		catch(ConstraintException e) {
 			Assert.fail("Unexpected constraint exception thrown. " + e.getMessage(), e);
@@ -186,5 +192,28 @@ public class SimpleTest
 		catch(IllegalCommandLineArgumentException e) {
 			Assert.fail("Unexpected command line argument exception thrown. " + e.getMessage(), e);
 		}
+	}
+	
+	@Test(expectedExceptions = {AnnotatedFieldSetException.class})
+	public void annotatedSetFailure()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				ParserTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(new Option("type-mismatch") {{
+			description("Description");
+			set(Integer.class, new OptionArgument() {{
+				minValue(1);
+				maxValue(10);
+			}});
+		}});
+		p.parse(this, new String[] { "--type-mismatch", "2" });
 	}
 }

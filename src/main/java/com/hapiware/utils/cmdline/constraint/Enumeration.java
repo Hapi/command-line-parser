@@ -53,7 +53,7 @@ public class Enumeration
 		for(Enum e : _enumerations) {
 			if(e._description == null || e._description.trim().length() == 0)
 				return null;
-			description.strong(e.value()).description(e._description).p();
+			description.strong(e.value()).description(", " + e._description).p();
 		}
 		return description;
 	}

@@ -15,13 +15,37 @@ public class Description
 	
 	public Description description(String descriptionElement)
 	{
-		_description.add(descriptionElement);
+		if(_description.size() > 0) {
+			String lastDescriptionElement = ((LinkedList<String>)_description).getLast();
+			if(lastDescriptionElement.endsWith(STRONG_END_TAG))
+				((LinkedList<String>)_description).set(
+					_description.size() - 1,
+					lastDescriptionElement + descriptionElement
+				);
+			else
+				_description.add(descriptionElement);
+		}
+		else
+			_description.add(descriptionElement);
 		return this;
 	}
 	
 	public Description strong(String descriptionElement)
 	{
-		_description.add(STRONG_BEGIN_TAG + descriptionElement + STRONG_END_TAG);
+		if(_description.size() > 0) {
+			String lastDescriptionElement = ((LinkedList<String>)_description).getLast();
+			if(lastDescriptionElement == END_PARAGRAPH)
+				_description.add(STRONG_BEGIN_TAG + descriptionElement + STRONG_END_TAG);
+			else {
+				lastDescriptionElement += STRONG_BEGIN_TAG + descriptionElement + STRONG_END_TAG;
+				((LinkedList<String>)_description).set(
+					_description.size() - 1,
+					lastDescriptionElement
+				);
+			}
+		}
+		else
+			_description.add(STRONG_BEGIN_TAG + descriptionElement + STRONG_END_TAG);
 		return this;
 	}
 	
