@@ -702,7 +702,7 @@ public class CommandLineParser
 		return
 			inputText.replaceAll(
 				Description.STRONG_BEGIN_TAG,
-				_writer.strongEnd()
+				_writer.strongBegin()
 			).replaceAll(Description.STRONG_END_TAG, _writer.strongEnd());
 	}
 	

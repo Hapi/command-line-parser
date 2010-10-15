@@ -76,7 +76,14 @@ public class Enumeration
 		
 		public void description(String description)
 		{
+			if(description == null || description.trim().length() == 0)
+				throw new ConfigurationException("'description' must have a value.");
 			_description = description;
+		}
+		
+		public void d(String description)
+		{
+			description(description);
 		}
 		
 		public String value()
