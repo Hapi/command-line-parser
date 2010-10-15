@@ -32,6 +32,16 @@ public class Util
 	private static final String CR = "\n";
 	
 	
+	/**
+	 * Checks the name pattern.
+	 * {@code name} must match this RE pattern: <code>^\\p{Alpha}[-\\p{Alnum}]*$</code>.
+	 * 
+	 * @param name
+	 * 		A name to be checked.
+	 * 
+	 * @return
+	 * 		{@code true} if {@code name} matches the pattern. {@code false} otherwise.
+	 */
 	public static boolean checkName(String name)
 	{
 		return Pattern.matches("^\\p{Alpha}[-\\p{Alnum}]*$", name);

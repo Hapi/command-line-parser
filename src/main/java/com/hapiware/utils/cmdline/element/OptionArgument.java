@@ -1,9 +1,9 @@
 package com.hapiware.utils.cmdline.element;
 
 
-public class OptionArgument
+public class OptionArgument<T>
 	extends
-		Argument
+		Argument<T>
 {
 	public OptionArgument()
 	{

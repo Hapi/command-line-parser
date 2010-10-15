@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.hapiware.utils.cmdline.Util;
 import com.hapiware.utils.cmdline.constraint.ConfigurationException;
+import com.hapiware.utils.cmdline.constraint.Constraint;
 import com.hapiware.utils.cmdline.constraint.ConstraintException;
 import com.hapiware.utils.cmdline.constraint.IllegalCommandLineArgumentException;
 
@@ -192,7 +193,7 @@ public class Command
 		return this;
 	}
 	
-	public <T> Command add(Class<T> argumentType, Argument argument)
+	public <T> Command add(Class<T> argumentType, Argument<T> argument)
 	{
 		if(argument == null)
 			throw
@@ -223,17 +224,26 @@ public class Command
 		if(inner.optional() && !inner.hasDefaultValueForOptional()) {
 			String msg =
 				"When annotations are used then optional arguments must have a default value "
-					+ "(Command '" + _command.name() + "', argument '" + inner.name() + "').";
+					+ "(command '" + _command.name() + "', argument '" + inner.name() + "').";
 			throw new ConfigurationException(msg);
 		}
+		
+		for(Constraint<?> constraint : inner.constraints())
+			if(!constraint.typeCheck(argumentType)) {
+				String msg =
+					"Using '" + constraint.getClass().getName() + "' with argument type '"
+						+ argumentType + "' creates a type conflict "
+						+ "(command '" + _command.name() + "', argument '" + inner.name() + "').";
+				throw new ConfigurationException(msg);
+			}
 		
 		_definedArguments.put(inner.name(), inner);
 		if(!inner.optional()) {
 			_mandatoryArguments = true;
 			if(_numOfOptionalArguments >= 2) {
 				String msg =
-					"If there are more than one optional argument they must be the last arguments. "
-						+ "(Command '" + _command.name() + "', argument '" + inner.name() + "'). "
+					"If there are more than one optional argument they must be the last arguments "
+						+ "(command '" + _command.name() + "', argument '" + inner.name() + "'). "
 						+ "A single optional argument can have any position.";
 				throw new ConfigurationException(msg);
 			}

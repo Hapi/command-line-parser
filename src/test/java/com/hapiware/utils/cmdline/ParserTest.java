@@ -41,7 +41,7 @@ public class ParserTest
 			//multiple();
 			alternatives("number");
 			description("Description for ").strong("number").description(" option.");
-			set(Integer.class, new OptionArgument() {{
+			set(Integer.class, new OptionArgument<Integer>() {{
 				optional(5);
 				minValue(1);
 				maxValue(1000);
@@ -50,15 +50,15 @@ public class ParserTest
 		p.add(new Option("s") {{
 			multiple();
 			description("Description");
-			set(String.class, new OptionArgument() {{
+			set(String.class, new OptionArgument<String>() {{
 				maxLength(5);
 			}});
 		}});
 		p.add(new Option("d") {{
 			description("Description");
-			set(String.class, new OptionArgument() {{
+			set(String.class, new OptionArgument<String>() {{
 				//maxLength(5);
-				constraint(new Enumeration() {{
+				constraint(new Enumeration<String>() {{
 					value("J").ignoreCase().description("for Java loggers.");
 					value("4").description("for log4j loggers.");
 				}});
@@ -68,24 +68,24 @@ public class ParserTest
 		p.add(new Command("set", "Short desc.") {{
 			alternatives("s").id("cmd");
 			description("Description");
-			add(Integer.class, new Argument("PID") {{
+			add(Integer.class, new Argument<Integer>("PID") {{
 				description("Process ID for JVM.");
 			}});
-			add(Integer.class, new Argument("TYPE") {{
+			add(Integer.class, new Argument<Integer>("TYPE") {{
 				optional(4);
 				//maxLength(5);
 				minValue(3);
 				maxValue(6);
-				/*constraint(new Enumeration() {{
-					value("J").ignoreCase().description("For Java loggers.");
-					value("4").description("For log4j loggers.");
-				}});*/
+				constraint(new Enumeration<Integer>() {{
+					value(3).description("for three");
+					value(7).description("fro seven");
+				}});
 				description("....");
 			}});
-			add(Integer.class, new Argument("RE") {{
+			add(Integer.class, new Argument<Integer>("RE") {{
 				description("Regular expression.");
 			}});
-			add(String.class, new Argument("LEVEL") {{
+			add(String.class, new Argument<String>("LEVEL") {{
 				description("New logging level.");
 			}});
 			add(new Option("v") {{

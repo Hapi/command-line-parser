@@ -165,7 +165,7 @@ public class CommandLineParser
 			_definedArgumentTypes.add(HelpType.COMMAND_ARGUMENTS);
 	}
 	
-	public <T> void add(Class<T> argumentType, Argument argument)
+	public <T> void add(Class<T> argumentType, Argument<T> argument)
 	{
 		if(_definedCommands.size() > 0)
 			throw
@@ -194,6 +194,14 @@ public class CommandLineParser
 					+ "('" + inner.name() + "').";
 			throw new ConfigurationException(msg);
 		}
+		
+		for(Constraint<?> constraint : inner.constraints())
+			if(!constraint.typeCheck(argumentType)) {
+				String msg =
+					"Using '" + constraint.getClass().getName() + "' with argument type '"
+						+ argumentType + "' creates a type conflict ('" + inner.name() + "').";
+				throw new ConfigurationException(msg);
+			}
 		
 		_definedArguments.put(inner.name(), inner);
 		if(!inner.optional()) {
@@ -637,7 +645,8 @@ public class CommandLineParser
 	{
 		_writer.header();
 		_writer.h1(t.getClass().getName());
-		_writer.paragraph(HeadingLevel.H1, t.getCause().getClass().getName());
+		if(t.getCause() != null)
+			_writer.paragraph(HeadingLevel.H1, t.getCause().getClass().getName());
 		_writer.paragraph(HeadingLevel.H1, t.getMessage());
 		for(StackTraceElement stackTraceElement : t.getStackTrace())
 			_writer.paragraph(HeadingLevel.H1, stackTraceElement.toString());
@@ -647,8 +656,8 @@ public class CommandLineParser
 	public void printErrorWithShortHelp(Throwable cause)
 	{
 		_writer.header();
-		//_writer.h1(cause.getClass().getName());
 		_writer.h1("Error:");
+		//_writer.paragraph(HeadingLevel.H1, cause.getClass().getName());
 		_writer.paragraph(HeadingLevel.H1, cause.getMessage());
 		printShortHelpWithoutHeaders();
 		_writer.footer();
@@ -657,8 +666,8 @@ public class CommandLineParser
 	public void printErrorWithCommandsHelp(Throwable cause)
 	{
 		_writer.header();
-		//_writer.h1(cause.getClass().getName());
 		_writer.h1("Error:");
+		//_writer.paragraph(HeadingLevel.H1, cause.getClass().getName());
 		_writer.paragraph(HeadingLevel.H1, cause.getMessage());
 		printShortCommands();
 		_writer.footer();
@@ -667,8 +676,8 @@ public class CommandLineParser
 	public void printErrorMessageWithoutHelp(Throwable cause)
 	{
 		_writer.header();
-		//_writer.h1(cause.getClass().getName());
 		_writer.h1("Error:");
+		//_writer.paragraph(HeadingLevel.H1, cause.getClass().getName());
 		_writer.paragraph(HeadingLevel.H1, cause.getMessage());
 		_writer.footer();
 	}
@@ -783,8 +792,8 @@ public class CommandLineParser
 			boolean hasEnumConstraint = false;
 			boolean hasOtherConstraints = false;
 			if(option.argument() != null)
-				for(Constraint constraint : option.argument().constraints()) {
-					if(constraint instanceof Enumeration)
+				for(Constraint<?> constraint : option.argument().constraints()) {
+					if(constraint instanceof Enumeration<?>)
 						hasEnumConstraint = true;
 					else
 						hasOtherConstraints = true;
@@ -797,8 +806,8 @@ public class CommandLineParser
 				else
 					_writer.h3("Constraints:");
 				_writer.listBegin(headingLevel);
-				for(Constraint constraint : option.argument().constraints()) {
-					if(constraint instanceof Enumeration)
+				for(Constraint<?> constraint : option.argument().constraints()) {
+					if(constraint instanceof Enumeration<?>)
 						hasEnumConstraint = true;
 					else
 						for(String constraintDesc : constraint.description().toParagraphs())
@@ -813,8 +822,8 @@ public class CommandLineParser
 				else
 					_writer.h3("Values:");
 				_writer.listBegin(headingLevel);
-				for(Constraint constraint : option.argument().constraints()) {
-					if(constraint instanceof Enumeration)
+				for(Constraint<?> constraint : option.argument().constraints()) {
+					if(constraint instanceof Enumeration<?>)
 						for(String constraintDesc : constraint.description().toParagraphs())
 							_writer.listItem(replaceStrong(constraintDesc));
 				}
@@ -861,8 +870,8 @@ public class CommandLineParser
 			
 			boolean hasEnumConstraint = false;
 			boolean hasOtherConstraints = false;
-			for(Constraint constraint : argument.constraints()) {
-				if(constraint instanceof Enumeration)
+			for(Constraint<?> constraint : argument.constraints()) {
+				if(constraint instanceof Enumeration<?>)
 					hasEnumConstraint = true;
 				else
 					hasOtherConstraints = true;
@@ -875,8 +884,8 @@ public class CommandLineParser
 				else
 					_writer.h3("Constraints:");
 				_writer.listBegin(headingLevel);
-				for(Constraint constraint : argument.constraints()) {
-					if(constraint instanceof Enumeration)
+				for(Constraint<?> constraint : argument.constraints()) {
+					if(constraint instanceof Enumeration<?>)
 						hasEnumConstraint = true;
 					else
 						for(String constraintDesc : constraint.description().toParagraphs())
@@ -891,8 +900,8 @@ public class CommandLineParser
 				else
 					_writer.h3("Values:");
 				_writer.listBegin(headingLevel);
-				for(Constraint constraint : argument.constraints()) {
-					if(constraint instanceof Enumeration)
+				for(Constraint<?> constraint : argument.constraints()) {
+					if(constraint instanceof Enumeration<?>)
 						for(String constraintDesc : constraint.description().toParagraphs())
 							_writer.listItem(replaceStrong(constraintDesc));
 				}

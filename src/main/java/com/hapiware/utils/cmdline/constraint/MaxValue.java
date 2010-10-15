@@ -6,9 +6,9 @@ import java.math.BigInteger;
 import com.hapiware.utils.cmdline.element.Description;
 
 
-public class MaxValue
+public class MaxValue<T extends Number>
 	implements
-		Constraint
+		Constraint<T>
 {
 	private final Number _maxValue;
 	
@@ -17,26 +17,30 @@ public class MaxValue
 		_maxValue = maxValue;
 	}
 	
-	public void evaluate(String argumentName, Object value) throws ConstraintException
+	public boolean typeCheck(Class<?> typeClass)
 	{
-		Number number = (Number)value;
+		return typeClass.getSuperclass() == Number.class;
+	}
+	
+	public void evaluate(String argumentName, Number value) throws ConstraintException
+	{
 		boolean isOk = false;
 		if(_maxValue instanceof Integer)
-			isOk = number.intValue() <= _maxValue.intValue();
+			isOk = value.intValue() <= _maxValue.intValue();
 		else if(_maxValue instanceof Long)
-			isOk = number.longValue() <= _maxValue.longValue();
+			isOk = value.longValue() <= _maxValue.longValue();
 		else if(_maxValue instanceof Byte)
-			isOk = number.byteValue() <= _maxValue.byteValue();
+			isOk = value.byteValue() <= _maxValue.byteValue();
 		else if(_maxValue instanceof Short)
-			isOk = number.shortValue() <= _maxValue.shortValue();
+			isOk = value.shortValue() <= _maxValue.shortValue();
 		else if(_maxValue instanceof Double)
-			isOk = Double.valueOf(number.doubleValue()).compareTo(_maxValue.doubleValue()) <= 0;
+			isOk = Double.valueOf(value.doubleValue()).compareTo(_maxValue.doubleValue()) <= 0;
 		else if(_maxValue instanceof Float)
-			isOk = Float.valueOf(number.floatValue()).compareTo(_maxValue.floatValue()) <= 0;
+			isOk = Float.valueOf(value.floatValue()).compareTo(_maxValue.floatValue()) <= 0;
 		else if(_maxValue instanceof BigInteger)
-			isOk = ((BigInteger)number).compareTo((BigInteger)_maxValue) <= 0;
+			isOk = ((BigInteger)value).compareTo((BigInteger)_maxValue) <= 0;
 		else if(_maxValue instanceof BigDecimal)
-			isOk = ((BigDecimal)number).compareTo((BigDecimal)_maxValue) <= 0;
+			isOk = ((BigDecimal)value).compareTo((BigDecimal)_maxValue) <= 0;
 		
 		if(!isOk) {
 			String str =

@@ -2,9 +2,10 @@ package com.hapiware.utils.cmdline.constraint;
 
 import com.hapiware.utils.cmdline.element.Description;
 
-public interface Constraint
+public interface Constraint<T>
 {
-	public void evaluate(String argumentName, Object value) throws ConstraintException;
+	public boolean typeCheck(Class<?> typeClass);
+	public void evaluate(String argumentName, T value) throws ConstraintException;
 	
 	/**
 	 * Paragraphs (calls to {@link Description#p()}) has a special meaning for {@code Constraint}s.

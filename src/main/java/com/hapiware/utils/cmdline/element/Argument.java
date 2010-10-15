@@ -15,15 +15,16 @@ import com.hapiware.utils.cmdline.constraint.MaxValue;
 import com.hapiware.utils.cmdline.constraint.MinLength;
 import com.hapiware.utils.cmdline.constraint.MinValue;
 
-public class Argument
+
+public class Argument<T>
 {
 	private ElementBase _argument = new ElementBase();
-	private List<Constraint> _constraints = new LinkedList<Constraint>();
+	private List<Constraint<T>> _constraints = new LinkedList<Constraint<T>>();
 	private boolean _hasEnumConstraint = false;
 	private boolean _optional;
 	private String _defaultForOptional;
 	
-	private Argument(Argument argument)
+	private Argument(Argument<T> argument)
 	{
 		_argument = new ElementBase(argument._argument);
 		_optional = argument._optional;
@@ -37,13 +38,14 @@ public class Argument
 	}
 	
 	/**
-	 * Creates new {@code Option}. {@code name} must match this RE pattern:
-	 * <code>^\p{Alpha}\p{Alnum}*$</code>.
+	 * Creates new {@code Option}.
 	 * 
 	 * @param name
 	 * 
 	 * @throws ConfigurationException
 	 * 		If {@code name} is incorrectly formed.
+	 * 
+	 * @see Util#checkName(String)
 	 */
 	public Argument(String name)
 	{
@@ -58,7 +60,7 @@ public class Argument
 		_argument.name(name);
 	}
 	
-	public Argument id(String id)
+	public Argument<T> id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
 			throw new ConfigurationException("'id' for '" + _argument.name() + "' must have a value.");
@@ -75,7 +77,7 @@ public class Argument
 	/**
 	 * For further details see {@link Description#description(String)}
 	 */
-	public Argument description(String description)
+	public Argument<T> description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
 			throw
@@ -90,7 +92,7 @@ public class Argument
 	/**
 	 * For further details see {@link Description#strong(String)}
 	 */
-	public Argument strong(String text)
+	public Argument<T> strong(String text)
 	{
 		_argument.strong(text);
 		return this;
@@ -99,7 +101,7 @@ public class Argument
 	/**
 	 * For further details see {@link Description#paragraph()}
 	 */
-	public Argument paragraph()
+	public Argument<T> paragraph()
 	{
 		_argument.paragraph();
 		return this;
@@ -108,7 +110,7 @@ public class Argument
 	/**
 	 * For further details see {@link Description#d(String)}
 	 */
-	public Argument d(String description)
+	public Argument<T> d(String description)
 	{
 		description(description);
 		return this;
@@ -117,7 +119,7 @@ public class Argument
 	/**
 	 * For further details see {@link Description#b(String)}
 	 */
-	public Argument b(String text)
+	public Argument<T> b(String text)
 	{
 		strong(text);
 		return this;
@@ -126,13 +128,13 @@ public class Argument
 	/**
 	 * For further details see {@link Description#p()}
 	 */
-	public Argument p()
+	public Argument<T> p()
 	{
 		paragraph();
 		return this;
 	}
 	
-	public <T> Argument optional(T defaultValue)
+	public Argument<T> optional(T defaultValue)
 	{
 		if(defaultValue == null)
 			throw
@@ -145,7 +147,7 @@ public class Argument
 		return this;
 	}
 	
-	public Argument constraint(Constraint constraint)
+	public Argument<T> constraint(Constraint<T> constraint)
 	{
 		String forName = _argument.name() == null ? "" : " for " + _argument.name();
 		if(constraint == null)
@@ -155,7 +157,7 @@ public class Argument
 				new ConfigurationException(
 					"Only one Enumeration constraint can be defined" + forName + "."
 				);
-		if(constraint instanceof Enumeration)
+		if(constraint instanceof Enumeration<?>)
 			_hasEnumConstraint = true;
 		if(constraint.description() == null || constraint.description().toParagraphs().size() == 0)
 			throw new ConfigurationException("A missing constraint description" + forName + ".");
@@ -164,24 +166,28 @@ public class Argument
 		return this;
 	}
 
-	public Argument maxLength(int maxLength)
+	@SuppressWarnings("unchecked")
+	public Argument<T> minLength(int minLength)
 	{
-		return constraint(new MaxLength(maxLength));
+		return constraint((Constraint<T>)new MinLength(minLength));
 	}
 	
-	public Argument minLength(int minLength)
+	@SuppressWarnings("unchecked")
+	public Argument<T> maxLength(int maxLength)
 	{
-		return constraint(new MinLength(minLength));
+		return constraint((Constraint<T>)new MaxLength(maxLength));
 	}
 	
-	public Argument minValue(Number minValue)
+	@SuppressWarnings("unchecked")
+	public Argument<T> minValue(T minValue)
 	{
-		return constraint(new MinValue(minValue));
+		return constraint((Constraint<T>)new MinValue<Number>((Number)minValue));
 	}
 	
-	public Argument maxValue(Number maxValue)
+	@SuppressWarnings("unchecked")
+	public Argument<T> maxValue(T maxValue)
 	{
-		return constraint(new MaxValue(maxValue));
+		return constraint((Constraint<T>)new MaxValue<Number>((Number)maxValue));
 	}
 	
 	
@@ -190,11 +196,11 @@ public class Argument
 			Parser,
 			Cloneable
 	{
-		private Argument _outer;
+		private Argument<T> _outer;
 		private final Class<T> _argumentTypeClass;
 		private T _value;
 		
-		public Inner(Argument outer, Class<T> argumentTypeClass)
+		public Inner(Argument<T> outer, Class<T> argumentTypeClass)
 		{
 			_outer = outer;
 			_argumentTypeClass = argumentTypeClass;
@@ -223,7 +229,7 @@ public class Argument
 		{
 			return _value;
 		}
-		public List<Constraint> constraints()
+		public List<Constraint<T>> constraints()
 		{
 			return Collections.unmodifiableList(_outer._constraints);
 		}
@@ -287,14 +293,14 @@ public class Argument
 		}
 		public void checkConstraints() throws ConstraintException
 		{
-			for(Constraint constraint : constraints())
+			for(Constraint<T> constraint : constraints())
 				constraint.evaluate(name(), value());
 		}
 		
 		@Override
 		public Inner<T> clone()
 		{
-			Inner<T> inner = new Inner<T>(new Argument(_outer), _argumentTypeClass);
+			Inner<T> inner = new Inner<T>(new Argument<T>(_outer), _argumentTypeClass);
 			inner._value = _value;
 			return inner;
 		}

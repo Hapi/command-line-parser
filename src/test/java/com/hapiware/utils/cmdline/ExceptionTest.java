@@ -37,21 +37,21 @@ public class ExceptionTest
 			);
 		_parser.add(new Option("type-mismatch") {{
 			description("Description");
-			set(Integer.class, new OptionArgument() {{
+			set(Integer.class, new OptionArgument<Integer>() {{
 				minValue(1);
 				maxValue(10);
 			}});
 		}});
 		_parser.add(new Command("set", "set description") {{
 			description("Description");
-			add(Integer.class, new Argument("PID") {{
+			add(Integer.class, new Argument<Integer>("PID") {{
 				description("PID");
 				minValue(-2);
 				maxValue(150);
 			}});
 			add(new Option("a") {{
 				description("Description");
-				set(String.class, new OptionArgument() {{
+				set(String.class, new OptionArgument<String>() {{
 					minLength(3);
 					maxLength(6);
 				}});

@@ -149,7 +149,7 @@ public class Option
 		return this;
 	}
 	
-	public <T> Option set(Class<T> argumentType, OptionArgument argument)
+	public <T> Option set(Class<T> argumentType, OptionArgument<T> argument)
 	{
 		if(argumentType == null)
 			throw new ConfigurationException("'argumentType' must have a value.");

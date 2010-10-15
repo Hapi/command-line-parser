@@ -5,7 +5,7 @@ import com.hapiware.utils.cmdline.element.Description;
 
 public class MaxLength
 	implements
-		Constraint
+		Constraint<String>
 {
 	private final int _maxLength;
 	
@@ -14,9 +14,14 @@ public class MaxLength
 		_maxLength = maxLength;
 	}
 	
-	public void evaluate(String argumentName, Object value) throws ConstraintException
+	public boolean typeCheck(Class<?> typeClass)
 	{
-		if(((String)value).length() > _maxLength) {
+		return typeClass == String.class;
+	}
+	
+	public void evaluate(String argumentName, String value) throws ConstraintException
+	{
+		if(value.length() > _maxLength) {
 			String str =
 				"Length of [" + value + "] is longer than the maximum length "
 					+ _maxLength + " allowed for '" + argumentName + "'"; 

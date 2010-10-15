@@ -6,9 +6,9 @@ import java.math.BigInteger;
 import com.hapiware.utils.cmdline.element.Description;
 
 
-public class MinValue
+public class MinValue<T extends Number>
 	implements
-		Constraint
+		Constraint<T>
 {
 	private final Number _minValue;
 	
@@ -17,26 +17,30 @@ public class MinValue
 		_minValue = minValue;
 	}
 	
-	public void evaluate(String argumentName, Object value) throws ConstraintException
+	public boolean typeCheck(Class<?> typeClass)
 	{
-		Number number = (Number)value;
+		return typeClass.getSuperclass() == Number.class;
+	}
+	
+	public void evaluate(String argumentName, Number value) throws ConstraintException
+	{
 		boolean isOk = false;
 		if(_minValue instanceof Integer)
-			isOk = number.intValue() >= _minValue.intValue();
+			isOk = value.intValue() >= _minValue.intValue();
 		else if(_minValue instanceof Long)
-			isOk = number.longValue() >= _minValue.longValue();
+			isOk = value.longValue() >= _minValue.longValue();
 		else if(_minValue instanceof Byte)
-			isOk = number.byteValue() >= _minValue.byteValue();
+			isOk = value.byteValue() >= _minValue.byteValue();
 		else if(_minValue instanceof Short)
-			isOk = number.shortValue() >= _minValue.shortValue();
+			isOk = value.shortValue() >= _minValue.shortValue();
 		else if(_minValue instanceof Double)
-			isOk = Double.valueOf(number.doubleValue()).compareTo(_minValue.doubleValue()) >= 0;
+			isOk = Double.valueOf(value.doubleValue()).compareTo(_minValue.doubleValue()) >= 0;
 		else if(_minValue instanceof Float)
-			isOk = Float.valueOf(number.floatValue()).compareTo(_minValue.floatValue()) >= 0;
+			isOk = Float.valueOf(value.floatValue()).compareTo(_minValue.floatValue()) >= 0;
 		else if(_minValue instanceof BigInteger)
-			isOk = ((BigInteger)number).compareTo((BigInteger)_minValue) >= 0;
+			isOk = ((BigInteger)value).compareTo((BigInteger)_minValue) >= 0;
 		else if(_minValue instanceof BigDecimal)
-			isOk = ((BigDecimal)number).compareTo((BigDecimal)_minValue) >= 0;
+			isOk = ((BigDecimal)value).compareTo((BigDecimal)_minValue) >= 0;
 			
 		if(!isOk) {
 			String str =

@@ -6,32 +6,40 @@ import java.util.List;
 import com.hapiware.utils.cmdline.element.Description;
 
 
-public class Enumeration
+public class Enumeration<T>
 	implements
-		Constraint
+		Constraint<T>
 {
-	private List<Enum> _enumerations = new LinkedList<Enum>();
+	private List<Enum<?>> _enumerations = new LinkedList<Enum<?>>();
 	
-	public Enum value(String value)
+	@SuppressWarnings("unchecked")
+	public Enum<T> value(T value)
 	{
-		Enum e = new Enum(value);
+		Enum<?> e = new Enum<T>(value);
 		_enumerations.add(e);
-		return e;
+		return (Enum<T>)e;
 	}
 
+	public boolean typeCheck(Class<?> typeClass)
+	{
+		if(_enumerations.size() == 0)
+			return false;
+		return typeClass == _enumerations.get(0).value().getClass();
+	}
+	
 	public void evaluate(String argumentName, Object value) throws ConstraintException
 	{
 		String str = value.toString();
 		boolean isOk = false;
-		for(Enum e : _enumerations) {
+		for(Enum<?> e : _enumerations) {
 			if(e._ignoreCase) {
-				if(e.value().equalsIgnoreCase(str)) {
+				if(e.value().toString().equalsIgnoreCase(str)) {
 					isOk = true;
 					break;
 				}
 			}
 			else {
-				if(e.value().equals(str)) {
+				if(e.value().toString().equals(str)) {
 					isOk = true;
 					break;
 				}
@@ -50,25 +58,25 @@ public class Enumeration
 	public Description description()
 	{
 		Description description = new Description();
-		for(Enum e : _enumerations) {
+		for(Enum<?> e : _enumerations) {
 			if(e._description == null || e._description.trim().length() == 0)
 				return null;
-			description.strong(e.value()).description(", " + e._description).p();
+			description.strong(e.value().toString()).description(", " + e._description).p();
 		}
 		return description;
 	}
 	
-	public static class Enum {
-		private String _value;
+	public static class Enum<T> {
+		private T _value;
 		private boolean _ignoreCase;
 		private String _description;
 		
-		public Enum(String value)
+		public Enum(T value)
 		{
 			_value = value;
 		}
 		
-		public Enum ignoreCase()
+		public Enum<T> ignoreCase()
 		{
 			_ignoreCase = true;
 			return this;
@@ -86,7 +94,7 @@ public class Enumeration
 			description(description);
 		}
 		
-		public String value()
+		private T value()
 		{
 			return _value;
 		}
@@ -98,9 +106,9 @@ public class Enumeration
 			if(obj == this)
 				return true;
 
-			if(!(obj instanceof Enumeration.Enum))
+			if(!(obj instanceof Enumeration.Enum<?>))
 				return false;
-			Enumeration.Enum object = (Enumeration.Enum)obj;
+			Enumeration.Enum<?> object = (Enumeration.Enum<?>)obj;
 			
 			return _value.equals(object._value) && _ignoreCase == object._ignoreCase;
 		}

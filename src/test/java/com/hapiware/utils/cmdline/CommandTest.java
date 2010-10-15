@@ -34,33 +34,33 @@ public class CommandTest
 			);
 		_parser.add(new Command("set", "set description") {{
 			description("Description");
-			add(Integer.class, new Argument("PID") {{
+			add(Integer.class, new Argument<Integer>("PID") {{
 				description("PID description");
 				minValue(-2);
 				maxValue(150);
 			}});
-			add(Integer.class, new Argument("TYPE") {{
+			add(Integer.class, new Argument<Integer>("TYPE") {{
 				description("TYPE description.");
 				optional(4);
-				constraint(new Enumeration() {{
-					value("2").description("2 desc.");
-					value("3").description("3 desc.");
-					value("4").description("4 desc.");
+				constraint(new Enumeration<Integer>() {{
+					value(2).description("2 desc.");
+					value(3).description("3 desc.");
+					value(4).description("4 desc.");
 				}});
 			}});
-			add(String.class, new Argument("LEVEL") {{
+			add(String.class, new Argument<String>("LEVEL") {{
 				description("LEVEL description.");
 			}});
 			add(new Option("a") {{
 				description("Description");
-				set(String.class, new OptionArgument() {{
+				set(String.class, new OptionArgument<String>() {{
 					minLength(3);
 					maxLength(6);
 				}});
 			}});
 			add(new Option("b") {{
 				description("Description");
-				set(Integer.class, new OptionArgument() {{
+				set(Integer.class, new OptionArgument<Integer>() {{
 					minValue(-3);
 					maxValue(6);
 				}});

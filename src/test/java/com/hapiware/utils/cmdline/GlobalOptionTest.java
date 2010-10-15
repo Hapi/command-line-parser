@@ -48,21 +48,21 @@ public class GlobalOptionTest
 		p.add(new Option("n") {{
 			alternatives("number");
 			description("Description");
-			set(Integer.class, new OptionArgument() {{
+			set(Integer.class, new OptionArgument<Integer>() {{
 				minValue(1);
 				maxValue(1000);
 			}});
 		}});
 		p.add(new Option("s") {{
 			description("Description");
-			set(String.class, new OptionArgument() {{
+			set(String.class, new OptionArgument<String>() {{
 				maxLength(5);
 			}});
 		}});
 		p.add(new Option("d") {{
 			description("Description");
-			set(String.class, new OptionArgument() {{
-				constraint(new Enumeration() {{
+			set(String.class, new OptionArgument<String>() {{
+				constraint(new Enumeration<String>() {{
 					value("J").ignoreCase().description("Desc J.");
 					value("x").description("Desc x.");
 					value("4").description("Desc 4.");
@@ -113,7 +113,7 @@ public class GlobalOptionTest
 			);
 		p.add(new Option("n") {{
 			description("Description");
-			set(Integer.class, new OptionArgument() {{
+			set(Integer.class, new OptionArgument<Integer>() {{
 				optional(13);
 				minValue(1);
 				maxValue(1000);
@@ -164,7 +164,7 @@ public class GlobalOptionTest
 		p.add(new Option("nums") {{
 			multiple().id("intarray");
 			description("Description");
-			set(Integer.class, new OptionArgument() {{
+			set(Integer.class, new OptionArgument<Integer>() {{
 				minValue(1);
 				maxValue(10);
 			}});
