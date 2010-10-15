@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 public class ElementBase
 {
 	private String _name;
@@ -42,19 +43,52 @@ public class ElementBase
 		_id = id;
 	}
 	
+	/**
+	 * For further details see {@link Description#description(String)}
+	 */
 	public void description(String description)
 	{
 		_description.description(description);
 	}
 	
-	public void p()
+	/**
+	 * For further details see {@link Description#d(String)}
+	 */
+	public void d(String description)
 	{
-		_description.p();
+		description(description);
 	}
 	
+	/**
+	 * For further details see {@link Description#strong(String)}
+	 */
 	public void strong(String text)
 	{
 		_description.strong(text);
+	}
+
+	/**
+	 * For further details see {@link Description#b(String)}
+	 */
+	public void b(String text)
+	{
+		strong(text);
+	}
+	
+	/**
+	 * For further details see {@link Description#paragraph()}
+	 */
+	public void paragraph()
+	{
+		_description.paragraph();
+	}
+	
+	/**
+	 * For further details see {@link Description#p()}
+	 */
+	public void p()
+	{
+		paragraph();
 	}
 	
 	public String name()

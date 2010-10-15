@@ -89,6 +89,9 @@ public class Option
 		return this;
 	}
 	
+	/**
+	 * For further details see {@link Description#description(String)}
+	 */
 	public Option description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
@@ -101,18 +104,51 @@ public class Option
 		return this;
 	}
 	
-	public Option p()
-	{
-		_option.p();
-		return this;
-	}
-	
+	/**
+	 * For further details see {@link Description#strong(String)}
+	 */
 	public Option strong(String text)
 	{
 		_option.strong(text);
 		return this;
 	}
-
+	
+	/**
+	 * For further details see {@link Description#paragraph()}
+	 */
+	public Option paragraph()
+	{
+		_option.paragraph();
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#d(String)}
+	 */
+	public Option d(String description)
+	{
+		description(description);
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#b(String)}
+	 */
+	public Option b(String text)
+	{
+		strong(text);
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#p()}
+	 */
+	public Option p()
+	{
+		paragraph();
+		return this;
+	}
+	
 	public <T> Option set(Class<T> argumentType, OptionArgument argument)
 	{
 		if(argumentType == null)

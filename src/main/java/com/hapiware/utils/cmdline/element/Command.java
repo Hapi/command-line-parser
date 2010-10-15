@@ -132,6 +132,9 @@ public class Command
 		return this;
 	}
 	
+	/**
+	 * For further details see {@link Description#description(String)}
+	 */
 	public Command description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
@@ -143,15 +146,49 @@ public class Command
 		_command.description(description);
 		return this;
 	}
-	public Command p()
-	{
-		_command.p();
-		return this;
-	}
 	
+	/**
+	 * For further details see {@link Description#strong(String)}
+	 */
 	public Command strong(String text)
 	{
 		_command.strong(text);
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#paragraph()}
+	 */
+	public Command paragraph()
+	{
+		_command.paragraph();
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#d(String)}
+	 */
+	public Command d(String description)
+	{
+		description(description);
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#b(String)}
+	 */
+	public Command b(String text)
+	{
+		strong(text);
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#p()}
+	 */
+	public Command p()
+	{
+		paragraph();
 		return this;
 	}
 	

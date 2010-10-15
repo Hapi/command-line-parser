@@ -72,6 +72,9 @@ public class Argument
 		return this;
 	}
 	
+	/**
+	 * For further details see {@link Description#description(String)}
+	 */
 	public Argument description(String description)
 	{
 		if(description == null || description.trim().length() == 0)
@@ -84,15 +87,48 @@ public class Argument
 		return this;
 	}
 	
-	public Argument p()
-	{
-		_argument.p();
-		return this;
-	}
-	
+	/**
+	 * For further details see {@link Description#strong(String)}
+	 */
 	public Argument strong(String text)
 	{
 		_argument.strong(text);
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#paragraph()}
+	 */
+	public Argument paragraph()
+	{
+		_argument.paragraph();
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#d(String)}
+	 */
+	public Argument d(String description)
+	{
+		description(description);
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#b(String)}
+	 */
+	public Argument b(String text)
+	{
+		strong(text);
+		return this;
+	}
+	
+	/**
+	 * For further details see {@link Description#p()}
+	 */
+	public Argument p()
+	{
+		paragraph();
 		return this;
 	}
 	
