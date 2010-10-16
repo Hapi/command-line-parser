@@ -46,6 +46,12 @@
 	
 	<dependencies>
 		<dependency>
+			<groupId>com.hapiware.util.publisher</groupId>
+			<artifactId>publisher</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>[5.0,5.11]</version>

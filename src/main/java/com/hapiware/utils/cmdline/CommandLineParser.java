@@ -60,12 +60,17 @@ public class CommandLineParser
 	{
 		this(mainClass, 80, description);
 	}
+	
 	public CommandLineParser(Class<?> mainClass, int screenWidth, Description description)
 	{
 		if(mainClass == null)
 			throw new NullPointerException("'mainClass' must have a value.");
 		if(description == null)
 			throw new NullPointerException("'description' must have a value.");
+		if(mainClass.getPackage().getImplementationTitle() == null)
+			throw new ConfigurationException("Implementation-Title: is missing from MANIFEST.MF.");
+		if(mainClass.getPackage().getImplementationVersion() == null)
+			throw new ConfigurationException("Implementation-Version: is missing from MANIFEST.MF.");
 		
 		_mainClass = mainClass;
 		_writer = new ScreenWriter(screenWidth);
@@ -85,6 +90,10 @@ public class CommandLineParser
 			throw new NullPointerException("'writer' must have a value.");
 		if(description == null)
 			throw new NullPointerException("'description' must have a value.");
+		if(mainClass.getPackage().getImplementationTitle() == null)
+			throw new ConfigurationException("Implementation-Title: is missing from MANIFEST.MF.");
+		if(mainClass.getPackage().getImplementationVersion() == null)
+			throw new ConfigurationException("Implementation-Version: is missing from MANIFEST.MF.");
 		
 		_mainClass = mainClass;
 		_writer = writer;

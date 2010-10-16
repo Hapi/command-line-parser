@@ -16,6 +16,8 @@ import com.hapiware.utils.cmdline.element.OptionArgument;
 
 
 public class ExceptionTest
+	extends
+		TestBase
 {
 	private CommandLineParser _parser;
 	

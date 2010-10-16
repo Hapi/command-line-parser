@@ -17,6 +17,8 @@ import com.hapiware.utils.cmdline.element.OptionArgument;
 
 
 public class GlobalOptionTest
+	extends
+		TestBase
 {
 	@Id("ver")
 	private boolean _ver;

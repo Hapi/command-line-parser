@@ -19,6 +19,8 @@ import static junit.framework.Assert.assertEquals;
 
 
 public class CommandTest
+	extends
+		TestBase
 {
 	private CommandLineParser _parser;
 	

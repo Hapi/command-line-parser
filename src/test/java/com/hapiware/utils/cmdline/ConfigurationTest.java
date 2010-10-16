@@ -3,6 +3,8 @@ package com.hapiware.utils.cmdline;
 import org.testng.annotations.Test;
 
 public class ConfigurationTest
+	extends
+		TestBase
 {
 	@Test
 	public void doNotUseAnnotations()

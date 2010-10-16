@@ -9,6 +9,8 @@ import com.hapiware.utils.cmdline.element.Option;
 import com.hapiware.utils.cmdline.element.OptionArgument;
 
 public class ParserTest
+	extends
+		TestBase
 {
 	@Id("n")
 	private static int _a;
@@ -24,7 +26,7 @@ public class ParserTest
 	
 	@Id("TYPE")
 	private static int _type;
-	
+
 	
 	public static void main(String[] args)
 	{
@@ -107,6 +109,7 @@ public class ParserTest
 		p.parsePrintAndExitOnError(
 			new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "1000" }
 			//new String[] { "--help", "cmd=set" }
+			//new String[] { "--version" }
 			
 			// TODO: Create a test case for these.
 			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--numbe", "1000" }
