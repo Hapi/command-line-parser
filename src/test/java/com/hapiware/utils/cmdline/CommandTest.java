@@ -45,9 +45,9 @@ public class CommandTest
 				description("TYPE description.");
 				optional(4);
 				constraint(new Enumeration<Integer>() {{
-					value(2).description("2 desc.");
-					value(3).description("3 desc.");
-					value(4).description("4 desc.");
+					value(2, "2 desc.");
+					value(3, "3 desc.");
+					value(4, "4 desc.");
 				}});
 			}});
 			add(String.class, new Argument<String>("LEVEL") {{

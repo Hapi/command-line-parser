@@ -12,12 +12,21 @@ public class Enumeration<T>
 {
 	private List<Enum<?>> _enumerations = new LinkedList<Enum<?>>();
 	
-	@SuppressWarnings("unchecked")
-	public Enum<T> value(T value)
+	public Enumeration<T> value(T value, String description)
 	{
-		Enum<?> e = new Enum<T>(value);
-		_enumerations.add(e);
-		return (Enum<T>)e;
+		value(value, description, false);
+		return this;
+	}
+	
+	public Enumeration<T> valueIgnoreCase(T value, String description)
+	{
+		value(value, description, true);
+		return this;
+	}
+	
+	private void value(T value, String description, boolean ignoreCase)
+	{
+		_enumerations.add(new Enum<T>(value, description, ignoreCase));
 	}
 
 	public boolean typeCheck(Class<?> typeClass)
@@ -66,32 +75,20 @@ public class Enumeration<T>
 		return description;
 	}
 	
-	public static class Enum<T> {
-		private T _value;
-		private boolean _ignoreCase;
-		private String _description;
+	private static class Enum<T> {
+		private final T _value;
+		private final String _description;
+		private final boolean _ignoreCase;
 		
-		public Enum(T value)
+		public Enum(T value, String description, boolean ignoreCase)
 		{
-			_value = value;
-		}
-		
-		public Enum<T> ignoreCase()
-		{
-			_ignoreCase = true;
-			return this;
-		}
-		
-		public void description(String description)
-		{
+			if(value == null)
+				throw new NullPointerException("'value' must have a value.");
 			if(description == null || description.trim().length() == 0)
 				throw new ConfigurationException("'description' must have a value.");
+			_value = value;
 			_description = description;
-		}
-		
-		public void d(String description)
-		{
-			description(description);
+			_ignoreCase = ignoreCase;
 		}
 		
 		private T value()

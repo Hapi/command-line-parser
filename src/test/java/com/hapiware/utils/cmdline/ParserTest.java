@@ -61,8 +61,8 @@ public class ParserTest
 			set(String.class, new OptionArgument<String>() {{
 				//maxLength(5);
 				constraint(new Enumeration<String>() {{
-					value("J").ignoreCase().description("for Java loggers.");
-					value("4").description("for log4j loggers.");
+					valueIgnoreCase("J", "for Java loggers.");
+					value("4", "for log4j loggers.");
 				}});
 			}});
 		}});
@@ -79,8 +79,8 @@ public class ParserTest
 				minValue(3);
 				maxValue(6);
 				constraint(new Enumeration<Integer>() {{
-					value(3).description("for three");
-					value(7).description("fro seven");
+					value(3, "for three");
+					value(7, "for seven");
 				}});
 				description("....");
 			}});

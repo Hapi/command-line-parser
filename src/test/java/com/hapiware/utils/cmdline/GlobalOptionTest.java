@@ -65,9 +65,9 @@ public class GlobalOptionTest
 			description("Description");
 			set(String.class, new OptionArgument<String>() {{
 				constraint(new Enumeration<String>() {{
-					value("J").ignoreCase().description("Desc J.");
-					value("x").description("Desc x.");
-					value("4").description("Desc 4.");
+					valueIgnoreCase("J", "Desc J.");
+					value("x", "Desc x.");
+					value("4", "Desc 4.");
 				}});
 			}});
 		}});
