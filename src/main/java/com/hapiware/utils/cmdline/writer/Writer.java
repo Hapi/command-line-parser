@@ -15,6 +15,9 @@ public interface Writer
 	public void listBegin(HeadingLevel headingLevel);
 	public void listItem(String text);
 	public void listEnd();
+	public void codeBegin(HeadingLevel headingLevel);
+	public void codeLine(String code);
+	public void codeEnd();
 	public String strongBegin();
 	public String strongEnd();
 	public void footer();

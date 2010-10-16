@@ -19,6 +19,7 @@ public class ScreenWriter
 	private final static int MAX_SCREEN_WIDTH = 250;
 	private final int _screenWidth;
 	private HeadingLevel _headingLevelForListItems;
+	private HeadingLevel _headingLevelForCodeLines;
 	
 	public ScreenWriter(int screenWidth)
 	{
@@ -92,6 +93,21 @@ public class ScreenWriter
 		System.out.println();
 	}
 
+	public void codeBegin(HeadingLevel headingLevel)
+	{
+		_headingLevelForCodeLines = headingLevel;
+	}
+	
+	public void codeLine(String code)
+	{
+		line(_headingLevelForCodeLines, code);
+	}
+	
+	public void codeEnd()
+	{
+		System.out.println();
+	}
+	
 	public void footer()
 	{
 		// Does nothing.

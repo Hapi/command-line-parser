@@ -734,10 +734,11 @@ public class CommandLineParser
 		command += _definedArgumentTypes.contains(HelpType.COMMAND_ARGUMENTS) ? " CMD-ARGS" : "";
 		command += _definedArgumentTypes.contains(HelpType.ARGUMENTS) ? " ARGS" : "";
 		_writer.h1("Usage:");
-		_writer.line(HeadingLevel.H1, _javaCommand + helpCommand);
-		_writer.line(HeadingLevel.H1, _javaCommand + " --version");
-		_writer.line(HeadingLevel.H1, _javaCommand + command);
-		_writer.line(HeadingLevel.H1, "");
+		_writer.codeBegin(HeadingLevel.H1);
+		_writer.codeLine(_javaCommand + helpCommand);
+		_writer.codeLine(_javaCommand + " --version");
+		_writer.codeLine(_javaCommand + command);
+		_writer.codeEnd();
 	}
 	
 	private void printDescription()
@@ -975,15 +976,16 @@ public class CommandLineParser
 	private void printExamples()
 	{
 		_writer.h1("Examples:");
-		_writer.line(HeadingLevel.H1, _javaCommand + " -? " + COMPLETE_HELP_COMMAND);
+		_writer.codeBegin(HeadingLevel.H1);
+		_writer.codeLine(_javaCommand + " -? " + COMPLETE_HELP_COMMAND);
 		if(_definedCommands.size() > 0)
-			_writer.line(
-				HeadingLevel.H1,
+			_writer.codeLine(
 				_javaCommand + " --help cmd=" + _definedCommands.keySet().iterator().next()
 			);
-		_writer.line(HeadingLevel.H1, _javaCommand + " --version");
+		_writer.codeLine(_javaCommand + " --version");
 		
 		for(String example : _exampleArguments)
-			_writer.line(HeadingLevel.H1, _javaCommand + " " + example);
+			_writer.codeLine(_javaCommand + " " + example);
+		_writer.codeEnd();
 	}
 }
