@@ -1,6 +1,7 @@
 package com.hapiware.utils.cmdline;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -27,14 +28,37 @@ import com.hapiware.utils.cmdline.writer.Writer;
 import com.hapiware.utils.cmdline.writer.Writer.Level;
 
 
+/**
+ * System property {@code com.hapiware.cmdline.width}.
+ * 
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ */
 public class CommandLineParser
 {
 	private enum HelpType { OPTIONS, ARGUMENTS, COMMANDS, COMMAND_OPTIONS, COMMAND_ARGUMENTS };
+	
 	private static final String COMPLETE_HELP_COMMAND = "all";
 	private static final String OPTS_HELP_COMMAND = "opts";
 	private static final String CMDS_HELP_COMMAND = "cmds";
 	private static final String CMD_HELP_COMMAND = "cmd=";
 	private static final String ARGS_HELP_COMMAND = "args";
+	private static final String SCREEN_WIDTH_PROPERTY = "com.hapiware.cmdline.width";
+	private static final int DEFAULT_SCREEN_WIDTH;
+	
+	static {
+		int screenWidth = 100;
+		try {
+			 screenWidth = Integer.parseInt(System.getProperty(SCREEN_WIDTH_PROPERTY));
+		}
+		catch(Throwable ignore) {
+			// Does nothing.
+		}
+		finally {
+			DEFAULT_SCREEN_WIDTH = screenWidth;
+		}
+	}
 	
 	
 	private final Description _description;
@@ -58,7 +82,7 @@ public class CommandLineParser
 	
 	public CommandLineParser(Class<?> mainClass, Description description)
 	{
-		this(mainClass, 80, description);
+		this(mainClass, DEFAULT_SCREEN_WIDTH, description);
 	}
 	
 	public CommandLineParser(Class<?> mainClass, int screenWidth, Description description)
@@ -575,7 +599,7 @@ public class CommandLineParser
 			);
 			Util.setAnnotatedOptions(callerObject, callerClass, _cmdLineCommand.cmdLineOptions());
 			Util.setAnnotatedArguments(callerObject, callerClass, _cmdLineCommand.cmdLineArguments());
-			_cmdLineCommand.execute(_cmdLineOptions);
+			_cmdLineCommand.execute(Collections.unmodifiableList(_cmdLineOptions));
 		}
 	}
 
