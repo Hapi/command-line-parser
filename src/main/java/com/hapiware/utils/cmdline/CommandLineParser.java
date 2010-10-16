@@ -29,7 +29,7 @@ import com.hapiware.utils.cmdline.writer.Writer.Level;
 
 
 /**
- * System property {@code com.hapiware.cmdline.width}.
+ * System property {@code screenwidth.default}.
  * 
  * 
  * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
@@ -44,7 +44,7 @@ public class CommandLineParser
 	private static final String CMDS_HELP_COMMAND = "cmds";
 	private static final String CMD_HELP_COMMAND = "cmd=";
 	private static final String ARGS_HELP_COMMAND = "args";
-	private static final String SCREEN_WIDTH_PROPERTY = "com.hapiware.cmdline.width";
+	private static final String SCREEN_WIDTH_PROPERTY = "screenwidth.default";
 	private static final int DEFAULT_SCREEN_WIDTH;
 	
 	static {
