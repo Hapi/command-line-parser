@@ -4,8 +4,6 @@ import java.io.PrintStream;
 
 
 /**
- * Headings and list items are one liners only (i.e. if they are longer than defined screen
- * width they are just cut).
  * 
  * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
  *
@@ -22,37 +20,62 @@ public class WikidotWriter
 		// Does nothing.
 	}
 
-	public void h1(String text)
+	public void level1Begin(String text)
 	{
 		STREAM.println("+ " + text);
 	}
 
-	public void h2(String text)
+	public void level1End()
+	{
+		// Does nothing.
+	}
+
+	public void level2Begin(String text)
 	{
 		STREAM.println("++ " + text);
 	}
 
-	public void h3(String text)
+	public void level2End()
+	{
+		// Does nothing.
+	}
+
+	public void level3Begin(String text)
 	{
 		STREAM.println("+++ " + text);
 	}
 
-	public void h4(String text)
+	public void level3End()
+	{
+		// Does nothing.
+	}
+
+	public void level4Begin(String text)
 	{
 		STREAM.println("++++ " + text);
 	}
 
-	public void h5(String text)
+	public void level4End()
+	{
+		// Does nothing.
+	}
+
+	public void level5Begin(String text)
 	{
 		STREAM.println("+++++ " + text);
 	}
 
-	public void line(HeadingLevel headingLevel, String text)
+	public void level5End()
+	{
+		// Does nothing.
+	}
+
+	public void line(Level level, String text)
 	{
 		STREAM.println(text + " _");
 	}
 
-	public void paragraph(HeadingLevel headingLevel, String text)
+	public void paragraph(Level level, String text)
 	{
 		STREAM.println(text);
 		STREAM.println();
@@ -68,7 +91,7 @@ public class WikidotWriter
 		return "**";
 	}
 
-	public void listBegin(HeadingLevel headingLevel)
+	public void listBegin(Level level)
 	{
 		// Does nothing.
 	}
@@ -83,7 +106,7 @@ public class WikidotWriter
 		STREAM.println();
 	}
 
-	public void codeBegin(HeadingLevel headingLevel)
+	public void codeBegin(Level level)
 	{
 		STREAM.println("[[code]]");
 	}

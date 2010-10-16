@@ -22,8 +22,8 @@ public class ScreenWriter
 	private final static PrintStream STREAM = System.out;
 	
 	private final int _screenWidth;
-	private HeadingLevel _headingLevelForListItems;
-	private HeadingLevel _headingLevelForCodeLines;
+	private Level _levelForListItems;
+	private Level _levelForCodeLines;
 	
 	public ScreenWriter(int screenWidth)
 	{
@@ -36,39 +36,64 @@ public class ScreenWriter
 		_screenWidth = screenWidth;
 	}
 
-	public void h1(String text)
+	public void level1Begin(String text)
 	{
 		STREAM.println(cut(text));
 	}
-
-	public void h2(String text)
+	
+	public void level1End()
 	{
-		STREAM.println(cut(tab(HeadingLevel.H1) + text));
+		// Does nothing.
 	}
 
-	public void h3(String text)
+	public void level2Begin(String text)
 	{
-		STREAM.println(cut(tab(HeadingLevel.H2) + text));
+		STREAM.println(cut(tab(Level.L1) + text));
 	}
 
-	public void h4(String text)
+	public void level2End()
 	{
-		STREAM.println(cut(tab(HeadingLevel.H3) + text));
+		// Does nothing.
 	}
 
-	public void h5(String text)
+	public void level3Begin(String text)
 	{
-		STREAM.println(cut(tab(HeadingLevel.H4) + text));
+		STREAM.println(cut(tab(Level.L2) + text));
 	}
 
-	public void line(HeadingLevel headingLevel, String text)
+	public void level3End()
 	{
-		STREAM.println(cut(tab(headingLevel) + text));
+		// Does nothing.
 	}
 
-	public void paragraph(HeadingLevel headingLevel, String text)
+	public void level4Begin(String text)
 	{
-		Util.write(text, TAB_SIZE * (headingLevel.ordinal() + 1), _screenWidth, STREAM);
+		STREAM.println(cut(tab(Level.L3) + text));
+	}
+
+	public void level4End()
+	{
+		// Does nothing.
+	}
+
+	public void level5Begin(String text)
+	{
+		STREAM.println(cut(tab(Level.L4) + text));
+	}
+
+	public void level5End()
+	{
+		// Does nothing.
+	}
+
+	public void line(Level level, String text)
+	{
+		STREAM.println(cut(tab(level) + text));
+	}
+
+	public void paragraph(Level level, String text)
+	{
+		Util.write(text, TAB_SIZE * (level.ordinal() + 1), _screenWidth, STREAM);
 		STREAM.println();
 	}
 
@@ -82,14 +107,14 @@ public class ScreenWriter
 		return "'";
 	}
 
-	public void listBegin(HeadingLevel headingLevel)
+	public void listBegin(Level level)
 	{
-		_headingLevelForListItems = headingLevel;
+		_levelForListItems = level;
 	}
 
 	public void listItem(String text)
 	{
-		STREAM.println(cut(tab(_headingLevelForListItems) + "* " + text));
+		STREAM.println(cut(tab(_levelForListItems) + "* " + text));
 	}
 
 	public void listEnd()
@@ -97,14 +122,14 @@ public class ScreenWriter
 		STREAM.println();
 	}
 
-	public void codeBegin(HeadingLevel headingLevel)
+	public void codeBegin(Level level)
 	{
-		_headingLevelForCodeLines = headingLevel;
+		_levelForCodeLines = level;
 	}
 	
 	public void codeLine(String code)
 	{
-		line(_headingLevelForCodeLines, code);
+		line(_levelForCodeLines, code);
 	}
 	
 	public void codeEnd()
@@ -122,10 +147,10 @@ public class ScreenWriter
 		// Does nothing.
 	}
 	
-	private static String tab(HeadingLevel headingLevel)
+	private static String tab(Level level)
 	{
 		String tab = "";
-		for(int i = 0; i < (headingLevel.ordinal() + 1) * TAB_SIZE; i++)
+		for(int i = 0; i < (level.ordinal() + 1) * TAB_SIZE; i++)
 			tab += " ";
 		return tab;
 	}

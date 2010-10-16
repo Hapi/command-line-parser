@@ -2,20 +2,25 @@ package com.hapiware.utils.cmdline.writer;
 
 public interface Writer
 {
-	public enum HeadingLevel { H1, H2, H3, H4, H5 };
+	public enum Level { L1, L2, L3, L4, L5 };
 	
 	public void header();
-	public void h1(String text);
-	public void h2(String text);
-	public void h3(String text);
-	public void h4(String text);
-	public void h5(String text);
-	public void paragraph(HeadingLevel headingLevel, String text);
-	public void line(HeadingLevel headingLevel, String text);
-	public void listBegin(HeadingLevel headingLevel);
+	public void level1Begin(String text);
+	public void level1End();
+	public void level2Begin(String text);
+	public void level2End();
+	public void level3Begin(String text);
+	public void level3End();
+	public void level4Begin(String text);
+	public void level4End();
+	public void level5Begin(String text);
+	public void level5End();
+	public void paragraph(Level headingLevel, String text);
+	public void line(Level headingLevel, String text);
+	public void listBegin(Level headingLevel);
 	public void listItem(String text);
 	public void listEnd();
-	public void codeBegin(HeadingLevel headingLevel);
+	public void codeBegin(Level headingLevel);
 	public void codeLine(String code);
 	public void codeEnd();
 	public String strongBegin();

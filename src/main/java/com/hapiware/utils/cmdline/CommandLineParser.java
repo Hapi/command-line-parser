@@ -24,7 +24,7 @@ import com.hapiware.utils.cmdline.element.Description;
 import com.hapiware.utils.cmdline.element.Option;
 import com.hapiware.utils.cmdline.writer.ScreenWriter;
 import com.hapiware.utils.cmdline.writer.Writer;
-import com.hapiware.utils.cmdline.writer.Writer.HeadingLevel;
+import com.hapiware.utils.cmdline.writer.Writer.Level;
 
 
 public class CommandLineParser
@@ -472,9 +472,10 @@ public class CommandLineParser
 			}
 
 			_writer.header();
-			_writer.h1("Help error:");
-			_writer.line(HeadingLevel.H1, "'" + helpCommand + "' is not a valid help command.");
-			_writer.line(HeadingLevel.H1, "");
+			_writer.level1Begin("Help error:");
+			_writer.line(Level.L1, "'" + helpCommand + "' is not a valid help command.");
+			_writer.line(Level.L1, "");
+			_writer.level1End();
 			printUsage();
 			_writer.footer();
 			System.exit(0);
@@ -582,7 +583,8 @@ public class CommandLineParser
 	private void showVersionAndExit()
 	{
 		_writer.header();
-		_writer.h1("Version: " + _mainClass.getPackage().getImplementationVersion());
+		_writer.level1Begin("Version: " + _mainClass.getPackage().getImplementationVersion());
+		_writer.level1End();
 		_writer.footer();
 		System.exit(0);
 	}
@@ -613,13 +615,14 @@ public class CommandLineParser
 		printDescription();
 		printShortCommands();
 		printGlobalArguments();
-		_writer.line(HeadingLevel.H1, "");
-		_writer.h1("Notice:");
+		_writer.line(Level.L1, "");
+		_writer.level1Begin("Notice:");
 		_writer.line(
-			HeadingLevel.H1,
+			Level.L1,
 			"This is a short help. To get a complete help run:"
 		);
-		_writer.line(HeadingLevel.H1, _javaCommand + " -? " + COMPLETE_HELP_COMMAND);
+		_writer.line(Level.L1, _javaCommand + " -? " + COMPLETE_HELP_COMMAND);
+		_writer.level1End();
 	}
 	
 	public void printGlobalOptionsHelp()
@@ -641,21 +644,23 @@ public class CommandLineParser
 	public void printThrowable(Throwable t)
 	{
 		_writer.header();
-		_writer.h1(t.getClass().getName());
+		_writer.level1Begin(t.getClass().getName());
 		if(t.getCause() != null)
-			_writer.paragraph(HeadingLevel.H1, t.getCause().getClass().getName());
-		_writer.paragraph(HeadingLevel.H1, t.getMessage());
+			_writer.paragraph(Level.L1, t.getCause().getClass().getName());
+		_writer.paragraph(Level.L1, t.getMessage());
 		for(StackTraceElement stackTraceElement : t.getStackTrace())
-			_writer.paragraph(HeadingLevel.H1, stackTraceElement.toString());
+			_writer.paragraph(Level.L1, stackTraceElement.toString());
+		_writer.level1End();
 		_writer.footer();
 	}
 
 	public void printErrorWithShortHelp(Throwable cause)
 	{
 		_writer.header();
-		_writer.h1("Error:");
-		//_writer.paragraph(HeadingLevel.H1, cause.getClass().getName());
-		_writer.paragraph(HeadingLevel.H1, cause.getMessage());
+		_writer.level1Begin("Error:");
+		//_writer.paragraph(Level.L1, cause.getClass().getName());
+		_writer.paragraph(Level.L1, cause.getMessage());
+		_writer.level1End();
 		printShortHelpWithoutHeaders();
 		_writer.footer();
 	}
@@ -663,9 +668,10 @@ public class CommandLineParser
 	public void printErrorWithCommandsHelp(Throwable cause)
 	{
 		_writer.header();
-		_writer.h1("Error:");
-		//_writer.paragraph(HeadingLevel.H1, cause.getClass().getName());
-		_writer.paragraph(HeadingLevel.H1, cause.getMessage());
+		_writer.level1Begin("Error:");
+		//_writer.paragraph(Level.L1, cause.getClass().getName());
+		_writer.paragraph(Level.L1, cause.getMessage());
+		_writer.level1End();
 		printShortCommands();
 		_writer.footer();
 	}
@@ -673,9 +679,10 @@ public class CommandLineParser
 	public void printErrorMessageWithoutHelp(Throwable cause)
 	{
 		_writer.header();
-		_writer.h1("Error:");
-		//_writer.paragraph(HeadingLevel.H1, cause.getClass().getName());
-		_writer.paragraph(HeadingLevel.H1, cause.getMessage());
+		_writer.level1Begin("Error:");
+		//_writer.paragraph(Level.L1, cause.getClass().getName());
+		_writer.paragraph(Level.L1, cause.getMessage());
+		_writer.level1End();
 		_writer.footer();
 	}
 	
@@ -691,13 +698,15 @@ public class CommandLineParser
 		Command.Inner command = _definedCommands.get(_definedCommandAlternatives.get(commandName));
 		_writer.header();
 		if(command != null) {
-			_writer.h1("CMD:");
+			_writer.level1Begin("CMD:");
 			printCommand(command);
+			_writer.level1End();
 		}
 		else {
-			_writer.h1("Help error:");
-			_writer.line(HeadingLevel.H1, "'" + commandName + "' is not a valid command.");
-			_writer.line(HeadingLevel.H1, "");
+			_writer.level1Begin("Help error:");
+			_writer.line(Level.L1, "'" + commandName + "' is not a valid command.");
+			_writer.line(Level.L1, "");
+			_writer.level1End();
 			printShortCommands();
 		}
 		_writer.footer();
@@ -730,19 +739,21 @@ public class CommandLineParser
 		command += _definedArgumentTypes.contains(HelpType.COMMAND_OPTIONS) ? " [CMD-OPTS]" : "";
 		command += _definedArgumentTypes.contains(HelpType.COMMAND_ARGUMENTS) ? " CMD-ARGS" : "";
 		command += _definedArgumentTypes.contains(HelpType.ARGUMENTS) ? " ARGS" : "";
-		_writer.h1("Usage:");
-		_writer.codeBegin(HeadingLevel.H1);
+		_writer.level1Begin("Usage:");
+		_writer.codeBegin(Level.L1);
 		_writer.codeLine(_javaCommand + helpCommand);
 		_writer.codeLine(_javaCommand + " --version");
 		_writer.codeLine(_javaCommand + command);
 		_writer.codeEnd();
+		_writer.level1End();
 	}
 	
 	private void printDescription()
 	{
-		_writer.h1("Description:");
+		_writer.level1Begin("Description:");
 		for(String paragraph : _description.toParagraphs())
-			_writer.paragraph(HeadingLevel.H1, replaceStrong(paragraph));
+			_writer.paragraph(Level.L1, replaceStrong(paragraph));
+		_writer.level1End();
 	}
 
 	private void printOptions(
@@ -754,9 +765,9 @@ public class CommandLineParser
 			return;
 		
 		if(isCommand)
-			_writer.h3("CMD-OPTS:");
+			_writer.level3Begin("CMD-OPTS:");
 		else
-			_writer.h1("OPTS:");
+			_writer.level1Begin("OPTS:");
 		for(Entry<String, Option.Inner> optionEntry : options.entrySet()) {
 			Option.Inner option = optionEntry.getValue();
 			
@@ -765,13 +776,13 @@ public class CommandLineParser
 			for(String alternative : option.alternatives())
 				optionNames += ", " + alternative;
 			if(isCommand)
-				_writer.h4(optionNames);
+				_writer.level4Begin(optionNames);
 			else
-				_writer.h2(optionNames);
+				_writer.level2Begin(optionNames);
 
 			// Adds description and handles optional arguments and possible default values.
 			boolean isFirstParagraph = true;
-			HeadingLevel headingLevel = isCommand ? HeadingLevel.H4 : HeadingLevel.H2;
+			Level level = isCommand ? Level.L4 : Level.L2;
 			for(String paragraph : option.description()) {
 				if(isFirstParagraph) {
 					if(option.argument() != null && option.argument().optional())
@@ -784,7 +795,7 @@ public class CommandLineParser
 					
 					isFirstParagraph = false;
 				}
-				_writer.paragraph(headingLevel, replaceStrong(paragraph));
+				_writer.paragraph(level, replaceStrong(paragraph));
 			}
 			
 			boolean hasEnumConstraint = false;
@@ -797,13 +808,13 @@ public class CommandLineParser
 						hasOtherConstraints = true;
 				}
 			
-			headingLevel = isCommand ? HeadingLevel.H5 : HeadingLevel.H3;
+			level = isCommand ? Level.L5 : Level.L3;
 			if(hasOtherConstraints) {
 				if(isCommand)
-					_writer.h5("Constraints:");
+					_writer.level5Begin("Constraints:");
 				else
-					_writer.h3("Constraints:");
-				_writer.listBegin(headingLevel);
+					_writer.level3Begin("Constraints:");
+				_writer.listBegin(level);
 				for(Constraint<?> constraint : option.argument().constraints()) {
 					if(constraint instanceof Enumeration<?>)
 						hasEnumConstraint = true;
@@ -812,22 +823,39 @@ public class CommandLineParser
 							_writer.listItem(replaceStrong(constraintDesc));
 				}
 				_writer.listEnd();
+				if(isCommand)
+					_writer.level5End();
+				else
+					_writer.level3End();
 			}
 				
 			if(hasEnumConstraint) {
 				if(isCommand)
-					_writer.h5("Values:");
+					_writer.level5Begin("Values:");
 				else
-					_writer.h3("Values:");
-				_writer.listBegin(headingLevel);
+					_writer.level3Begin("Values:");
+				_writer.listBegin(level);
 				for(Constraint<?> constraint : option.argument().constraints()) {
 					if(constraint instanceof Enumeration<?>)
 						for(String constraintDesc : constraint.description().toParagraphs())
 							_writer.listItem(replaceStrong(constraintDesc));
 				}
 				_writer.listEnd();
+				if(isCommand)
+					_writer.level5End();
+				else
+					_writer.level3End();
 			}
+			
+			if(isCommand)
+				_writer.level4End();
+			else
+				_writer.level2End();
 		}
+		if(isCommand)
+			_writer.level3End();
+		else
+			_writer.level1End();
 	}
 
 	
@@ -840,21 +868,21 @@ public class CommandLineParser
 			return;
 		
 		if(isCommand)
-			_writer.h3("CMD-ARGS:");
+			_writer.level3Begin("CMD-ARGS:");
 		else
-			_writer.h1("ARGS:");
+			_writer.level1Begin("ARGS:");
 		for(Entry<String, Argument.Inner<?>> argumentEntry : arguments.entrySet()) {
 			Argument.Inner<?> argument = argumentEntry.getValue();
 			
 			// Adds argument name.
 			if(isCommand)
-				_writer.h4(argument.name());
+				_writer.level4Begin(argument.name());
 			else
-				_writer.h2(argument.name());
+				_writer.level2Begin(argument.name());
 
 			// Adds description and handles optional arguments and possible default values.
 			boolean isFirstParagraph = true;
-			HeadingLevel headingLevel = isCommand ? HeadingLevel.H4 : HeadingLevel.H2;
+			Level level = isCommand ? Level.L4 : Level.L2;
 			for(String paragraph : argument.description()) {
 				if(isFirstParagraph && argument.optional()) {
 					paragraph = 
@@ -863,7 +891,7 @@ public class CommandLineParser
 							+ paragraph;
 					isFirstParagraph = false;
 				}
-				_writer.paragraph(headingLevel, replaceStrong(paragraph));
+				_writer.paragraph(level, replaceStrong(paragraph));
 			}
 			
 			boolean hasEnumConstraint = false;
@@ -875,13 +903,13 @@ public class CommandLineParser
 					hasOtherConstraints = true;
 			}
 			
-			headingLevel = isCommand ? HeadingLevel.H5 : HeadingLevel.H3;
+			level = isCommand ? Level.L5 : Level.L3;
 			if(hasOtherConstraints) {
 				if(isCommand)
-					_writer.h5("Constraints:");
+					_writer.level5Begin("Constraints:");
 				else
-					_writer.h3("Constraints:");
-				_writer.listBegin(headingLevel);
+					_writer.level3Begin("Constraints:");
+				_writer.listBegin(level);
 				for(Constraint<?> constraint : argument.constraints()) {
 					if(constraint instanceof Enumeration<?>)
 						hasEnumConstraint = true;
@@ -890,22 +918,40 @@ public class CommandLineParser
 							_writer.listItem(replaceStrong(constraintDesc));
 				}
 				_writer.listEnd();
+				if(isCommand)
+					_writer.level5End();
+				else
+					_writer.level3End();
 			}
 				
 			if(hasEnumConstraint) {
 				if(isCommand)
-					_writer.h5("Values:");
+					_writer.level5Begin("Values:");
 				else
-					_writer.h3("Values:");
-				_writer.listBegin(headingLevel);
+					_writer.level3Begin("Values:");
+				_writer.listBegin(level);
 				for(Constraint<?> constraint : argument.constraints()) {
 					if(constraint instanceof Enumeration<?>)
 						for(String constraintDesc : constraint.description().toParagraphs())
 							_writer.listItem(replaceStrong(constraintDesc));
 				}
 				_writer.listEnd();
+				if(isCommand)
+					_writer.level5End();
+				else
+					_writer.level3End();
 			}
+			
+			if(isCommand)
+				_writer.level4End();
+			else
+				_writer.level2End();
 		}
+		
+		if(isCommand)
+			_writer.level3End();
+		else
+			_writer.level1End();
 	}
 
 	
@@ -930,14 +976,15 @@ public class CommandLineParser
 			else
 				commandNames += " " + argument.name();
 		}
-		_writer.h2(commandNames);
+		_writer.level2Begin(commandNames);
 		
 		for(String paragraph : command.description())
-			_writer.paragraph(HeadingLevel.H2, replaceStrong(paragraph));
+			_writer.paragraph(Level.L2, replaceStrong(paragraph));
 		
 		printOptions(command.definedOptions(), true);
 		
 		printArguments(command.definedArguments(), true);
+		_writer.level2End();
 	}
 	
 	private void printCommands()
@@ -945,9 +992,10 @@ public class CommandLineParser
 		if(_definedCommands.size() == 0)
 			return;
 		
-		_writer.h1("CMD:");
+		_writer.level1Begin("CMD:");
 		for(Entry<String, Command.Inner> commandEntry : _definedCommands.entrySet())
 			printCommand(commandEntry.getValue());
+		_writer.level1End();
 	}
 	
 	private void printShortCommands()
@@ -955,14 +1003,15 @@ public class CommandLineParser
 		if(_definedCommands.size() == 0)
 			return;
 		
-		_writer.h1("Commands:");
+		_writer.level1Begin("Commands:");
 		for(Entry<String, Command.Inner> commandEntry : _definedCommands.entrySet()) {
 			Command.Inner command = commandEntry.getValue();
 			String shortDescription = command.name();
 			for(String alternative : command.alternatives())
 				shortDescription += ", " + alternative;
-			_writer.line(HeadingLevel.H1, shortDescription + ": " + command.shortDescription());
+			_writer.line(Level.L1, shortDescription + ": " + command.shortDescription());
 		}
+		_writer.level1End();
 	}
 
 	private void printGlobalArguments()
@@ -972,8 +1021,8 @@ public class CommandLineParser
 	
 	private void printExamples()
 	{
-		_writer.h1("Examples:");
-		_writer.codeBegin(HeadingLevel.H1);
+		_writer.level1Begin("Examples:");
+		_writer.codeBegin(Level.L1);
 		_writer.codeLine(_javaCommand + " -? " + COMPLETE_HELP_COMMAND);
 		if(_definedCommands.size() > 0)
 			_writer.codeLine(
@@ -984,5 +1033,6 @@ public class CommandLineParser
 		for(String example : _exampleArguments)
 			_writer.codeLine(_javaCommand + " " + example);
 		_writer.codeEnd();
+		_writer.level1End();
 	}
 }

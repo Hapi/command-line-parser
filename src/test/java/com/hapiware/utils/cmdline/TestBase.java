@@ -50,7 +50,7 @@ abstract public class TestBase
 					"TestBase",
 					"1.0.0",
 					"hapi",
-					"command-line-parser",
+					"cmd-parser",
 					"1.0.0",
 					"http://www.hapiware.com",
 					null,
