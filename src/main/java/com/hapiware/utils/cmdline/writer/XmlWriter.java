@@ -18,20 +18,31 @@ public class XmlWriter
 	private final static Logger LOGGER = Logger.getLogger(XmlWriter.class.getName());
 	
 	private final static int TAB_SIZE = 4;
-	private final static String ENCODING = "UTF-8";
+	private final static String DEFAULT_ENCODING = "UTF-8";
 	
 	private final OutputStream _outputStream;
+	private final String _encoding;
 	private Level _levelForListItems;
 	private Level _levelForCodeLines;
 	
 	
 	public XmlWriter()
 	{
-		_outputStream = System.out;
+		this(DEFAULT_ENCODING, System.out);
 	}
 	
 	public XmlWriter(OutputStream os)
 	{
+		this(DEFAULT_ENCODING, os);
+	}
+
+	public XmlWriter(String encoding, OutputStream os)
+	{
+		if(encoding == null || encoding.trim().length() == 0)
+			throw new NullPointerException("'encoding' must have a value.");
+		if(os == null)
+			throw new NullPointerException("'os' must have a value.");
+		_encoding = encoding;
 		_outputStream = os;
 	}
 
@@ -144,7 +155,7 @@ public class XmlWriter
 	
 	public void header()
 	{
-		println("<?xml version=\"1.0\" encoding=\"" + ENCODING + "\" ?>");
+		println("<?xml version=\"1.0\" encoding=\"" + _encoding + "\" ?>");
 		println("<cmdline-out>");
 	}
 	
@@ -156,13 +167,13 @@ public class XmlWriter
 	private void println(String text)
 	{
 		try {
-			_outputStream.write((text + "\n").getBytes(ENCODING));
+			_outputStream.write((text + "\n").getBytes(_encoding));
 		}
 		catch(UnsupportedEncodingException e) {
 			if(LOGGER.isLoggable(java.util.logging.Level.SEVERE)) {
 				LOGGER.log(
 					java.util.logging.Level.SEVERE,
-					ENCODING + " is unsupported encoding.",
+					_encoding + " is unsupported encoding.",
 					e
 				);
 			}

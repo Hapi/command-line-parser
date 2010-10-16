@@ -18,18 +18,29 @@ public class HtmlWriter
 	private final static Logger LOGGER = Logger.getLogger(HtmlWriter.class.getName());
 	
 	private final static int TAB_SIZE = 4;
-	private final static String ENCODING = "UTF-8";
+	private final static String DEFAULT_ENCODING = "UTF-8";
 	
 	private final OutputStream _outputStream;
+	private final String _encoding;
 	
 	
 	public HtmlWriter()
 	{
-		_outputStream = System.out;
+		this(DEFAULT_ENCODING, System.out);
 	}
 	
 	public HtmlWriter(OutputStream os)
 	{
+		this(DEFAULT_ENCODING, os);
+	}
+
+	public HtmlWriter(String encoding, OutputStream os)
+	{
+		if(encoding == null || encoding.trim().length() == 0)
+			throw new NullPointerException("'encoding' must have a value.");
+		if(os == null)
+			throw new NullPointerException("'os' must have a value.");
+		_encoding = encoding;
 		_outputStream = os;
 	}
 
@@ -150,13 +161,13 @@ public class HtmlWriter
 	private void println(String text)
 	{
 		try {
-			_outputStream.write((text + "\n").getBytes(ENCODING));
+			_outputStream.write((text + "\n").getBytes(_encoding));
 		}
 		catch(UnsupportedEncodingException e) {
 			if(LOGGER.isLoggable(java.util.logging.Level.SEVERE)) {
 				LOGGER.log(
 					java.util.logging.Level.SEVERE,
-					ENCODING + " is unsupported encoding.",
+					_encoding + " is unsupported encoding.",
 					e
 				);
 			}
