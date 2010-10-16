@@ -2,47 +2,35 @@ package com.hapiware.utils.cmdline;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Map;
 
+/**
+ * A base class for tests. The main task of this test is to add {@code Implementation-Title} and
+ * {@code Implementation-Version} information to {@link java.lang.ClassLoader} so that tests can
+ * pass. The reason is {@link CommandLineParser)} constructors that check the existence of
+ * the manifest properties.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ */
 abstract public class TestBase
 {
-	private static Map<?, ?> getPackages(ClassLoader classLoader)
-	{
+	static {
 		try {
-			Class<?> javaLangClassLoader =
-				classLoader.getClass().getSuperclass().getSuperclass().getSuperclass();
-			Field packages = javaLangClassLoader.getDeclaredField("packages");
-			packages.setAccessible(true);
-			return (Map<?, ?>)packages.get(classLoader);
+			replacePackage(TestBase.class);
 		}
-		catch(IllegalArgumentException e) {
-			// TODO Auto-generated catch block
+		catch(Throwable e) {
 			e.printStackTrace();
+			System.exit(-1);
 		}
-		catch(IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
 	}
 	
+	
 	@SuppressWarnings("unchecked")
-	private static void replacePackage(Class<?> baseClass)
+	private static void replacePackage(Class<?> baseClass) throws Throwable
 	{
 		String key = baseClass.getPackage().getName(); 
-		try {
-			Map<String, Package> map = (Map<String, Package>)getPackages(baseClass.getClassLoader());
-			map.remove(key);
 			Class<?> pkgClass = Class.forName("java.lang.Package");
 			Constructor<?> constructor = pkgClass.getDeclaredConstructor(
 				String.class,
@@ -60,7 +48,7 @@ abstract public class TestBase
 				(Package)constructor.newInstance(
 					key,
 					"TestBase",
-					"0.0.0",
+					"1.0.0",
 					"hapi",
 					"command-line-parser",
 					"1.0.0",
@@ -68,44 +56,17 @@ abstract public class TestBase
 					null,
 					baseClass.getClassLoader()
 			);
+			Map<String, Package> map = (Map<String, Package>)getPackages(baseClass.getClassLoader());
+			//map.remove(key);
 			map.put(key, pkg);
-			
-			/*Field parent = javaLangClassLoader.getDeclaredField("parent");
-			parent.setAccessible(true);
-			ClassLoader parentClassLoader = (ClassLoader)parent.get(cl);
-			Map<?, ?> parentMap = getPackages(parentClassLoader);*/
-		}
-		catch(SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch(InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
-	static {
-		replacePackage(TestBase.class);
+	private static Map<?, ?> getPackages(ClassLoader classLoader) throws Throwable
+	{
+		Class<?> javaLangClassLoader =
+			classLoader.getClass().getSuperclass().getSuperclass().getSuperclass();
+		Field packages = javaLangClassLoader.getDeclaredField("packages");
+		packages.setAccessible(true);
+		return (Map<?, ?>)packages.get(classLoader);
 	}
 }
