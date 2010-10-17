@@ -356,7 +356,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Value for 'TYPE' was \\[1\\] but it must be one of these: \\[2, 3, 4\\]"
+			"Value for 'TYPE' was \\[1\\] but it must be one of these: \\[2, 3, 4\\]."
 	)
 	public void fullCommandLineAllOptionsArgumentTypeOutOfRange()
 		throws
@@ -374,7 +374,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Value for 'TYPE' was \\[6\\] but it must be one of these: \\[2, 3, 4\\]"
+			"Value for 'TYPE' was \\[6\\] but it must be one of these: \\[2, 3, 4\\]."
 	)
 	public void fullCommandLineAllOptionsArgumentTypeOutOfRange2()
 		throws

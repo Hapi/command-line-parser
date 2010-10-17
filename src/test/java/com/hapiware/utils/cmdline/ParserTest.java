@@ -77,10 +77,12 @@ public class ParserTest
 				optional(4);
 				//maxLength(5);
 				minValue(3);
-				maxValue(6);
+				maxValue(12);
 				constraint(new Enumeration<Integer>() {{
 					value(3, "for three");
 					value(7, "for seven");
+					includeRange(1, 18, "moro poro");
+					excludeRange(2, 5, "moro poro");
 				}});
 				description("....");
 			}});
@@ -109,6 +111,7 @@ public class ParserTest
 		p.parsePrintAndExitOnError(
 			new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "1000" }
 			//new String[] { "--help", "cmd=set" }
+			//new String[] { "--help", "all" }
 			//new String[] { "--version" }
 			
 			// TODO: Create a test case for these.

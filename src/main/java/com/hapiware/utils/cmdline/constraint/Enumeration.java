@@ -10,119 +10,217 @@ public class Enumeration<T>
 	implements
 		Constraint<T>
 {
-	private List<Enum<?>> _enumerations = new LinkedList<Enum<?>>();
+	private List<Enum<T>> _enumerations = new LinkedList<Enum<T>>();
+	private List<Enum<T>> _includeRanges = new LinkedList<Enum<T>>();
+	private List<Enum<T>> _excludeRanges = new LinkedList<Enum<T>>();
 	
 	public Enumeration<T> value(T value, String description)
 	{
-		value(value, description, false);
+		_enumerations.add(new NormalEnum<T>(value, description));
 		return this;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Enumeration<T> valueIgnoreCase(T value, String description)
 	{
-		value(value, description, true);
+		_enumerations.add((Enum<T>)new IgnoreCaseEnum((String) value, description));
 		return this;
 	}
 	
-	private void value(T value, String description, boolean ignoreCase)
+	@SuppressWarnings("unchecked")
+	public Enumeration<T> includeRange(T lower, T upper, String description)
 	{
-		_enumerations.add(new Enum<T>(value, description, ignoreCase));
+		_includeRanges.add(new Range((Comparable)lower, (Comparable)upper, description));
+		return this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Enumeration<T> excludeRange(T lower, T upper, String description)
+	{
+		_excludeRanges.add(new Range((Comparable)lower, (Comparable)upper, description));
+		return this;
 	}
 
 	public boolean typeCheck(Class<?> typeClass)
 	{
-		if(_enumerations.size() == 0)
-			return false;
-		return typeClass == _enumerations.get(0).value().getClass();
+		for(Enum<T> e : _includeRanges)
+			if(!e.typeCheck(typeClass))
+				return false;
+		for(Enum<T> e : _excludeRanges)
+			if(!e.typeCheck(typeClass))
+				return false;
+		for(Enum<T> e : _enumerations)
+			if(!e.typeCheck(typeClass))
+				return false;
+		
+		return true;
 	}
 	
-	public void evaluate(String argumentName, Object value) throws ConstraintException
+	public void evaluate(String argumentName, T value) throws ConstraintException
 	{
-		String str = value.toString();
-		boolean isOk = false;
-		for(Enum<?> e : _enumerations) {
-			if(e._ignoreCase) {
-				if(e.value().toString().equalsIgnoreCase(str)) {
-					isOk = true;
-					break;
-				}
-			}
-			else {
-				if(e.value().toString().equals(str)) {
-					isOk = true;
-					break;
-				}
-			}
-		}
-		
-		if(!isOk) {
+		if(!evaluate(value)) {
 			String msg =
 				"Value for '" + argumentName + "' was [" + value + "] but it must be"
-					+ " one of these: " + _enumerations.toString();
+					+ " one of these:"
+					+ (_includeRanges.size() > 0 ? " " + _includeRanges.toString() : "")
+					+ (_excludeRanges.size() > 0 ? " !" + _excludeRanges.toString() : "")
+					+ (_enumerations.size() > 0 ? " " + _enumerations.toString() : "")
+					+ ".";
 			throw new ConstraintException(msg);
 		}
 	}
 
+	private boolean evaluate(T value)
+	{
+		// Single values overrule includes and excludes.
+		for(Enum<T> e : _enumerations)
+			if(e.evaluate(value))
+				return true;
+		
+		// Excludes overrule includes.
+		for(Enum<T> e : _excludeRanges)
+			if(e.evaluate(value))
+				return false;
+		
+		// Includes are overruled by excludes (and single values).
+		for(Enum<T> e : _includeRanges)
+			if(e.evaluate(value))
+				return true;
+		
+		return false;
+	}
 
 	public Description description()
 	{
 		Description description = new Description();
-		for(Enum<?> e : _enumerations) {
-			if(e._description == null || e._description.trim().length() == 0)
-				return null;
-			description.strong(e.value().toString()).description(", " + e._description).p();
-		}
+		for(Enum<?> e : _includeRanges)
+			description.strong(e.toString()).description(", " + e._description).p();
+		for(Enum<?> e : _excludeRanges)
+			description.strong("not " + e.toString()).description(", " + e._description).p();
+		for(Enum<?> e : _enumerations)
+			description.strong(e.toString()).description(", " + e._description).p();
 		return description;
 	}
 	
-	private static class Enum<T> {
-		private final T _value;
+	
+	private static abstract class Enum<T>
+	{
 		private final String _description;
-		private final boolean _ignoreCase;
 		
-		public Enum(T value, String description, boolean ignoreCase)
+		protected Enum(String description)
 		{
-			if(value == null)
-				throw new NullPointerException("'value' must have a value.");
 			if(description == null || description.trim().length() == 0)
 				throw new ConfigurationException("'description' must have a value.");
-			_value = value;
 			_description = description;
-			_ignoreCase = ignoreCase;
 		}
 		
-		private T value()
+		public abstract boolean typeCheck(Class<?> typeClass);
+		public abstract boolean evaluate(T value);
+		public abstract String toString();
+	}
+	
+	private static class NormalEnum<T>
+		extends Enum<T>
+	{
+		private final T _value;
+		
+		public NormalEnum(T value, String description)
 		{
-			return _value;
+			super(description);
+			if(value == null)
+				throw new NullPointerException("'value' must have a value.");
+			_value = value;
 		}
-		
 		
 		@Override
-		public boolean equals(Object obj)
+		public boolean typeCheck(Class<?> typeClass)
 		{
-			if(obj == this)
-				return true;
-
-			if(!(obj instanceof Enumeration.Enum<?>))
-				return false;
-			Enumeration.Enum<?> object = (Enumeration.Enum<?>)obj;
-			
-			return _value.equals(object._value) && _ignoreCase == object._ignoreCase;
+			return typeClass == _value.getClass();
 		}
 
 		@Override
-		public int hashCode()
+		public boolean evaluate(T value)
 		{
-			int resultHash = 17;
-			resultHash = 31 * resultHash + (_ignoreCase ? 1 : 0);
-			resultHash = 31 * resultHash + (_value == null ? 0 : _value.hashCode());
-			return resultHash;
+			return _value.equals(value);
 		}
-		
+
 		@Override
 		public String toString()
 		{
 			return _value.toString();
 		}
+	}
+	
+	private static class IgnoreCaseEnum
+		extends
+			Enum<String>
+	{
+		private final String _value;
+		
+		public IgnoreCaseEnum(String value, String description)
+		{
+			super(description);
+			if(value == null)
+				throw new NullPointerException("'value' must have a value.");
+			_value = value;
+		}
+		
+		@Override
+		public boolean typeCheck(Class<?> typeClass)
+		{
+			return typeClass == String.class;
+		}
+
+		@Override
+		public boolean evaluate(String value)
+		{
+			return _value.equalsIgnoreCase(value);
+		}
+
+		@Override
+		public String toString()
+		{
+			return _value;
+		}
+	}
+	
+	private static class Range<T extends Comparable<T>>
+		extends
+			Enum<T>
+	{
+		private final T _lower ;
+		private final T _upper;
+		
+		public Range(T lower, T upper, String description)
+		{
+			super(description);
+			if(lower == null)
+				throw new NullPointerException("'lower' must have a value.");
+			if(upper == null)
+				throw new NullPointerException("'upper' must have a value.");
+			if(lower.compareTo(upper) > 0)
+				throw new IllegalArgumentException("'lower' must be lower than 'upper'.");
+			_lower = lower;
+			_upper = upper;
+		}
+		
+		@Override
+		public boolean typeCheck(Class<?> typeClass)
+		{
+			return typeClass == _lower.getClass();
+		}
+
+		@Override
+		public boolean evaluate(T value)
+		{
+			return _lower.compareTo(value) > 0 && _upper.compareTo(value) < 0;
+		}
+
+		@Override
+		public String toString()
+		{
+			return "(" + _lower.toString() + " ... " + _upper.toString() + ")";
+		}
+		
 	}
 }

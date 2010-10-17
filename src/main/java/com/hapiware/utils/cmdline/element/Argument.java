@@ -181,13 +181,13 @@ public class Argument<T>
 	@SuppressWarnings("unchecked")
 	public Argument<T> minValue(T minValue)
 	{
-		return constraint((Constraint<T>)new MinValue<Number>((Number)minValue));
+		return constraint(new MinValue((Comparable)minValue));
 	}
 	
 	@SuppressWarnings("unchecked")
 	public Argument<T> maxValue(T maxValue)
 	{
-		return constraint((Constraint<T>)new MaxValue<Number>((Number)maxValue));
+		return constraint(new MaxValue((Comparable)maxValue));
 	}
 	
 	
