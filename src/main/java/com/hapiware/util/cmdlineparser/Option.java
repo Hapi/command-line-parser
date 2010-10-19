@@ -218,7 +218,7 @@ public class Option
 		 * @param internal
 		 * 		The internal option object.
 		 */
-		public Data(Internal internal)
+		Data(Internal internal)
 		{
 			super(internal.name(), internal.id(), internal.alternatives());
 			if(internal.argument() != null)

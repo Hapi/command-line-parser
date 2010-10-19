@@ -313,7 +313,7 @@ public class Command
 		 * @param internal
 		 * 		The internal command object.
 		 */
-		public Data(Internal internal)
+		Data(Internal internal)
 		{
 			super(internal.name(), internal.id(), internal.alternatives());
 			

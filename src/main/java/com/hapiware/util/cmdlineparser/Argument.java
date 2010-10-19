@@ -193,7 +193,7 @@ public class Argument<T>
 	 * {@code Argument.Data} is a container class for holding argument values given from the command
 	 * line for options and command arguments. <p>
 	 * 
-	 * This class is immutable <u>only if {@code T} is an immutable class</>.
+	 * This class is immutable <b>only if {@code T} is an immutable class</b>.
 	 * 
 	 * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
 	 *
