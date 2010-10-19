@@ -128,7 +128,7 @@ public class Enumeration<T>
 		{
 			super(description);
 			if(value == null)
-				throw new NullPointerException("'value' must have a value.");
+				throw new ConfigurationException("'value' must have a value.");
 			_value = value;
 		}
 		
@@ -161,7 +161,7 @@ public class Enumeration<T>
 		{
 			super(description);
 			if(value == null)
-				throw new NullPointerException("'value' must have a value.");
+				throw new ConfigurationException("'value' must have a value.");
 			_value = value;
 		}
 		
@@ -195,9 +195,9 @@ public class Enumeration<T>
 		{
 			super(description);
 			if(lower == null)
-				throw new NullPointerException("'lower' must have a value.");
+				throw new ConfigurationException("'lower' must have a value.");
 			if(upper == null)
-				throw new NullPointerException("'upper' must have a value.");
+				throw new ConfigurationException("'upper' must have a value.");
 			if(lower.compareTo(upper) > 0)
 				throw new IllegalArgumentException("'lower' must be lower than 'upper'.");
 			_lower = lower;

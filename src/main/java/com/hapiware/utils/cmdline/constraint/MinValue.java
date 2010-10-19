@@ -11,6 +11,8 @@ public class MinValue<T extends Comparable<T>>
 	
 	public MinValue(T minValue)
 	{
+		if(minValue == null)
+			throw new ConfigurationException("'minValue' must have a value.");
 		_minValue = minValue;
 	}
 	

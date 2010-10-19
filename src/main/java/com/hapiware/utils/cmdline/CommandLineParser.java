@@ -97,11 +97,11 @@ public class CommandLineParser
 	)
 	{
 		if(mainClass == null)
-			throw new NullPointerException("'mainClass' must have a value.");
+			throw new ConfigurationException("'mainClass' must have a value.");
 		if(writer == null)
-			throw new NullPointerException("'writer' must have a value.");
+			throw new ConfigurationException("'writer' must have a value.");
 		if(description == null)
-			throw new NullPointerException("'description' must have a value.");
+			throw new ConfigurationException("'description' must have a value.");
 		if(mainClass.getPackage().getImplementationTitle() == null)
 			throw new ConfigurationException("Implementation-Title: is missing from MANIFEST.MF.");
 		if(mainClass.getPackage().getImplementationVersion() == null)
@@ -244,7 +244,7 @@ public class CommandLineParser
 	public void addExampleArguments(String exampleArguments)
 	{
 		if(exampleArguments == null || exampleArguments.trim().length() == 0)
-			throw new NullPointerException("'exampleArguments' must have a value.");
+			throw new ConfigurationException("'exampleArguments' must have a value.");
 		
 		_exampleArguments.add(exampleArguments);
 	}

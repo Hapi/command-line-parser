@@ -50,7 +50,7 @@ public class Argument<T>
 	public Argument(String name)
 	{
 		if(name == null || name.trim().length() == 0)
-			throw new NullPointerException("'name' must have a value.");
+			throw new ConfigurationException("'name' must have a value.");
 		if(!Util.checkName(name))
 			throw
 				new ConfigurationException(

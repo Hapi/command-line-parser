@@ -11,6 +11,8 @@ public class MaxValue<T extends Comparable<T>>
 	
 	public MaxValue(T maxValue)
 	{
+		if(maxValue == null)
+			throw new ConfigurationException("'maxValue' must have a value.");
 		_maxValue = maxValue;
 	}
 	
