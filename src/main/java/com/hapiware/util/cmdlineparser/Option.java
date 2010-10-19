@@ -10,10 +10,10 @@ import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
 public class Option
 {
 	private ElementBase _option = new ElementBase();
-	private Argument.Inner<?> _definedArgument;
+	private Argument.Internal<?> _definedArgument;
 	private boolean _multiple;
 	
-	private <T> Option(Option option)
+	private Option(Option option)
 	{
 		_option = new ElementBase(option._option);
 		if(option._definedArgument != null)
@@ -154,7 +154,7 @@ public class Option
 			throw new ConfigurationException("'argument' must have a value.");
 		
 		argument.id(removeOptionMinusFromId(_option.id()));
-		_definedArgument = new Argument.Inner<T>(argument, argumentType);
+		_definedArgument = new Argument.Internal<T>(argument, argumentType);
 		if(_definedArgument.name() != null)
 			throw
 				new ConfigurationException(
@@ -196,25 +196,119 @@ public class Option
 			return id;
 	}
 	
+
+	/**
+	 * {@code Option.Data} is a container class for holding information about the given options. <p>
+	 * 
+	 * This class is immutable <b>only if {@link Argument.Data} is immutable</b>.
+	 * 
+	 * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+	 *
+	 */
+	public static final class Data
+		extends
+			DataBase
+	{
+		private final Argument.Data<?> _argument;
+		private final boolean _allowMultipleOccurences;
+		
+		/**
+		 * "Copy" constructs a data object from the internal option object.
+		 * 
+		 * @param internal
+		 * 		The internal option object.
+		 */
+		public Data(Internal internal)
+		{
+			super(internal.name(), internal.id(), internal.alternatives());
+			if(internal.argument() != null)
+				_argument =  internal.argument().createDataObject();
+			else
+				_argument = null;
+			_allowMultipleOccurences = internal.multiple();
+		}
+		
+		public Set<String> getAlternatives()
+		{
+			return super.getAlternatives();
+		}
+
+		/**
+		 * Returns the argument of the given option. {@code null} if the option definition does
+		 * not have an argument.
+		 * 
+		 * @return
+		 * 		The option argument. {@code null} if the option definition does not have
+		 * 		an argument.
+		 */
+		public Argument.Data<?> getArgument()
+		{
+			return _argument;
+		}
+
+		/**
+		 * Tells if the option can occur multiple times.
+		 * 
+		 * @return
+		 * 		{@code true} if the option can occur multiple times within a single command line
+		 * 		command. {@code false} otherwise.
+		 */
+		public boolean allowMultipleOccurences()
+		{
+			return _allowMultipleOccurences;
+		}
+		
+		/**
+		 * Returns a {@code String} representation of {@code Option.Data} object. The form is:
+		 * <p>
+		 * <code>{NAME(ID, MULTI) = VALUE (OPTIONAL) : ALTERNATIVES}</code>
+		 * <p>
+		 * where:
+		 * 	<ul>
+		 * 		<li>NAME is the argument name.</li>
+		 * 		<li>ID is the id for the argument.</li>
+		 * 		<li>MULTI indicates if the option can occur multiple times.</li>
+		 * 		<li>VALUE is the argument value (if the value has been defined).</li>
+		 * 		<li>OPTIONAL indicates if the value is optional or not.</li>
+		 * 		<li>ALTERNATIVES alternative names for the option</li>
+		 * 	</ul>
+		 */
+		@Override
+		public String toString()
+		{
+			String str =
+				"{" + getName() + "(" + getId() + ", " + allowMultipleOccurences() + ")"
+					+ (
+						getArgument() != null ? 
+							" = " + getArgument().getValue() + "(" + getArgument().isOptional() + ")"
+							: ""
+					);
+			str += " : " + getAlternatives();
+			str += "}";
+			return str;
+		}
+	}
 	
-	public static final class Inner
+
+	static final class Internal
 		implements
 			Parser
 	{
 		private Option _outer;
-		public Inner(Option outer)
+		
+		public Internal(Option outer)
 		{
 			_outer = outer;
 		}
-		public Inner(Inner inner)
+		public Internal(Internal internal)
 		{
-			_outer = new Option(inner._outer);
+			_outer = new Option(internal._outer);
 		}
 		public String name()
 		{
 			return _outer._option.name();
 		}
-		public boolean checkAlternative(String name)
+		private boolean checkAlternative(String name)
 		{
 			return _outer._option.checkAlternative(name);
 		}
@@ -230,10 +324,9 @@ public class Option
 		{
 			return _outer._option.description();
 		}
-		@SuppressWarnings("unchecked")
-		public <T> Argument.Inner<T> argument()
+		public Argument.Internal<?> argument()
 		{
-			return (Argument.Inner<T>)_outer._definedArgument;
+			return _outer._definedArgument;
 		}
 		public boolean multiple()
 		{
@@ -266,10 +359,10 @@ public class Option
 			if(obj == this)
 				return true;
 
-			if(!(obj instanceof Option.Inner))
+			if(!(obj instanceof Option.Internal))
 				return false;
-			Option.Inner inner = (Option.Inner)obj;
-			return name().equals(inner.name());
+			Option.Internal internal = (Option.Internal)obj;
+			return name().equals(internal.name());
 		}
 
 		@Override
@@ -283,15 +376,11 @@ public class Option
 		@Override
 		public String toString()
 		{
-			String str = "[";
-			str += "name: " + name() + ", id: " + id() + ", multi: " + multiple();
-			if(alternatives().size() > 0) {
-				str += ", alt: ";
-				int i = 0;
-				for(String alternative : alternatives())
-					str += alternative + (i++ < alternatives().size() ? ", " : "");
-			}
-			str += "]";
+			String str =
+				"{" + name() + "(" + id() + ", " + multiple() + ")"
+					+ (argument() != null ? " = " + argument().value() : "");
+			str += " : " + alternatives();
+			str += "}";
 			return str;
 		}
 	}

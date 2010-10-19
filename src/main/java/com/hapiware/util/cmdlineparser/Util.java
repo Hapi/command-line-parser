@@ -46,15 +46,15 @@ public class Util
 	public static boolean checkOption(
 		String arg,
 		List<String> cmdLineArgs,
-		Map<String, Option.Inner> definedOptions,
+		Map<String, Option.Internal> definedOptions,
 		Map<String, String> definedOptionAlternatives,
-		Set<Option.Inner> nonMultipleOptionCheckSet,
-		List<Option.Inner> cmdLineOptions
+		Set<Option.Internal> nonMultipleOptionCheckSet,
+		List<Option.Internal> cmdLineOptions
 	) throws ConstraintException, IllegalCommandLineArgumentException
 	{
-		Option.Inner option = definedOptions.get(definedOptionAlternatives.get(arg));
+		Option.Internal option = definedOptions.get(definedOptionAlternatives.get(arg));
 		if(option != null)
-			option = new Option.Inner(option);
+			option = new Option.Internal(option);
 		if(option != null && !option.multiple()) {
 			if(nonMultipleOptionCheckSet.contains(option)) {
 				String msg = "Option '" + option.name() + "' can occur only once.";
@@ -77,14 +77,14 @@ public class Util
 	public static boolean checkArguments(
 		String commandName,
 		List<String> cmdLineArgs,
-		Map<String, Argument.Inner<?>> definedArguments,
-		List<Argument.Inner<?>> outputArguments
+		Map<String, Argument.Internal<?>> definedArguments,
+		List<Argument.Internal<?>> outputArguments
 	) throws ConstraintException, IllegalCommandLineArgumentException
 	{
 		int numberOfOptionalArguments = 0;
-		Set<Entry<String, Argument.Inner<?>>> entrySet = definedArguments.entrySet();
+		Set<Entry<String, Argument.Internal<?>>> entrySet = definedArguments.entrySet();
 		for(Iterator<?> it = entrySet.iterator(); it.hasNext();) {
-			Entry<String, Argument.Inner<?>> entry = (Entry<String, Argument.Inner<?>>)it.next();
+			Entry<String, Argument.Internal<?>> entry = (Entry<String, Argument.Internal<?>>)it.next();
 			if(entry.getValue().optional())
 				numberOfOptionalArguments++;
 		}
@@ -122,13 +122,13 @@ public class Util
 		}
 
 		for(Iterator<?> it = entrySet.iterator(); it.hasNext();) {
-			Entry<String, Argument.Inner<?>> entry = (Entry<String, Argument.Inner<?>>)it.next();
-			Argument.Inner<?> argument = entry.getValue();
+			Entry<String, Argument.Internal<?>> entry = (Entry<String, Argument.Internal<?>>)it.next();
+			Argument.Internal<?> argument = entry.getValue();
 			if(argument.optional() && numberOfCmdLineArguments < entrySet.size())
 				if(mandatoryOptionalDiff == 1) {
 					// Adds a default value to one optional argument.
 					if(it.hasNext())
-						//argument = ((Entry<String, Argument.Inner<?>>)it.next()).getValue();
+						//argument = ((Entry<String, Argument.Internal<?>>)it.next()).getValue();
 						((LinkedList<String>)cmdLineArgs).addFirst(argument.defaultValueAsString());
 					else
 						break;
@@ -151,13 +151,13 @@ public class Util
 	public static void setAnnotatedOptions(
 		Object callerObject,
 		Class<?> callerClass,
-		List<Option.Inner> cmdLineOptions
+		List<Option.Internal> cmdLineOptions
 	)
 		throws AnnotatedFieldSetException
 	{
 		Map<String, List<Object>> multipleOptions =
 			new HashMap<String, List<Object>>();
-		for(Option.Inner cmdLineOption : cmdLineOptions) {
+		for(Option.Internal cmdLineOption : cmdLineOptions) {
 			if(cmdLineOption.argument() != null) {
 				String id = cmdLineOption.argument().id();
 				if(cmdLineOption.multiple()) {
@@ -195,12 +195,12 @@ public class Util
 	public static void setAnnotatedArguments(
 		Object callerObject,
 		Class<?> callerClass,
-		List<Argument.Inner<?>> cmdLineArguments
+		List<Argument.Internal<?>> cmdLineArguments
 	)
 		throws
 			AnnotatedFieldSetException
 	{
-		for(Argument.Inner<?> cmdLineArgument : cmdLineArguments)
+		for(Argument.Internal<?> cmdLineArgument : cmdLineArguments)
 			setAnnotatedValue(callerObject, callerClass, cmdLineArgument.value(), cmdLineArgument.id());
 	}
 	

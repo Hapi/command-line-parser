@@ -104,6 +104,28 @@ public class Enumeration<T>
 	}
 	
 	
+	/**
+	 * Returns a {@code String} representation of {@code Enumeration} object. The form is:<p>
+	 * 
+	 * <code>{includes: INCLUDERANGES excludes: EXCLUDERANGES values: OTHERVALUES}</code> <p>
+	 * 
+	 * where: <p>
+	 * 	<ul>
+	 * 		<li>INCLUDERANGES is a list of possible range of valid values.</li>
+	 * 		<li>EXCLUDERANGES is a list of possible range of invalid values.</li>
+	 * 		<li>OTHERVALUES is a list of possible individual valid values.</li>
+	 * 	<ul>
+	 */
+	@Override
+	public String toString()
+	{
+		return
+			"{includes:" + _includeRanges
+				+ " excludes:" + _excludeRanges
+				+ " values:" + _enumerations + "}";
+	}
+	
+	
 	private static abstract class Enum<T>
 	{
 		private final String _description;
@@ -214,7 +236,7 @@ public class Enumeration<T>
 		@Override
 		public boolean evaluate(T value)
 		{
-			return _lower.compareTo(value) > 0 && _upper.compareTo(value) < 0;
+			return _lower.compareTo(value) <= 0 && _upper.compareTo(value) >= 0;
 		}
 
 		@Override

@@ -1,4 +1,4 @@
-package com.hapiware.util.cmdlineparser;
+package com.hapiware.util.cmdlineparser.proof;
 
 import com.hapiware.util.cmdlineparser.Argument;
 import com.hapiware.util.cmdlineparser.Command;
@@ -8,8 +8,9 @@ import com.hapiware.util.cmdlineparser.Option;
 import com.hapiware.util.cmdlineparser.OptionArgument;
 import com.hapiware.util.cmdlineparser.annotation.Id;
 import com.hapiware.util.cmdlineparser.constraint.Enumeration;
+import com.hapiware.util.cmdlineparser.publicApiTest.TestBase;
 
-public class ParserTest
+public class ParserProof
 	extends
 		TestBase
 {
@@ -29,11 +30,12 @@ public class ParserTest
 	private static int _type;
 
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws Throwable
 	{
+		replacePackage(ParserProof.class);
 		CommandLineParser p =
 			new CommandLineParser(
-				ParserTest.class,
+				ParserProof.class,
 				new Description().description("Main description.").p().description("Something else.")
 			);
 		p.add(new Option("m") {{
@@ -125,8 +127,8 @@ public class ParserTest
 		
 		System.out.println(p.optionExists("-m"));
 		System.out.println(p.optionExists("-a"));
-		System.out.println(p.optionValue("-m"));
-		System.out.println(p.optionValue("-n"));
+		System.out.println(p.getOptionValue("-m"));
+		System.out.println(p.getOptionValue("-n"));
 	
 		System.out.println("_miu = " + _miu);
 		System.out.println("_a = " + _a);

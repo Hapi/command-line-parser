@@ -18,14 +18,14 @@ public class Command
 	private final String _shortDescription;
 	private final CommandExecutor _commandExecutor;
 
-	private Map<String, Option.Inner> _definedOptions = new LinkedHashMap<String, Option.Inner>();
+	private Map<String, Option.Internal> _definedOptions = new LinkedHashMap<String, Option.Internal>();
 	private Map<String, String> _definedOptionAlternatives = new HashMap<String, String>();
-	private Map<String, Argument.Inner<?>> _definedArguments =
-		new LinkedHashMap<String, Argument.Inner<?>>();
+	private Map<String, Argument.Internal<?>> _definedArguments =
+		new LinkedHashMap<String, Argument.Internal<?>>();
 	private boolean _mandatoryArguments;
 	private int _numOfOptionalArguments;
-	private List<Option.Inner> _cmdLineOptions = new ArrayList<Option.Inner>(); 
-	private List<Argument.Inner<?>> _cmdLineArguments = new ArrayList<Argument.Inner<?>>();
+	private List<Option.Internal> _cmdLineOptions = new ArrayList<Option.Internal>(); 
+	private List<Argument.Internal<?>> _cmdLineArguments = new ArrayList<Argument.Internal<?>>();
 	
 	
 	private Command(Command command)
@@ -198,49 +198,49 @@ public class Command
 					"'argument' for command '" + _command.name() + "' must have a value."
 				);
 		
-		Argument.Inner<T> inner = new Argument.Inner<T>(argument, argumentType);
-		if(inner.name() == null || inner.name().trim().length() == 0)
+		Argument.Internal<T> internal = new Argument.Internal<T>(argument, argumentType);
+		if(internal.name() == null || internal.name().trim().length() == 0)
 			throw
 				new ConfigurationException(
 					"'argument' for command '" + _command.name() + "' must have a name."
 				);
 		
-		if(inner.description().size() == 0)
+		if(internal.description().size() == 0)
 			throw
 				new ConfigurationException(
-					"Argument '" + inner.name() + "' for command '" 
+					"Argument '" + internal.name() + "' for command '" 
 						+ _command.name() + "' must have a description."
 				);
-		if(_definedArguments.containsKey(inner.name()))
+		if(_definedArguments.containsKey(internal.name()))
 			throw
 				new ConfigurationException(
-					"Argument name '" + inner.name() + "' for command '" 
+					"Argument name '" + internal.name() + "' for command '" 
 						+ _command.name() +"' must be unique."
 				);
 
-		if(inner.optional() && !inner.hasDefaultValueForOptional()) {
+		if(internal.optional() && !internal.hasDefaultValueForOptional()) {
 			String msg =
 				"When annotations are used then optional arguments must have a default value "
-					+ "(command '" + _command.name() + "', argument '" + inner.name() + "').";
+					+ "(command '" + _command.name() + "', argument '" + internal.name() + "').";
 			throw new ConfigurationException(msg);
 		}
 		
-		for(Constraint<?> constraint : inner.constraints())
+		for(Constraint<?> constraint : internal.constraints())
 			if(!constraint.typeCheck(argumentType)) {
 				String msg =
 					"Using '" + constraint.getClass().getName() + "' with argument type '"
 						+ argumentType + "' creates a type conflict "
-						+ "(command '" + _command.name() + "', argument '" + inner.name() + "').";
+						+ "(command '" + _command.name() + "', argument '" + internal.name() + "').";
 				throw new ConfigurationException(msg);
 			}
 		
-		_definedArguments.put(inner.name(), inner);
-		if(!inner.optional()) {
+		_definedArguments.put(internal.name(), internal);
+		if(!internal.optional()) {
 			_mandatoryArguments = true;
 			if(_numOfOptionalArguments >= 2) {
 				String msg =
 					"If there are more than one optional argument they must be the last arguments "
-						+ "(command '" + _command.name() + "', argument '" + inner.name() + "'). "
+						+ "(command '" + _command.name() + "', argument '" + internal.name() + "'). "
 						+ "A single optional argument can have any position.";
 				throw new ConfigurationException(msg);
 			}
@@ -258,30 +258,30 @@ public class Command
 					"'option' for command '" + _command.name() + "' must have a value."
 				);
 		
-		Option.Inner inner = new Option.Inner(option);
-		if(inner.name() == null || inner.name().trim().length() == 0)
+		Option.Internal internal = new Option.Internal(option);
+		if(internal.name() == null || internal.name().trim().length() == 0)
 			throw
 				new ConfigurationException(
 					"'option' for command '" + _command.name() + "' must have a name."
 				);
 		
-		if(inner.description().size() == 0)
+		if(internal.description().size() == 0)
 			throw
 				new ConfigurationException(
-					"Option '" + inner.name() + "' for command '" 
+					"Option '" + internal.name() + "' for command '" 
 						+ _command.name() + "' must have a description."
 				);
-		if(_definedOptionAlternatives.containsKey(inner.name()))
+		if(_definedOptionAlternatives.containsKey(internal.name()))
 			throw
 				new ConfigurationException(
-					"Option name '" + inner.name() + "' for command '" 
+					"Option name '" + internal.name() + "' for command '" 
 						+ _command.name() + "'must be unique."
 				);
 		
-		_definedOptions.put(inner.name(), inner);
-		_definedOptionAlternatives.put(inner.name(), inner.name());
-		for(String alternative : inner.alternatives())
-			if(_definedOptionAlternatives.put(alternative, inner.name()) != null)
+		_definedOptions.put(internal.name(), internal);
+		_definedOptionAlternatives.put(internal.name(), internal.name());
+		for(String alternative : internal.alternatives())
+			if(_definedOptionAlternatives.put(alternative, internal.name()) != null)
 				throw
 					new ConfigurationException(
 						"Option alternative name '" + alternative + "' for command '" 
@@ -290,27 +290,163 @@ public class Command
 		
 		return this;
 	}
+
 	
-	public static final class Inner
+	/**
+	 * {@code Command.Data} is a container class for holding information about the given commands.
+	 * <p>
+	 * This class is immutable <b>only if {@link Argument.Data} is immutable</b>.
+	 * 
+	 * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+	 *
+	 */
+	public static final class Data
+		extends
+			DataBase
+	{
+		private final List<Argument.Data<?>> _arguments;
+		private final List<Option.Data> _options;
+		
+		/**
+		 * "Copy" constructs a data object from the internal command object.
+		 * 
+		 * @param internal
+		 * 		The internal command object.
+		 */
+		public Data(Internal internal)
+		{
+			super(internal.name(), internal.id(), internal.alternatives());
+			
+			List<Argument.Data<?>> argumentData = new ArrayList<Argument.Data<?>>();
+			for(Argument.Internal<?> argument : internal._outer._cmdLineArguments)
+				argumentData.add(argument.createDataObject());
+			_arguments = Collections.unmodifiableList(argumentData);
+
+			List<Option.Data> optionData = new ArrayList<Option.Data>();
+			for(Option.Internal option : internal._outer._cmdLineOptions)
+				optionData.add(new Option.Data(option));
+			_options  = Collections.unmodifiableList(optionData);
+		}
+		
+		
+		public Set<String> getAlternatives()
+		{
+			return super.getAlternatives();
+		}
+
+		
+		/**
+		 * Returns an array of command options.
+		 * 
+		 * @return
+		 * 		An array of options.
+		 */
+		public Option.Data[] getAllOptions()
+		{
+			return _options.toArray(new Option.Data[0]);
+		}
+		
+		
+		public boolean optionExists(String name)
+		{
+			for(Option.Data option : _options)
+				if(option.getName().equals(name))
+					return true;
+			
+			return false;
+		}
+		
+		
+		@SuppressWarnings("unchecked")
+		public <T> T optionValue(String name)
+		{
+			try {
+				Option.Data option = getOptions(name)[0];
+				if(option.getArgument() != null)
+					return (T)option.getArgument().getValue();
+				else
+					return null;
+			}
+			catch(IndexOutOfBoundsException e) {
+				return null;
+			}
+		}
+		
+		public Option.Data[] getOptions(String name)
+		{
+			List<Option.Data> options = new ArrayList<Option.Data>();
+			for(Option.Data option : _options)
+				if(option.getName().equals(name))
+					options.add(option);
+			
+			return options.toArray(new Option.Data[0]);
+		}
+		
+		public Argument.Data<?> getArgument(String name)
+		{
+			for(Argument.Data<?> argument : _arguments)
+				if(argument.getName().equals(name))
+					return argument;
+
+			return null;
+		}
+
+		/**
+		 * Returns an array of command arguments.
+		 * 
+		 * @return
+		 * 		An array of arguments.
+		 */
+		public Argument.Data<?>[] getAllArguments()
+		{
+			return _arguments.toArray(new Argument.Data[0]);
+		}
+		
+		/**
+		 * Returns a {@code String} representation of {@code Option.Data} object. The form is:
+		 * <p>
+		 * <code>{NAME(ID) : OPTIONS : ARGUMENTS : ALTERNATIVES}</code>
+		 * <p>
+		 * where:
+		 * 	<ul>
+		 * 		<li>NAME is the argument name.</li>
+		 * 		<li>ID is the id for the argument.</li>
+		 * 		<li>MULTI indicates if the option can occur multiple times.</li>
+		 * 		<li>VALUE is the argument value.</li>
+		 * 		<li>OPTIONAL indicates if the value is optional or not.</li>
+		 * 		<li>ALTERNATIVES alternative names for the option</li>
+		 * 	</ul>
+		 */
+		@Override
+		public String toString()
+		{
+			return
+				"{" + getName() + "(" + getId()  + ") : "
+					+ getAllOptions() + ":"
+					+ getAllArguments() + ":"
+					+ getAlternatives()
+					+ "}";
+		}
+	}
+
+	
+	static final class Internal
 		implements
 			Parser
 	{
 		private Command _outer;
-		public Inner(Inner inner)
+		
+		public Internal(Internal internal)
 		{
-			_outer = new Command(inner._outer);
+			_outer = new Command(internal._outer);
 		}
-		public Inner(Command outer)
+		public Internal(Command outer)
 		{
 			_outer = outer;
 		}
 		public String name()
 		{
 			return _outer._command.name();
-		}
-		public boolean checkAlternative(String name)
-		{
-			return _outer._command.checkAlternative(name);
 		}
 		public Set<String> alternatives()
 		{
@@ -328,64 +464,19 @@ public class Command
 		{
 			return _outer._shortDescription;
 		}
-		public List<Option.Inner> cmdLineOptions()
+		public List<Option.Internal> cmdLineOptions()
 		{
 			return Collections.unmodifiableList(_outer._cmdLineOptions);
 		}
-		public List<Argument.Inner<?>> cmdLineArguments()
+		public List<Argument.Internal<?>> cmdLineArguments()
 		{
 			return Collections.unmodifiableList(_outer._cmdLineArguments);
 		}
-		
-		public boolean optionExists(String name)
-		{
-			for(Option.Inner option : _outer._cmdLineOptions)
-				if(option.name().equals(_outer._definedOptionAlternatives.get(name)))
-					return true;
-			
-			return false;
-		}
-		
-		@SuppressWarnings("unchecked")
-		public <T> T optionValue(String name)
-		{
-			try {
-				Option.Inner option = options(name)[0];
-				if(option.argument() != null)
-					return (T)option.argument().value();
-				else
-					return null;
-			}
-			catch(IndexOutOfBoundsException e) {
-				return null;
-			}
-		}
-		
-		public Option.Inner[] options(String name)
-		{
-			List<Option.Inner> options = new ArrayList<Option.Inner>();
-			for(Option.Inner option : _outer._cmdLineOptions)
-				if(option.name().equals(_outer._definedOptionAlternatives.get(name)))
-					options.add(new Option.Inner(option));
-			
-			return options.toArray(new Option.Inner[0]);
-		}
-		
-		public Argument.Inner<?> argument(String name)
-		{
-			for(Argument.Inner<?> argument : _outer._cmdLineArguments)
-				if(argument.name().equals(name))
-					return argument.clone();
-
-			return null;
-		}
-		
-		public Map<String, Option.Inner>definedOptions()
+		public Map<String, Option.Internal>definedOptions()
 		{
 			return Collections.unmodifiableMap(_outer._definedOptions);
 		}
-		
-		public Map<String, Argument.Inner<?>> definedArguments()
+		public Map<String, Argument.Internal<?>> definedArguments()
 		{
 			return Collections.unmodifiableMap(_outer._definedArguments);
 		}
@@ -399,7 +490,7 @@ public class Command
 				return false;
 			
 			String commandName = arguments.remove(0);
-			Set<Option.Inner> nonMultipleOptionCheckSet = new HashSet<Option.Inner>();
+			Set<Option.Internal> nonMultipleOptionCheckSet = new HashSet<Option.Internal>();
 			boolean commandArgumentsChecked = false;
 			while(arguments.size() > 0) {
 				String arg = arguments.get(0);
@@ -435,10 +526,10 @@ public class Command
 			
 			return true;
 		}
-		public void execute(List<Option.Inner> options)
+		public void execute(List<Option.Data> options)
 		{
 			if(_outer._commandExecutor != null)
-				_outer._commandExecutor.execute(this, options);
+				_outer._commandExecutor.execute(new Data(this), options);
 		}
 		
 		@Override
@@ -447,10 +538,10 @@ public class Command
 			if(obj == this)
 				return true;
 
-			if(!(obj instanceof Command.Inner))
+			if(!(obj instanceof Command.Internal))
 				return false;
-			Command.Inner inner = (Command.Inner)obj;
-			return name().equals(inner.name());
+			Command.Internal internal = (Command.Internal)obj;
+			return name().equals(internal.name());
 		}
 
 		@Override
@@ -464,15 +555,10 @@ public class Command
 		@Override
 		public String toString()
 		{
-			String str = "[";
-			str += "name: " + name() + ", id: " + id();
-			if(alternatives().size() > 0) {
-				str += ", alt: ";
-				int i = 0;
-				for(String alternative : alternatives())
-					str += alternative + (i++ < alternatives().size() ? ", " : "");
-			}
-			str += "]";
+			String str = "{" + name() + "(" + id() + ")";
+			if(alternatives().size() > 0)
+				str += " = " + alternatives();
+			str += "}";
 			return str;
 		}
 		

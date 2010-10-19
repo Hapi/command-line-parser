@@ -54,17 +54,17 @@ public class CommandLineParser
 	
 	
 	private final Description _description;
-	private Map<String, Option.Inner> _definedGlobalOptions = new LinkedHashMap<String, Option.Inner>();
+	private Map<String, Option.Internal> _definedGlobalOptions = new LinkedHashMap<String, Option.Internal>();
 	private Map<String, String> _definedGlobalOptionAlternatives = new HashMap<String, String>();
-	private Map<String, Command.Inner> _definedCommands = new LinkedHashMap<String, Command.Inner>();
+	private Map<String, Command.Internal> _definedCommands = new LinkedHashMap<String, Command.Internal>();
 	private Map<String, String> _definedCommandAlternatives = new HashMap<String, String>();
-	private Map<String, Argument.Inner<?>> _definedArguments =
-		new LinkedHashMap<String, Argument.Inner<?>>();
+	private Map<String, Argument.Internal<?>> _definedArguments =
+		new LinkedHashMap<String, Argument.Internal<?>>();
 	private boolean _mandatoryArguments;
 	private int _numOfOptionalArguments;
-	private List<Option.Inner> _cmdLineOptions = new ArrayList<Option.Inner>(); 
-	private Command.Inner _cmdLineCommand;
-	private List<Argument.Inner<?>> _cmdLineArguments = new ArrayList<Argument.Inner<?>>();
+	private List<Option.Internal> _cmdLineGlobalOptions = new ArrayList<Option.Internal>(); 
+	private Command.Internal _cmdLineCommand;
+	private List<Argument.Internal<?>> _cmdLineArguments = new ArrayList<Argument.Internal<?>>();
 	private final Class<?> _mainClass;
 	private final String _javaCommand;
 	private Set<HelpType> _definedArgumentTypes = new HashSet<HelpType>();
@@ -110,21 +110,21 @@ public class CommandLineParser
 		if(option == null)
 			throw new ConfigurationException("'option' must have a value.");
 		
-		Option.Inner inner = new Option.Inner(option);
-		if(inner.name() == null || inner.name().trim().length() == 0)
+		Option.Internal internal = new Option.Internal(option);
+		if(internal.name() == null || internal.name().trim().length() == 0)
 			throw new ConfigurationException("'option' must have a name.");
 		
-		if(inner.description().size() == 0)
+		if(internal.description().size() == 0)
 			throw
-				new ConfigurationException("Option '" + inner.name() + "' must have a description.");
-		if(_definedGlobalOptionAlternatives.containsKey(inner.name()))
+				new ConfigurationException("Option '" + internal.name() + "' must have a description.");
+		if(_definedGlobalOptionAlternatives.containsKey(internal.name()))
 			throw
-				new ConfigurationException("Option name '" + inner.name() + "' must be unique.");
+				new ConfigurationException("Option name '" + internal.name() + "' must be unique.");
 		
-		_definedGlobalOptions.put(inner.name(), inner);
-		_definedGlobalOptionAlternatives.put(inner.name(), inner.name());
-		for(String alternative : inner.alternatives())
-			if(_definedGlobalOptionAlternatives.put(alternative, inner.name()) != null)
+		_definedGlobalOptions.put(internal.name(), internal);
+		_definedGlobalOptionAlternatives.put(internal.name(), internal.name());
+		for(String alternative : internal.alternatives())
+			if(_definedGlobalOptionAlternatives.put(alternative, internal.name()) != null)
 				throw
 					new ConfigurationException(
 						"Option alternative name '" + alternative + "' must be unique."
@@ -145,36 +145,36 @@ public class CommandLineParser
 		if(command == null)
 			throw new ConfigurationException("'command' must have a value.");
 		
-		Command.Inner inner = new Command.Inner(command);
-		if(inner.name() == null || inner.name().trim().length() == 0)
+		Command.Internal internal = new Command.Internal(command);
+		if(internal.name() == null || internal.name().trim().length() == 0)
 			throw new ConfigurationException("'command' must have a name.");
 		
-		if(inner.shortDescription() == null || inner.shortDescription().length() == 0)
+		if(internal.shortDescription() == null || internal.shortDescription().length() == 0)
 			throw
 				new ConfigurationException(
-					"Command '" + inner.name() + "' must have a short description."
+					"Command '" + internal.name() + "' must have a short description."
 				);
 		
-		if(inner.description().size() == 0)
+		if(internal.description().size() == 0)
 			throw
-				new ConfigurationException("Command '" + inner.name() + "' must have a description.");
-		if(_definedCommandAlternatives.containsKey(inner.name()))
+				new ConfigurationException("Command '" + internal.name() + "' must have a description.");
+		if(_definedCommandAlternatives.containsKey(internal.name()))
 			throw
-				new ConfigurationException("Command name '" + inner.name() + "' must be unique.");
+				new ConfigurationException("Command name '" + internal.name() + "' must be unique.");
 
-		_definedCommands.put(inner.name(), inner);
-		_definedCommandAlternatives.put(inner.name(), inner.name());
-		for(String alternative : inner.alternatives())
-			if(_definedCommandAlternatives.put(alternative, inner.name()) != null)
+		_definedCommands.put(internal.name(), internal);
+		_definedCommandAlternatives.put(internal.name(), internal.name());
+		for(String alternative : internal.alternatives())
+			if(_definedCommandAlternatives.put(alternative, internal.name()) != null)
 				throw
 					new ConfigurationException(
 						"Command alternative name '" + alternative + "' must be unique."
 					);
 		
 		_definedArgumentTypes.add(HelpType.COMMANDS);
-		if(inner.definedOptions().size() > 0)
+		if(internal.definedOptions().size() > 0)
 			_definedArgumentTypes.add(HelpType.COMMAND_OPTIONS);
-		if(inner.definedArguments().size() > 0)
+		if(internal.definedArguments().size() > 0)
 			_definedArgumentTypes.add(HelpType.COMMAND_ARGUMENTS);
 	}
 	
@@ -189,40 +189,40 @@ public class CommandLineParser
 		if(argument == null)
 			throw new ConfigurationException("'argument' must have a value.");
 		
-		Argument.Inner<T> inner = new Argument.Inner<T>(argument, argumentType);
-		if(inner.name() == null || inner.name().trim().length() == 0)
+		Argument.Internal<T> internal = new Argument.Internal<T>(argument, argumentType);
+		if(internal.name() == null || internal.name().trim().length() == 0)
 			throw new ConfigurationException("'argument' must have a name.");
 		
-		if(inner.description().size() == 0)
+		if(internal.description().size() == 0)
 			throw
-				new ConfigurationException("Argument '" + inner.name() + "' must have a description.");
-		if(_definedArguments.containsKey(inner.name()))
+				new ConfigurationException("Argument '" + internal.name() + "' must have a description.");
+		if(_definedArguments.containsKey(internal.name()))
 			throw
-				new ConfigurationException("Argument name '" + inner.name() + "' must be unique.");
+				new ConfigurationException("Argument name '" + internal.name() + "' must be unique.");
 
 		
-		if(inner.optional() && !inner.hasDefaultValueForOptional()) {
+		if(internal.optional() && !internal.hasDefaultValueForOptional()) {
 			String msg =
 				"When annotations are used then optional arguments must have a default value "
-					+ "('" + inner.name() + "').";
+					+ "('" + internal.name() + "').";
 			throw new ConfigurationException(msg);
 		}
 		
-		for(Constraint<?> constraint : inner.constraints())
+		for(Constraint<?> constraint : internal.constraints())
 			if(!constraint.typeCheck(argumentType)) {
 				String msg =
 					"Using '" + constraint.getClass().getName() + "' with argument type '"
-						+ argumentType + "' creates a type conflict ('" + inner.name() + "').";
+						+ argumentType + "' creates a type conflict ('" + internal.name() + "').";
 				throw new ConfigurationException(msg);
 			}
 		
-		_definedArguments.put(inner.name(), inner);
-		if(!inner.optional()) {
+		_definedArguments.put(internal.name(), internal);
+		if(!internal.optional()) {
 			_mandatoryArguments = true;
 			if(_numOfOptionalArguments >= 2) {
 				String msg =
 					"If there are more than one optional argument they must be the last arguments "
-						+ "('" + inner.name() + "'). "
+						+ "('" + internal.name() + "'). "
 						+ " A single optional argument can have any position.";
 				throw new ConfigurationException(msg);
 			}
@@ -243,7 +243,7 @@ public class CommandLineParser
 	
 	public boolean optionExists(String name)
 	{
-		for(Option.Inner option : _cmdLineOptions)
+		for(Option.Internal option : _cmdLineGlobalOptions)
 			if(option.name().equals(_definedGlobalOptionAlternatives.get(name)))
 				return true;
 		
@@ -251,12 +251,12 @@ public class CommandLineParser
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> T optionValue(String name)
+	public <T> T getOptionValue(String name)
 	{
 		try {
-			Option.Inner option = options(name)[0];
-			if(option.argument() != null)
-				return (T)option.argument().value();
+			Option.Data option = getOptions(name)[0];
+			if(option.getArgument() != null)
+				return (T)option.getArgument().getValue();
 			else
 				return null;
 		}
@@ -265,23 +265,41 @@ public class CommandLineParser
 		}
 	}
 	
-	public Option.Inner[] options(String name)
+	public Option.Data[] getOptions(String name)
 	{
-		List<Option.Inner> options = new ArrayList<Option.Inner>();
-		for(Option.Inner option : _cmdLineOptions)
+		List<Option.Data> options = new ArrayList<Option.Data>();
+		for(Option.Internal option : _cmdLineGlobalOptions)
 			if(option.name().equals(_definedGlobalOptionAlternatives.get(name)))
-				options.add(new Option.Inner(option));
+				options.add(new Option.Data(option));
 		
-		return options.toArray(new Option.Inner[0]);
+		return options.toArray(new Option.Data[0]);
 	}
 	
-	public Argument.Inner<?> argument(String name)
+	public Option.Data[] getAllOptions()
 	{
-		for(Argument.Inner<?> argument : _cmdLineArguments)
+		List<Option.Data> options = new ArrayList<Option.Data>();
+		for(Option.Internal option : _cmdLineGlobalOptions)
+			options.add(new Option.Data(option));
+		
+		return options.toArray(new Option.Data[0]);
+	}
+	
+	public Argument.Data<?> getArgument(String name)
+	{
+		for(Argument.Internal<?> argument : _cmdLineArguments)
 			if(argument.name().equals(name))
-				return argument.clone();
+				return argument.createDataObject();
 
 		return null;
+	}
+	
+	public Argument.Data<?>[] getAllArguments()
+	{
+		List<Argument.Data<?>> arguments = new ArrayList<Argument.Data<?>>();
+		for(Argument.Internal<?> argument : _cmdLineArguments)
+			arguments.add(argument.createDataObject());
+		
+		return arguments.toArray(new Argument.Data[0]);
 	}
 	
 	public boolean commandExists(String name)
@@ -289,9 +307,9 @@ public class CommandLineParser
 		return _definedCommandAlternatives.containsKey(name);
 	}
 	
-	public Command.Inner getCommand()
+	public Command.Data getCommand()
 	{
-		return new Command.Inner(_cmdLineCommand);
+		return new Command.Data(_cmdLineCommand);
 	}
 	
 	public void parse(String[] args)
@@ -521,7 +539,7 @@ public class CommandLineParser
 				cmdLineArgs.add(arg);
 		}
 
-		Set<Option.Inner> nonMultipleOptionCheckSet = new HashSet<Option.Inner>();
+		Set<Option.Internal> nonMultipleOptionCheckSet = new HashSet<Option.Internal>();
 		_cmdLineCommand = null;
 		while(cmdLineArgs.size() > 0) {
 			String arg = cmdLineArgs.get(0);
@@ -532,7 +550,7 @@ public class CommandLineParser
 					_definedGlobalOptions,
 					_definedGlobalOptionAlternatives,
 					nonMultipleOptionCheckSet,
-					_cmdLineOptions
+					_cmdLineGlobalOptions
 				)
 			)
 				continue;
@@ -550,14 +568,14 @@ public class CommandLineParser
 			}
 					
 			if(_definedCommands.size() > 0) {
-				Command.Inner command = _definedCommands.get(_definedCommandAlternatives.get(arg));
+				Command.Internal command = _definedCommands.get(_definedCommandAlternatives.get(arg));
 				if(command == null)
 					throw
 						new CommandNotFoundException(
 							"A command was expected but '" + arg + "' cannot be interpreted "
 								+ "as a command."
 						);
-				_cmdLineCommand = new Command.Inner(command);
+				_cmdLineCommand = new Command.Internal(command);
 				if(_cmdLineCommand.parse(cmdLineArgs))
 					continue;
 			}
@@ -576,7 +594,7 @@ public class CommandLineParser
 			throw new CommandNotFoundException("No command found from the command line.");
 
 		// Global options.
-		Util.setAnnotatedOptions(callerObject, callerClass, _cmdLineOptions);
+		Util.setAnnotatedOptions(callerObject, callerClass, _cmdLineGlobalOptions);
 		
 		// Global arguments.
 		Util.setAnnotatedArguments(callerObject, callerClass, _cmdLineArguments);
@@ -591,7 +609,10 @@ public class CommandLineParser
 			);
 			Util.setAnnotatedOptions(callerObject, callerClass, _cmdLineCommand.cmdLineOptions());
 			Util.setAnnotatedArguments(callerObject, callerClass, _cmdLineCommand.cmdLineArguments());
-			_cmdLineCommand.execute(Collections.unmodifiableList(_cmdLineOptions));
+			List<Option.Data> optionData = new ArrayList<Option.Data>();
+			for(Option.Internal internal : _cmdLineGlobalOptions)
+				optionData.add(new Option.Data(internal));
+			_cmdLineCommand.execute(Collections.unmodifiableList(optionData));
 		}
 	}
 
@@ -711,7 +732,7 @@ public class CommandLineParser
 	
 	public void printCommandHelp(String commandName)
 	{
-		Command.Inner command = _definedCommands.get(_definedCommandAlternatives.get(commandName));
+		Command.Internal command = _definedCommands.get(_definedCommandAlternatives.get(commandName));
 		_writer.header();
 		if(command != null) {
 			_writer.level1Begin("CMD:");
@@ -773,7 +794,7 @@ public class CommandLineParser
 	}
 
 	private void printOptions(
-		Map<String, Option.Inner> options,
+		Map<String, Option.Internal> options,
 		boolean isCommand
 	)
 	{
@@ -784,8 +805,8 @@ public class CommandLineParser
 			_writer.level3Begin("CMD-OPTS:");
 		else
 			_writer.level1Begin("OPTS:");
-		for(Entry<String, Option.Inner> optionEntry : options.entrySet()) {
-			Option.Inner option = optionEntry.getValue();
+		for(Entry<String, Option.Internal> optionEntry : options.entrySet()) {
+			Option.Internal option = optionEntry.getValue();
 			
 			// Adds option names.
 			String optionNames = option.name();
@@ -876,7 +897,7 @@ public class CommandLineParser
 
 	
 	private void printArguments(
-		Map<String, Argument.Inner<?>> arguments,
+		Map<String, Argument.Internal<?>> arguments,
 		boolean isCommand
 	)
 	{
@@ -887,8 +908,8 @@ public class CommandLineParser
 			_writer.level3Begin("CMD-ARGS:");
 		else
 			_writer.level1Begin("ARGS:");
-		for(Entry<String, Argument.Inner<?>> argumentEntry : arguments.entrySet()) {
-			Argument.Inner<?> argument = argumentEntry.getValue();
+		for(Entry<String, Argument.Internal<?>> argumentEntry : arguments.entrySet()) {
+			Argument.Internal<?> argument = argumentEntry.getValue();
 			
 			// Adds argument name.
 			if(isCommand)
@@ -977,7 +998,7 @@ public class CommandLineParser
 	}
 
 	
-	private void printCommand(Command.Inner command)
+	private void printCommand(Command.Internal command)
 	{
 		// Adds command names.
 		String commandNames = command.name();
@@ -985,8 +1006,8 @@ public class CommandLineParser
 			commandNames += ", " + alternative;
 		commandNames +=
 			_definedArgumentTypes.contains(HelpType.COMMAND_OPTIONS) ? " [CMD-OPTS]" : "";
-		for(Entry<String, Argument.Inner<?>> argumentEntry : command.definedArguments().entrySet()) {
-			Argument.Inner<?> argument = argumentEntry.getValue();
+		for(Entry<String, Argument.Internal<?>> argumentEntry : command.definedArguments().entrySet()) {
+			Argument.Internal<?> argument = argumentEntry.getValue();
 			if(argument.optional())
 				commandNames += " [" + argument.name() + "]";
 			else
@@ -1009,7 +1030,7 @@ public class CommandLineParser
 			return;
 		
 		_writer.level1Begin("CMD:");
-		for(Entry<String, Command.Inner> commandEntry : _definedCommands.entrySet())
+		for(Entry<String, Command.Internal> commandEntry : _definedCommands.entrySet())
 			printCommand(commandEntry.getValue());
 		_writer.level1End();
 	}
@@ -1020,8 +1041,8 @@ public class CommandLineParser
 			return;
 		
 		_writer.level1Begin("Commands:");
-		for(Entry<String, Command.Inner> commandEntry : _definedCommands.entrySet()) {
-			Command.Inner command = commandEntry.getValue();
+		for(Entry<String, Command.Internal> commandEntry : _definedCommands.entrySet()) {
+			Command.Internal command = commandEntry.getValue();
 			String shortDescription = command.name();
 			for(String alternative : command.alternatives())
 				shortDescription += ", " + alternative;

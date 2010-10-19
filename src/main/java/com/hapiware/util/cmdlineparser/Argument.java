@@ -1,6 +1,7 @@
 package com.hapiware.util.cmdlineparser;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -186,9 +187,86 @@ public class Argument<T>
 	{
 		return constraint(new MaxValue((Comparable)maxValue));
 	}
+
+
+	/**
+	 * {@code Argument.Data} is a container class for holding argument values given from the command
+	 * line for options and command arguments. <p>
+	 * 
+	 * This class is immutable <u>only if {@code T} is an immutable class</>.
+	 * 
+	 * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+	 *
+	 * @param <T>
+	 * 		Type of argument.
+	 */
+	public static final class Data<T>
+		extends
+			DataBase
+	{
+		private final T _value;
+		private final boolean _optional;
+		
+		/**
+		 * "Copy" constructs a data object from the internal argument object.
+		 * 
+		 * @param internal
+		 * 		The internal argument object.
+		 */
+		Data(Internal<T> internal)
+		{
+			// Arguments do not have alternatives and thus an empty set is a proper value. 
+			super(internal.name(), internal.id(), new HashSet<String>());
+			_value = internal.value();
+			_optional = internal.optional();
+		}
+
+		/**
+		 * Returns the argument value.
+		 * 
+		 * @return
+		 * 		The value from the command line.
+		 */
+		public T getValue()
+		{
+			return _value;
+		}
+		
+
+		/**
+		 * Tells if the argument is optional or not.
+		 * @return
+		 * 		{@code true} if optional, {@code false} otherwise.
+		 */
+		public boolean isOptional()
+		{
+			return _optional;
+		}
+		
+		
+		/**
+		 * Returns a {@code String} representation of {@code Argument.Data} object. The form is:
+		 * <p>
+		 * <code>{NAME(ID) = VALUE (OPTIONAL)}</code>
+		 * <p>
+		 * where:
+		 * 	<ul>
+		 * 		<li>NAME is the argument name.</li>
+		 * 		<li>ID is the id for the argument.</li>
+		 * 		<li>VALUE is the argument value.</li>
+		 * 		<li>OPTIONAL indicates if the value is optional or not.</li>
+		 * 	</ul>
+		 */
+		@Override
+		public String toString()
+		{
+			return
+				"{" + getName() + "(" + getId() + ") = " + getValue() + " (" + isOptional() + ")}";
+		}
+	}
 	
 	
-	public static final class Inner<T>
+	static final class Internal<T>
 		implements
 			Parser,
 			Cloneable
@@ -197,7 +275,7 @@ public class Argument<T>
 		private final Class<T> _argumentTypeClass;
 		private T _value;
 		
-		public Inner(Argument<T> outer, Class<T> argumentTypeClass)
+		public Internal(Argument<T> outer, Class<T> argumentTypeClass)
 		{
 			_outer = outer;
 			_argumentTypeClass = argumentTypeClass;
@@ -218,7 +296,7 @@ public class Argument<T>
 		{
 			return _outer._argument.description();
 		}
-		public void value(T value)
+		private void value(T value)
 		{
 			_value = value;
 		}
@@ -294,12 +372,17 @@ public class Argument<T>
 				constraint.evaluate(name(), value());
 		}
 		
-		@Override
-		public Inner<T> clone()
+		public Data<T> createDataObject()
 		{
-			Inner<T> inner = new Inner<T>(new Argument<T>(_outer), _argumentTypeClass);
-			inner._value = _value;
-			return inner;
+			return new Data<T>(this);
+		}
+		
+		@Override
+		public Internal<T> clone()
+		{
+			Internal<T> internal = new Internal<T>(new Argument<T>(_outer), _argumentTypeClass);
+			internal._value = _value;
+			return internal;
 		}
 		
 		@Override
@@ -308,10 +391,10 @@ public class Argument<T>
 			if(obj == this)
 				return true;
 
-			if(!(obj instanceof Argument.Inner<?>))
+			if(!(obj instanceof Argument.Internal<?>))
 				return false;
-			Argument.Inner<?> inner = (Argument.Inner<?>)obj;
-			return name().equals(inner.name());
+			Argument.Internal<?> internal = (Argument.Internal<?>)obj;
+			return name().equals(internal.name());
 		}
 
 		@Override
@@ -325,9 +408,7 @@ public class Argument<T>
 		@Override
 		public String toString()
 		{
-			String str = "[";
-			str += "name: " + name() + ", id: " + id() + ", optional: " + optional() + "]";
-			return str;
+			return "{" + name() + "(" + id() + ") = " + value() + " (" + optional() + ")}";
 		}
 		
 		private T defaultValue() throws IllegalCommandLineArgumentException

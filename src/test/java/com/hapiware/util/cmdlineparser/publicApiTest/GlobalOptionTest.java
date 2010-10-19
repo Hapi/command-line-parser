@@ -1,4 +1,4 @@
-package com.hapiware.util.cmdlineparser;
+package com.hapiware.util.cmdlineparser.publicApiTest;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -41,7 +41,7 @@ public class GlobalOptionTest
 	{
 		CommandLineParser p =
 			new CommandLineParser(
-				ParserTest.class,
+				GlobalOptionTest.class,
 				new Description().description("Main description.")
 			);
 		p.add(new Option("v") {{
@@ -81,11 +81,11 @@ public class GlobalOptionTest
 			assertEquals(true, p.optionExists("--verbose"));
 			assertEquals(true, p.optionExists("-n"));
 		
-			assertEquals(1000, p.optionValue("-n"));
-			assertEquals(1000, p.optionValue("--number"));
-			assertEquals(null, p.optionValue("-v"));
-			assertEquals("Speed", p.optionValue("-s"));
-			assertEquals("j", p.optionValue("-d"));
+			assertEquals(1000, p.getOptionValue("-n"));
+			assertEquals(1000, p.getOptionValue("--number"));
+			assertEquals(null, p.getOptionValue("-v"));
+			assertEquals("Speed", p.getOptionValue("-s"));
+			assertEquals("j", p.getOptionValue("-d"));
 			
 			assertEquals(true, _ver);
 			assertEquals(1000, _n);
@@ -111,7 +111,7 @@ public class GlobalOptionTest
 	{
 		CommandLineParser p =
 			new CommandLineParser(
-				ParserTest.class,
+				GlobalOptionTest.class,
 				new Description().description("Main description.")
 			);
 		p.add(new Option("n") {{
@@ -161,7 +161,7 @@ public class GlobalOptionTest
 	{
 		CommandLineParser p =
 			new CommandLineParser(
-				ParserTest.class,
+				GlobalOptionTest.class,
 				new Description().description("Main description.")
 			);
 		p.add(new Option("nums") {{

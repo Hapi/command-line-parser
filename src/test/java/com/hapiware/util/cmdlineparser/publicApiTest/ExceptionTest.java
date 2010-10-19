@@ -1,4 +1,4 @@
-package com.hapiware.util.cmdlineparser;
+package com.hapiware.util.cmdlineparser.publicApiTest;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -35,7 +35,7 @@ public class ExceptionTest
 	{
 		_parser =
 			new CommandLineParser(
-				ParserTest.class,
+				ExceptionTest.class,
 				new Description().description("Main description.")
 			);
 		_parser.add(new Option("type-mismatch") {{

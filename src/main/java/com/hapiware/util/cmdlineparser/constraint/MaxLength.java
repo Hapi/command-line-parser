@@ -33,4 +33,13 @@ public class MaxLength
 	{
 		return new Description().description("Maximum length is " + _maxLength + " characters.");
 	}
+
+	/**
+	 * Returns the maximum length as {@code String}.
+	 */
+	@Override
+	public String toString()
+	{
+		return String.valueOf(_maxLength);
+	}
 }

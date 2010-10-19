@@ -1,4 +1,4 @@
-package com.hapiware.util.cmdlineparser;
+package com.hapiware.util.cmdlineparser.publicApiTest;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -28,7 +28,7 @@ abstract public class TestBase
 	
 	
 	@SuppressWarnings("unchecked")
-	private static void replacePackage(Class<?> baseClass) throws Throwable
+	protected static void replacePackage(Class<?> baseClass) throws Throwable
 	{
 		String key = baseClass.getPackage().getName(); 
 			Class<?> pkgClass = Class.forName("java.lang.Package");

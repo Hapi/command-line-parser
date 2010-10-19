@@ -39,4 +39,13 @@ public class MinValue<T extends Comparable<T>>
 	{
 		return new Description().description("Minimum value is " + _minValue + ".");
 	}
+	
+	/**
+	 * Returns the minimum value as {@code String}.
+	 */
+	@Override
+	public String toString()
+	{
+		return _minValue.toString();
+	}
 }

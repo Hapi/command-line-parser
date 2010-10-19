@@ -161,7 +161,7 @@ public class Description
 	 * 		{@code Description} object thus allowing method call chaining.
 	 * 
 	 * @see Description
-	 * @see #p(String)
+	 * @see #p()
 	 * @see #toParagraphs()
 	 */
 	public Description paragraph()

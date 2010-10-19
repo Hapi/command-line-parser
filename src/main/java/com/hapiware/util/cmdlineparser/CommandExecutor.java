@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface CommandExecutor
 {
-	public void execute(Command.Inner command, List<Option.Inner> globalOptions);
+	public void execute(Command.Data command, List<Option.Data> globalOptions);
 }

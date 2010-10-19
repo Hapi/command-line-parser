@@ -1,6 +1,7 @@
-package com.hapiware.util.cmdlineparser;
+package com.hapiware.util.cmdlineparser.publicApiTest;
 
 import org.testng.annotations.Test;
+
 
 public class ConfigurationTest
 	extends

@@ -33,4 +33,13 @@ public class MinLength
 	{
 		return new Description().description("Minimum length is " + _minLength + " characters.");
 	}
+
+	/**
+	 * Returns the minimum length as {@code String}.
+	 */
+	@Override
+	public String toString()
+	{
+		return String.valueOf(_minLength);
+	}
 }
