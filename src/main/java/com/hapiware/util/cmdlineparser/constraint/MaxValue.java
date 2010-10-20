@@ -37,7 +37,11 @@ public class MaxValue<T extends Comparable<T>>
 
 	public Description description()
 	{
-		return new Description().description("Maximum value is " + _maxValue + ".");
+		return
+			new Description()
+				.description("Maximum value is ")
+				.strong(_maxValue.toString())
+				.description(".");
 	}
 	
 	/**

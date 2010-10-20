@@ -23,10 +23,90 @@ import com.hapiware.util.cmdlineparser.annotation.Id;
 import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
 
 
+/**
+ * An utility class for command line parser.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ */
 public class Util
 {
 	private static final String CR = "\n";
 	
+	
+	/**
+	 * Writes left and right justified {@code text} to an output stream (usually {@link System.out})
+	 * creating new lines when necessary. Justifying the left side is done by adding space
+	 * characters until the left {@code column} is reached. {@code width} tells the width of
+	 * the write area (e.g. screen).
+	 * <p>
+	 * For example if {@code width} is 80 and {@code column} is 10 then every line has ten space
+	 * characters (one in every column between 0 -9) and characters from {@code text} are written
+	 * to columns 10 - 79.
+	 * <p>
+	 * Notice that this method adds a newline feed character at the end of the stream. 
+	 * 
+	 * @param text
+	 * 		Text to be written.
+	 * 
+	 * @param column
+	 * 		A zero-based position of the leftmost characters (in number of characters).
+	 * 
+	 * @param width
+	 * 		Width of the write area in characters.
+	 * 
+	 * @param outStream
+	 * 		A stream where the justified text is to be written. Most usually {@link System.out}.
+	 * 
+	 * @throws RuntimeException
+	 * 		If something goes wrong with writing to {@code outStream}. In practice this just
+	 * 		re-throws {@link IOException}.
+	 */
+	public static void write(String text, int column, int width, OutputStream outStream)
+	{
+		if(column >= width)
+			throw new IllegalArgumentException("'width' must be greater than 'column'.");
+		
+		StringBuilder tab = new StringBuilder();
+		for(int i = 0; i < column; i++)
+			tab.append(" ");
+
+		StringBuilder toWrite = new StringBuilder(tab);
+		int pos = column;
+		StringTokenizer tokenizer = new StringTokenizer(text);
+		while(tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken();
+			if(pos + token.length() > width) {
+				if(pos != column) {
+					if(toWrite.charAt(toWrite.length() - 1) == ' ')
+						toWrite.deleteCharAt(toWrite.length() - 1);
+					pos = column;
+					toWrite.append(CR).append(tab);
+				}
+				if(token.length() > width - column) {
+					String rest = token;
+					while(rest.length() > width - column) {
+						toWrite.append(rest.substring(0, width - column)).append(CR).append(tab);
+						rest = rest.substring(width - column);
+					}
+					token = rest;
+				}
+			}
+			pos += token.length() + 1;
+			toWrite.append(token).append(" ");
+		}
+		if(toWrite.charAt(toWrite.length() - 1) == ' ')
+			toWrite.deleteCharAt(toWrite.length() - 1);
+		if(toWrite.toString().trim().length() > 0)
+			toWrite.append(CR);
+		try {
+			outStream.write(toWrite.toString().getBytes());
+		}
+		catch(IOException e) {
+			throw new RuntimeException("Writing to an output stream failed.", e);
+		}
+	}
+
 	
 	/**
 	 * Checks the name pattern.
@@ -38,12 +118,12 @@ public class Util
 	 * @return
 	 * 		{@code true} if {@code name} matches the pattern. {@code false} otherwise.
 	 */
-	public static boolean checkName(String name)
+	static boolean checkName(String name)
 	{
 		return Pattern.matches("^\\p{Alpha}[-\\p{Alnum}]*$", name);
 	}
 	
-	public static boolean checkOption(
+	static boolean checkOption(
 		String arg,
 		List<String> cmdLineArgs,
 		Map<String, Option.Internal> definedOptions,
@@ -74,7 +154,7 @@ public class Util
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static boolean checkArguments(
+	static boolean checkArguments(
 		String commandName,
 		List<String> cmdLineArgs,
 		Map<String, Argument.Internal<?>> definedArguments,
@@ -128,7 +208,6 @@ public class Util
 				if(mandatoryOptionalDiff == 1) {
 					// Adds a default value to one optional argument.
 					if(it.hasNext())
-						//argument = ((Entry<String, Argument.Internal<?>>)it.next()).getValue();
 						((LinkedList<String>)cmdLineArgs).addFirst(argument.defaultValueAsString());
 					else
 						break;
@@ -136,7 +215,6 @@ public class Util
 				else
 					// Adds default values to the rest of the optional arguments
 					// (which must be at end of the command definition).
-					//break;
 					((LinkedList<String>)cmdLineArgs).addFirst(argument.defaultValueAsString());
 			
 			if(argument.parse(cmdLineArgs)) {
@@ -148,7 +226,7 @@ public class Util
 	}
 	
 
-	public static void setAnnotatedOptions(
+	static void setAnnotatedOptions(
 		Object callerObject,
 		Class<?> callerClass,
 		List<Option.Internal> cmdLineOptions
@@ -192,7 +270,7 @@ public class Util
 	}
 
 	
-	public static void setAnnotatedArguments(
+	static void setAnnotatedArguments(
 		Object callerObject,
 		Class<?> callerClass,
 		List<Argument.Internal<?>> cmdLineArguments
@@ -205,7 +283,7 @@ public class Util
 	}
 	
 	
-	public static <T> void setAnnotatedValue(
+	static <T> void setAnnotatedValue(
 		Object callerObject,
 		Class<?> callerClass,
 		T value,
@@ -292,7 +370,7 @@ public class Util
 	}
 	
 	
-	public static Object valueOf(String valueAsString, Class<?> argumentTypeClass)
+	static Object valueOf(String valueAsString, Class<?> argumentTypeClass)
 	{
 		if(argumentTypeClass == Integer.class)
 			return Integer.valueOf(valueAsString);
@@ -311,46 +389,5 @@ public class Util
 		if(argumentTypeClass == BigInteger.class)
 			return new BigInteger(valueAsString);
 		return valueAsString;
-	}
-
-	
-	public static void write(String text, int column, int width, OutputStream out)
-	{
-		if(column >= width)
-			throw new IllegalArgumentException("'width' must be greater than 'column'.");
-		
-		String tab = "";
-		for(int i = 0; i < column; i++)
-			tab += " ";
-
-		String toWrite = tab;
-		int pos = column;
-		StringTokenizer tokenizer = new StringTokenizer(text);
-		while(tokenizer.hasMoreTokens()) {
-			String token = tokenizer.nextToken();
-			if(pos + token.length() > width) {
-				pos = column;
-				toWrite += CR + tab;
-				if(token.length() > width - column) {
-					String rest = token;
-					while(rest.length() > width - column) {
-						toWrite += rest.substring(0, width - column) + CR + tab;
-						rest = rest.substring(width - column);
-					}
-					token = rest;
-				}
-			}
-			pos += token.length() + 1;
-			toWrite += token + " ";
-		}
-		if(toWrite.trim().length() > 0)
-			toWrite += CR;
-		try {
-			out.write(toWrite.getBytes());
-		}
-		catch(IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }

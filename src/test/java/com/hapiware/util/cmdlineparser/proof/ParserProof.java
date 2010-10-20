@@ -40,7 +40,7 @@ public class ParserProof
 			);
 		p.add(new Option("m") {{
 			alternatives("moi").id("miu");
-			description("dfšlasjdfa lsfj");
+			description("dflasjdfa lsfj");
 		}});
 		p.add(new Option("n") {{
 			//multiple();

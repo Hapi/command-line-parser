@@ -825,7 +825,7 @@ public class CommandLineParser
 					if(option.argument() != null && option.argument().optional())
 						paragraph = 
 							"Argument is optional. " 
-								+ option.argument().defaultValueDescription() 
+								+ option.argument().defaultValueDescription() + " " 
 								+ paragraph;
 					if(option.multiple())
 						paragraph = "This option can occur several times. " + paragraph;
@@ -924,7 +924,7 @@ public class CommandLineParser
 				if(isFirstParagraph && argument.optional()) {
 					paragraph = 
 						"Argument is optional. " 
-							+ argument.defaultValueDescription() 
+							+ argument.defaultValueDescription() + " " 
 							+ paragraph;
 					isFirstParagraph = false;
 				}

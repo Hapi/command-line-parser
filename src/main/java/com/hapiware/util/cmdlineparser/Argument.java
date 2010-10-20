@@ -324,9 +324,12 @@ public class Argument<T>
 		{
 			if(hasDefaultValueForOptional())
 				return 
-					"Default value for the optional argument is " 
-						+ _outer._defaultForOptional 
-						+ ". ";
+					new Description()
+						.d("Default value for the optional argument is ")
+						.b(_outer._defaultForOptional)
+						.d(".")
+						.toParagraphs()
+						.get(0);
 			else
 				return "";
 		}

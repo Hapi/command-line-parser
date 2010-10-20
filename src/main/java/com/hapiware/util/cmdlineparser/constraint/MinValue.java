@@ -37,7 +37,11 @@ public class MinValue<T extends Comparable<T>>
 
 	public Description description()
 	{
-		return new Description().description("Minimum value is " + _minValue + ".");
+		return
+			new Description()
+				.description("Minimum value is ")
+				.strong(_minValue.toString())
+				.description(".");
 	}
 	
 	/**
