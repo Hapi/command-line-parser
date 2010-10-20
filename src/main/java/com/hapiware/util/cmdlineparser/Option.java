@@ -22,10 +22,10 @@ public class Option
 	}
 	
 	/**
-	 * Creates new {@code Option}. {@code name} must match this RE pattern:
-	 * <code>^\p{Alpha}\p{Alnum}*$</code>.
+	 * Creates new {@code Option}.
 	 * 
 	 * @param name
+	 * 		Name for the option.
 	 * 
 	 * @throws ConfigurationException
 	 * 		If {@code name} is incorrectly formed.

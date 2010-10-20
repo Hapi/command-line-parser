@@ -44,6 +44,21 @@ public class Command
 		_definedArguments = command._definedArguments;
 	}
 	
+	/**
+	 * Creates new {@code Command}.
+	 * 
+	 * @param name
+	 * 		Name for the command.
+	 *
+	 * @param shortDescription
+	 * 		A short textual description about the command. This is used by the help system
+	 * 		for listing all commands. See {@link CommandLineParser#printCommandsHelp()}. 
+	 * 
+	 * @throws ConfigurationException
+	 * 		If {@code name} is incorrectly formed or {@code shortDescrption} is missing.
+	 * 
+	 * @see Util#checkName(String)
+	 */
 	public Command(String name, String shortDescription)
 	{
 		if(name == null || name.trim().length() == 0)

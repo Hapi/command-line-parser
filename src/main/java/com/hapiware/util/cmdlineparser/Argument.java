@@ -36,9 +36,10 @@ public class Argument<T>
 	}
 	
 	/**
-	 * Creates new {@code Option}.
+	 * Creates new {@code Argument}.
 	 * 
 	 * @param name
+	 * 		Name for the argument.
 	 * 
 	 * @throws ConfigurationException
 	 * 		If {@code name} is incorrectly formed.

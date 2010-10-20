@@ -118,7 +118,7 @@ public class Util
 	 * @return
 	 * 		{@code true} if {@code name} matches the pattern. {@code false} otherwise.
 	 */
-	static boolean checkName(String name)
+	public static boolean checkName(String name)
 	{
 		return Pattern.matches("^\\p{Alpha}[-\\p{Alnum}]*$", name);
 	}
