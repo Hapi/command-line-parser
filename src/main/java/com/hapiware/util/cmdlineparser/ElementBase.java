@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ElementBase
+class ElementBase
 {
 	private String _name;
 	private Set<String> _alternatives = new HashSet<String>();
@@ -32,10 +32,21 @@ public class ElementBase
 		_name = name;
 	}
 	
-	public void alternatives(String...alternatives)
+	/**
+	 * 
+	 * @param alternatives
+	 * 
+	 * @return
+	 * 		{@code null} if there were no duplicates. Otherwise the duplicate alternative
+	 * 		name is returned.
+	 */
+	public String alternatives(String...alternatives)
 	{
 		for(String alternative : alternatives)
-			_alternatives.add(alternative);
+			if(!_alternatives.add(alternative))
+				return alternative;
+		
+		return null;
 	}
 	
 	public void id(String id)

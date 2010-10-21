@@ -124,7 +124,13 @@ public class Command
 							+ "' is incorrect ('" + alternatives[i] + "')."
 					);
 		
-		_command.alternatives(alternatives);
+		String duplicateAlternative = _command.alternatives(alternatives);
+		if(duplicateAlternative != null)
+			throw
+				new ConfigurationException(
+					"All the alternative names for command '" + _command.name() + "' must be unique. "
+					+ "Conflicting alternative name is '" + duplicateAlternative + "'." 
+				);
 		return this;
 	}
 	
@@ -290,7 +296,7 @@ public class Command
 			throw
 				new ConfigurationException(
 					"Option name '" + internal.name() + "' for command '" 
-						+ _command.name() + "'must be unique."
+						+ _command.name() + "' must be unique."
 				);
 		
 		_definedOptions.put(internal.name(), internal);
@@ -300,7 +306,7 @@ public class Command
 				throw
 					new ConfigurationException(
 						"Option alternative name '" + alternative + "' for command '" 
-							+ _command.name() + "'must be unique."
+							+ _command.name() + "' must be unique."
 					);
 		
 		return this;

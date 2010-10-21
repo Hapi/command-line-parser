@@ -65,7 +65,13 @@ public class Option
 					);
 			alternatives[i] = addOptionMinus(alternatives[i]);
 		}
-		_option.alternatives(alternatives);
+		String duplicateAlternative = _option.alternatives(alternatives);
+		if(duplicateAlternative != null)
+			throw
+				new ConfigurationException(
+					"All the alternative names for option '" + _option.name() + "' must be unique. "
+					+ "Conflicting alternative name is '" + duplicateAlternative + "'." 
+				);
 		return this;
 	}
 	
