@@ -177,13 +177,13 @@ public class Argument<T>
 		return constraint((Constraint<T>)new MaxLength(maxLength));
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Argument<T> minValue(T minValue)
 	{
 		return constraint(new MinValue((Comparable)minValue));
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Argument<T> maxValue(T maxValue)
 	{
 		return constraint(new MaxValue((Comparable)maxValue));

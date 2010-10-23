@@ -188,15 +188,17 @@ public class Util
 		
 		if(numberOfCmdLineArguments < numberOfMandatoryArguments) {
 			String msg =
-				"Too few command line arguments for command '" + commandName + "'. "
-					+ "Expected min: " + numberOfMandatoryArguments
+				"Too few command line arguments"
+					+ (commandName != null ? " for command '" + commandName + "'" : "")
+					+ ". Expected min: " + numberOfMandatoryArguments
 					+ " but was: " + numberOfCmdLineArguments;
 			throw new IllegalCommandLineArgumentException(msg);
 		}
 		if(numberOfCmdLineArguments > numberOfMaximumArguments) {
 			String msg =
-				"Too many command line arguments for command '" + commandName + "'. "
-					+ "Expected max: " + numberOfMaximumArguments
+				"Too many command line arguments"
+					+ (commandName != null ? " for command '" + commandName + "'" : "")
+					+ ". Expected max: " + numberOfMaximumArguments
 					+ " but was: " + numberOfCmdLineArguments;
 			throw new IllegalCommandLineArgumentException(msg);
 		}
@@ -215,7 +217,8 @@ public class Util
 				else
 					// Adds default values to the rest of the optional arguments
 					// (which must be at end of the command definition).
-					((LinkedList<String>)cmdLineArgs).addFirst(argument.defaultValueAsString());
+					if(cmdLineArgs.size() == 0)
+						((LinkedList<String>)cmdLineArgs).addFirst(argument.defaultValueAsString());
 			
 			if(argument.parse(cmdLineArgs)) {
 				argument.checkConstraints();

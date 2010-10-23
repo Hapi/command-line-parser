@@ -28,17 +28,17 @@ public class Enumeration<T>
 		return this;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Enumeration<T> includeRange(T lower, T upper, String description)
 	{
-		_includeRanges.add(new Range((Comparable)lower, (Comparable)upper, description));
+		_includeRanges.add(new Range((Comparable<?>)lower, (Comparable<?>)upper, description));
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Enumeration<T> excludeRange(T lower, T upper, String description)
 	{
-		_excludeRanges.add(new Range((Comparable)lower, (Comparable)upper, description));
+		_excludeRanges.add(new Range((Comparable<?>)lower, (Comparable<?>)upper, description));
 		return this;
 	}
 

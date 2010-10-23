@@ -16,7 +16,6 @@ import com.hapiware.util.cmdlineparser.Option;
 import com.hapiware.util.cmdlineparser.OptionArgument;
 import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
 import com.hapiware.util.cmdlineparser.constraint.Enumeration;
-import com.hapiware.util.cmdlineparser.writer.ScreenWriter;
 
 
 public class CommandTest
@@ -32,7 +31,6 @@ public class CommandTest
 		_parser =
 			new CommandLineParser(
 				CommandTest.class,
-				new ScreenWriter(80),
 				new Description().description("Main description.")
 			);
 		_parser.add(new Command("set", "set description") {{
@@ -105,8 +103,8 @@ public class CommandTest
 		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
 		assertEquals(2, _parser.getCommand().getArgument("TYPE").getValue());
 		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().optionValue("-a"));
-		assertEquals(-2, _parser.getCommand().optionValue("-b"));
+		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
+		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
 
 		// Different option order.
 		_parser.parse(
@@ -117,8 +115,8 @@ public class CommandTest
 		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
 		assertEquals(2, _parser.getCommand().getArgument("TYPE").getValue());
 		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().optionValue("-a"));
-		assertEquals(-2, _parser.getCommand().optionValue("-b"));
+		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
+		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
 		_parser.parse(
 			this,
 			new String[] { "set", "123", "2", "level", "-b", "-2", "-a", "abc" }
@@ -127,8 +125,8 @@ public class CommandTest
 		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
 		assertEquals(2, _parser.getCommand().getArgument("TYPE").getValue());
 		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().optionValue("-a"));
-		assertEquals(-2, _parser.getCommand().optionValue("-b"));
+		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
+		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
 	}
 	
 	@Test(
@@ -202,8 +200,8 @@ public class CommandTest
 		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
 		assertEquals(4, _parser.getCommand().getArgument("TYPE").getValue());
 		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().optionValue("-a"));
-		assertEquals(-2, _parser.getCommand().optionValue("-b"));
+		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
+		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
 
 		// Different option order.
 		_parser.parse(
@@ -214,8 +212,8 @@ public class CommandTest
 		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
 		assertEquals(4, _parser.getCommand().getArgument("TYPE").getValue());
 		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().optionValue("-a"));
-		assertEquals(-2, _parser.getCommand().optionValue("-b"));
+		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
+		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
 		_parser.parse(
 			this,
 			new String[] { "set", "123", "level", "-b", "-2", "-a", "abc" }
@@ -224,8 +222,8 @@ public class CommandTest
 		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
 		assertEquals(4, _parser.getCommand().getArgument("TYPE").getValue());
 		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().optionValue("-a"));
-		assertEquals(-2, _parser.getCommand().optionValue("-b"));
+		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
+		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
 	}
 	
 	@Test(

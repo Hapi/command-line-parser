@@ -24,6 +24,7 @@ public class Command
 		new LinkedHashMap<String, Argument.Internal<?>>();
 	private boolean _mandatoryArguments;
 	private int _numOfOptionalArguments;
+	private boolean _previousWasOptional;
 	private List<Option.Internal> _cmdLineOptions = new ArrayList<Option.Internal>(); 
 	private List<Argument.Internal<?>> _cmdLineArguments = new ArrayList<Argument.Internal<?>>();
 	
@@ -256,18 +257,21 @@ public class Command
 			}
 		
 		_definedArguments.put(internal.name(), internal);
-		if(!internal.optional()) {
+
+		if(!internal.optional())
 			_mandatoryArguments = true;
-			if(_numOfOptionalArguments >= 2) {
-				String msg =
-					"If there are more than one optional argument they must be the last arguments "
-						+ "(command '" + _command.name() + "', argument '" + internal.name() + "'). "
-						+ "A single optional argument can have any position.";
-				throw new ConfigurationException(msg);
-			}
-		}
 		else
 			_numOfOptionalArguments++;
+
+		if(_numOfOptionalArguments >= 2 && (!internal.optional() || !_previousWasOptional)) {
+			String msg =
+				"If there is more than one optional argument they must be the last arguments. "
+					+ "The first conflicting argument for command '" + _command.name()
+					+ "' is '" + internal.name() + "'. "
+					+ "A single optional argument can have any position.";
+			throw new ConfigurationException(msg);
+		}
+		_previousWasOptional = internal.optional();
 		return this;
 	}
 	
@@ -378,12 +382,22 @@ public class Command
 		}
 		
 		
-		@SuppressWarnings("unchecked")
-		public <T> T optionValue(String name)
+		public Option.Data getOption(String name)
 		{
 			try {
-				Option.Data option = getOptions(name)[0];
-				if(option.getArgument() != null)
+				return getOptions(name)[0];
+			}
+			catch(IndexOutOfBoundsException e) {
+				return null;
+			}
+		}
+		
+		@SuppressWarnings("unchecked")
+		public <T> T getOptionValue(String name)
+		{
+			try {
+				Option.Data option = getOption(name);
+				if(option != null && option.getArgument() != null)
 					return (T)option.getArgument().getValue();
 				else
 					return null;
@@ -412,6 +426,16 @@ public class Command
 			return null;
 		}
 
+		@SuppressWarnings("unchecked")
+		public <T> T getArgumentValue(String name)
+		{
+			Argument.Data<?> argument = getArgument(name);
+			if(argument != null)
+				return (T)argument.getValue();
+			else
+				return null;
+		}
+		
 		/**
 		 * Returns an array of command arguments.
 		 * 
