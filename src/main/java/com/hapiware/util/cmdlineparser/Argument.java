@@ -430,7 +430,7 @@ public class Argument<T>
 				String msg =
 					"[" + valueAsString + "] cannot be interpreted as "
 						+ argumentTypeClass.getCanonicalName()
-						+ " for '" + name() + "'";
+						+ " for '" + name() + "'.";
 				throw new IllegalCommandLineArgumentException(msg, ex);
 			}
 		}

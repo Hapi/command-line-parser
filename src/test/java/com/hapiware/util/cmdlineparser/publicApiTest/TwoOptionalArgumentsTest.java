@@ -63,8 +63,8 @@ public class TwoOptionalArgumentsTest
 		expectedExceptions = {ConfigurationException.class},
 		expectedExceptionsMessageRegExp = 
 			"If there is more than one optional argument they must be the last arguments\\. "
-				+ "The first conflicting argument is 'LEVEL'. "
-				+ "A single optional argument can have any position."
+				+ "The first conflicting argument is 'LEVEL'\\. "
+				+ "A single optional argument can have any position\\."
 	)
 	public void misplacedOptionalArguments()
 	{
@@ -93,8 +93,8 @@ public class TwoOptionalArgumentsTest
 		expectedExceptions = {ConfigurationException.class},
 		expectedExceptionsMessageRegExp = 
 			"If there is more than one optional argument they must be the last arguments\\. "
-				+ "The first conflicting argument is 'LEVEL'. "
-				+ "A single optional argument can have any position."
+				+ "The first conflicting argument is 'LEVEL'\\. "
+				+ "A single optional argument can have any position\\."
 	)
 	public void misplacedOptionalArguments2()
 	{
@@ -123,8 +123,8 @@ public class TwoOptionalArgumentsTest
 		expectedExceptions = {ConfigurationException.class},
 		expectedExceptionsMessageRegExp = 
 			"If there is more than one optional argument they must be the last arguments\\. "
-				+ "The first conflicting argument is 'LEVEL'. "
-				+ "A single optional argument can have any position."
+				+ "The first conflicting argument is 'LEVEL'\\. "
+				+ "A single optional argument can have any position\\."
 	)
 	public void misplacedOptionalArguments3()
 	{
@@ -157,8 +157,8 @@ public class TwoOptionalArgumentsTest
 		expectedExceptions = {ConfigurationException.class},
 		expectedExceptionsMessageRegExp = 
 			"If there is more than one optional argument they must be the last arguments\\. "
-				+ "The first conflicting argument is 'INFO'. "
-				+ "A single optional argument can have any position."
+				+ "The first conflicting argument is 'INFO'\\. "
+				+ "A single optional argument can have any position\\."
 	)
 	public void misplacedOptionalArguments4()
 	{
@@ -249,7 +249,7 @@ public class TwoOptionalArgumentsTest
 	@Test(
 		expectedExceptions = { IllegalCommandLineArgumentException.class },
 		expectedExceptionsMessageRegExp =
-			"Too few command line arguments\\. Expected min: 2 but was: 1"
+			"Too few command line arguments\\. Expected min: 2 but was: 1\\."
 	)
 	public void noOptionsAndTooFewArguments()
 		throws
@@ -266,7 +266,7 @@ public class TwoOptionalArgumentsTest
 	@Test(
 		expectedExceptions = { IllegalCommandLineArgumentException.class },
 		expectedExceptionsMessageRegExp =
-			"Too many command line arguments\\. Expected max: 4 but was: 5"
+			"Too many command line arguments\\. Expected max: 4 but was: 5\\."
 	)
 	public void noOptionsAndTooManyArguments()
 		throws
@@ -415,7 +415,7 @@ public class TwoOptionalArgumentsTest
 	@Test(
 		expectedExceptions = { IllegalCommandLineArgumentException.class },
 		expectedExceptionsMessageRegExp =
-			"Too few command line arguments\\. Expected min: 2 but was: 1"
+			"Too few command line arguments\\. Expected min: 2 but was: 1\\."
 	)
 	public void optionAWithDefaultArgumentAndMandatoryArgumentsOnly()
 		throws
@@ -586,5 +586,77 @@ public class TwoOptionalArgumentsTest
 	
 	// TODO: Test options between arguments.
 	// TODO: The system does not recognize options between arguments (which is illegal). Figure out the algorithm.
+	@Test(
+		expectedExceptions = { IllegalCommandLineArgumentException.class },
+		expectedExceptionsMessageRegExp =
+			"Command line argument '400' is at the wrong position\\. All the arguments must "
+				+ "be sequentially positioned \\(i\\.e\\. options cannot be between arguments\\)\\."
+	)
+	public void optionBBetweenArgumentsAndMandatoryArgumentsOnly()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			new String[] { "100", "200", "300", "-b22", "400" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = { IllegalCommandLineArgumentException.class },
+		expectedExceptionsMessageRegExp =
+			"Command line argument '300' is at the wrong position\\. All the arguments must "
+				+ "be sequentially positioned \\(i\\.e\\. options cannot be between arguments\\)\\."
+	)
+	public void optionBBetweenArgumentsAndMandatoryArgumentsOnly2()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			new String[] { "100", "200", "-b22", "300", "400" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = { IllegalCommandLineArgumentException.class },
+		expectedExceptionsMessageRegExp =
+			"Too few command line arguments\\. Expected min: 2 but was: 1\\."
+				+ " Check that there are no options between arguments\\."
+	)
+	public void optionBBetweenArgumentsAndMandatoryArgumentsOnly3()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			new String[] { "100", "-b22", "200", "300", "400" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = { IllegalCommandLineArgumentException.class },
+		expectedExceptionsMessageRegExp =
+			"Too few command line arguments\\. Expected min: 2 but was: 1\\."
+				+ " Check that there are no options between arguments\\."
+	)
+	public void optionCBetweenArgumentsAndMandatoryArgumentsOnly()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			new String[] { "100", "-c", "200", "300", "400" }
+		);
+	}
+	
 }
 

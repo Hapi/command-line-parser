@@ -558,6 +558,7 @@ public class CommandLineParser
 
 		Set<Option.Internal> nonMultipleOptionCheckSet = new HashSet<Option.Internal>();
 		_cmdLineCommand = null;
+		boolean argumentsChecked = false;
 		while(cmdLineArgs.size() > 0) {
 			String arg = cmdLineArgs.get(0);
 			if(
@@ -598,8 +599,17 @@ public class CommandLineParser
 					continue;
 			}
 			else {
-				if(Util.checkArguments(null, cmdLineArgs, _definedArguments, _cmdLineArguments))
+				if(argumentsChecked) {
+					String msg =
+						"Command line argument '" + arg + "' is at the wrong position. "
+							+ "All the arguments must be sequentially positioned "
+							+ "(i.e. options cannot be between arguments).";
+					throw new IllegalCommandLineArgumentException(msg);
+				}
+				if(Util.checkArguments(null, cmdLineArgs, _definedArguments, _cmdLineArguments)) {
+					argumentsChecked = true;
 					continue;
+				}
 			}
 			
 			// If this point is reached then it means that

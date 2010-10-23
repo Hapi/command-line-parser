@@ -132,7 +132,8 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {IllegalCommandLineArgumentException.class},
 		expectedExceptionsMessageRegExp =
-			"Too few command line arguments for command 'set'. Expected min: 2 but was: 1"
+			"Too few command line arguments for command 'set'. Expected min: 2 but was: 1\\. "
+				+ "Check that there are no options between arguments\\."
 	)
 	public void fullCommandLineWrongOptionLocations()
 		throws
@@ -150,7 +151,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {IllegalCommandLineArgumentException.class},
 		expectedExceptionsMessageRegExp =
-			"'level' cannot be interpreted as a proper command line parameter."
+			"'level' cannot be interpreted as a proper command line parameter\\."
 	)
 	public void fullCommandLineWrongOptionLocations2()
 		throws
@@ -229,7 +230,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Length of \\[ab\\] is shorter than the minimum length 3 allowed for '-a'"
+			"Length of \\[ab\\] is shorter than the minimum length 3 allowed for '-a'\\."
 	)
 	public void fullCommandLineAllOptionsOptionATooShort()
 		throws
@@ -247,7 +248,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Length of \\[abcdefg\\] is longer than the maximum length 6 allowed for '-a'"
+			"Length of \\[abcdefg\\] is longer than the maximum length 6 allowed for '-a'\\."
 	)
 	public void fullCommandLineAllOptionsOptionATooLong()
 		throws
@@ -265,7 +266,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[-4\\] is smaller than the minimum value -3 allowed for '-b'"
+			"\\[-4\\] is smaller than the minimum value -3 allowed for '-b'\\."
 	)
 	public void fullCommandLineAllOptionsOptionBTooSmall()
 		throws
@@ -283,7 +284,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[7\\] is greater than the maximum value 6 allowed for '-b'"
+			"\\[7\\] is greater than the maximum value 6 allowed for '-b'\\."
 	)
 	public void fullCommandLineAllOptionsOptionBTooBig()
 		throws
@@ -301,7 +302,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[-3\\] is smaller than the minimum value -2 allowed for 'PID'"
+			"\\[-3\\] is smaller than the minimum value -2 allowed for 'PID'\\."
 	)
 	public void fullCommandLineAllOptionsArgumentPidTooSmall()
 		throws
@@ -319,7 +320,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[151\\] is greater than the maximum value 150 allowed for 'PID'"
+			"\\[151\\] is greater than the maximum value 150 allowed for 'PID'\\."
 	)
 	public void fullCommandLineAllOptionsArgumentPidTooBig()
 		throws
@@ -337,7 +338,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {IllegalCommandLineArgumentException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[xyz\\] cannot be interpreted as java.lang.Integer for 'PID'"
+			"\\[xyz\\] cannot be interpreted as java.lang.Integer for 'PID'\\."
 	)
 	public void fullCommandLineAllOptionsArgumentPidWrongType()
 		throws
@@ -391,7 +392,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {IllegalCommandLineArgumentException.class},
 		expectedExceptionsMessageRegExp =
-			"'level' cannot be interpreted as a proper command line parameter."
+			"'level' cannot be interpreted as a proper command line parameter\\."
 	)
 	public void fullCommandLineAllOptionsArgumentTypeWrongType()
 		throws

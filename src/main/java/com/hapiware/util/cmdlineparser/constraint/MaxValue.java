@@ -30,7 +30,7 @@ public class MaxValue<T extends Comparable<T>>
 		if(_maxValue.compareTo(value) < 0) {
 			String str =
 				"[" + value + "] is greater than the maximum value "
-					+ _maxValue + " allowed for '" + argumentName + "'"; 
+					+ _maxValue + " allowed for '" + argumentName + "'."; 
 			throw new ConstraintException(str);
 		}
 	}

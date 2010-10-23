@@ -177,11 +177,8 @@ public class Util
 		// There cannot be options between command arguments. Only before or after
 		// all the command arguments.
 		for(String cmdLineArg : cmdLineArgs) {
-			if(cmdLineArg.startsWith("-"))
-				if(Pattern.matches("^-\\p{Digit}+$", cmdLineArg))
-					numberOfCmdLineArguments++;
-				else
-					break;
+			if(cmdLineArg.startsWith("-") && !Pattern.matches("^-\\p{Digit}+$", cmdLineArg))
+				break;
 			else
 				numberOfCmdLineArguments++;
 		}
@@ -191,7 +188,12 @@ public class Util
 				"Too few command line arguments"
 					+ (commandName != null ? " for command '" + commandName + "'" : "")
 					+ ". Expected min: " + numberOfMandatoryArguments
-					+ " but was: " + numberOfCmdLineArguments;
+					+ " but was: " + numberOfCmdLineArguments + "."
+					+ (
+						cmdLineArgs.size() > numberOfCmdLineArguments ?
+						" Check that there are no options between arguments." :
+						""
+					);
 			throw new IllegalCommandLineArgumentException(msg);
 		}
 		if(numberOfCmdLineArguments > numberOfMaximumArguments) {
@@ -199,7 +201,7 @@ public class Util
 				"Too many command line arguments"
 					+ (commandName != null ? " for command '" + commandName + "'" : "")
 					+ ". Expected max: " + numberOfMaximumArguments
-					+ " but was: " + numberOfCmdLineArguments;
+					+ " but was: " + numberOfCmdLineArguments + ".";
 			throw new IllegalCommandLineArgumentException(msg);
 		}
 

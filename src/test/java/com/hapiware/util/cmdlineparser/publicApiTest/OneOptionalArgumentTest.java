@@ -112,7 +112,7 @@ public class OneOptionalArgumentTest
 	@Test(
 		expectedExceptions = { IllegalCommandLineArgumentException.class },
 		expectedExceptionsMessageRegExp =
-			"Too few command line arguments\\. Expected min: 2 but was: 1"
+			"Too few command line arguments\\. Expected min: 2 but was: 1\\."
 	)
 	public void noOptionsAndTooFewArguments()
 		throws
@@ -129,7 +129,7 @@ public class OneOptionalArgumentTest
 	@Test(
 		expectedExceptions = { IllegalCommandLineArgumentException.class },
 		expectedExceptionsMessageRegExp =
-			"Too many command line arguments\\. Expected max: 3 but was: 4"
+			"Too many command line arguments\\. Expected max: 3 but was: 4\\."
 	)
 	public void noOptionsAndTooManyArguments()
 		throws
@@ -251,7 +251,7 @@ public class OneOptionalArgumentTest
 	@Test(
 		expectedExceptions = { IllegalCommandLineArgumentException.class },
 		expectedExceptionsMessageRegExp =
-			"Too few command line arguments\\. Expected min: 2 but was: 1"
+			"Too few command line arguments\\. Expected min: 2 but was: 1\\."
 	)
 	public void optionAWithDefaultArgumentAndMandatoryArgumentsOnly()
 		throws
@@ -391,11 +391,47 @@ public class OneOptionalArgumentTest
 		assertEquals(300, _parser.getArgumentValue("ACTION"));
 	}
 	
-	// TODO: Test options between arguments.
 	@Test(
-		expectedExceptions = { IllegalCommandLineArgumentException.class }
-		//expectedExceptionsMessageRegExp =
-			//"" // TODO: Wrong message!!!
+		expectedExceptions = { IllegalCommandLineArgumentException.class },
+		expectedExceptionsMessageRegExp =
+			"Command line argument '300' is at the wrong position\\. All the arguments must "
+				+ "be sequentially positioned \\(i\\.e\\. options cannot be between arguments\\)\\."
+	)
+	public void optionBBetweenArgumentsAndMandatoryArgumentsOnly()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			new String[] { "100", "200", "-b22", "300" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = { IllegalCommandLineArgumentException.class },
+		expectedExceptionsMessageRegExp =
+			"Too few command line arguments\\. Expected min: 2 but was: 1\\."
+				+ " Check that there are no options between arguments\\."
+	)
+	public void optionBBetweenArgumentsAndMandatoryArgumentsOnly2()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			new String[] { "100", "-b22", "200", "300" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = { IllegalCommandLineArgumentException.class },
+		expectedExceptionsMessageRegExp =
+			"Too few command line arguments\\. Expected min: 2 but was: 1\\."
+				+ " Check that there are no options between arguments\\."
 	)
 	public void optionCBetweenArgumentsAndMandatoryArgumentsOnly()
 		throws
@@ -404,10 +440,8 @@ public class OneOptionalArgumentTest
 			CommandNotFoundException,
 			IllegalCommandLineArgumentException
 	{
-		// TODO: The system does not recognize options between arguments (which is illegal). Figure out the algorithm.
 		_parser.parse(
-			new String[] { "100", "200", "-b22", "300" }
+			new String[] { "100", "-c", "200", "300" }
 		);
 	}
-	
 }

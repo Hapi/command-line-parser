@@ -95,7 +95,7 @@ public class ExceptionTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Length of \\[ab\\] is shorter than the minimum length 3 allowed for '-a'"
+			"Length of \\[ab\\] is shorter than the minimum length 3 allowed for '-a'\\."
 	)
 	public void tooShortStringLength()
 		throws
@@ -110,7 +110,7 @@ public class ExceptionTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Length of \\[abcdefg\\] is longer than the maximum length 6 allowed for '-a'"
+			"Length of \\[abcdefg\\] is longer than the maximum length 6 allowed for '-a'\\."
 	)
 	public void tooLongStringLength()
 		throws
@@ -125,7 +125,7 @@ public class ExceptionTest
 	@Test(
 		expectedExceptions = {IllegalCommandLineArgumentException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[123a\\] cannot be interpreted as java.lang.Integer for 'PID'"
+			"\\[123a\\] cannot be interpreted as java.lang.Integer for 'PID'\\."
 	)
 	public void wrongCommandArgument()
 		throws
@@ -140,7 +140,7 @@ public class ExceptionTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[-31\\] is smaller than the minimum value -2 allowed for 'PID'"
+			"\\[-31\\] is smaller than the minimum value -2 allowed for 'PID'\\."
 	)
 	public void tooSmallValue()
 		throws
@@ -155,7 +155,7 @@ public class ExceptionTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[1234\\] is greater than the maximum value 150 allowed for 'PID'"
+			"\\[1234\\] is greater than the maximum value 150 allowed for 'PID'\\."
 	)
 	public void tooBigValue()
 		throws
