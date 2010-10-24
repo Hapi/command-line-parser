@@ -75,22 +75,22 @@ public class GlobalOptionTest
 		
 		try {
 			p.parse(this, new String[] { "-sSpeed", "--verbose", "--number", "1000", "-d", "j" });
-			assertEquals(true, p.optionExists("-s"));
-			assertEquals(false, p.optionExists("-a"));
-			assertEquals(true, p.optionExists("-v"));
-			assertEquals(true, p.optionExists("--verbose"));
-			assertEquals(true, p.optionExists("-n"));
+			assertEquals(p.optionExists("-s"), true);
+			assertEquals(p.optionExists("-a"), false);
+			assertEquals(p.optionExists("-v"), true);
+			assertEquals(p.optionExists("--verbose"), true);
+			assertEquals(p.optionExists("-n"), true);
 		
-			assertEquals(1000, p.getOptionValue("-n"));
-			assertEquals(1000, p.getOptionValue("--number"));
-			assertEquals(null, p.getOptionValue("-v"));
-			assertEquals("Speed", p.getOptionValue("-s"));
-			assertEquals("j", p.getOptionValue("-d"));
+			assertEquals(p.getOptionValue("-n"), 1000);
+			assertEquals(p.getOptionValue("--number"), 1000);
+			assertEquals(p.getOptionValue("-v"), null);
+			assertEquals(p.getOptionValue("-s"), "Speed");
+			assertEquals(p.getOptionValue("-d"), "j");
 			
-			assertEquals(true, _ver);
-			assertEquals(1000, _n);
-			assertEquals("Speed", _s);
-			assertEquals("j", _d);
+			assertEquals(_ver, true);
+			assertEquals(_n, 1000);
+			assertEquals(_s, "Speed");
+			assertEquals(_d, "j");
 		}
 		catch(ConstraintException e) {
 			Assert.fail("Unexpected constraint exception thrown. " + e.getMessage(), e);
@@ -128,19 +128,19 @@ public class GlobalOptionTest
 		
 		try {
 			p.parse(this, new String[] { "-d" });
-			assertEquals(0, _n);
+			assertEquals(_n, 0);
 			p.parse(this, new String[] { "-n" });
-			assertEquals(13, _n);
+			assertEquals(_n, 13);
 			p.parse(this, new String[] { "-n", "-d" });
-			assertEquals(13, _n);
+			assertEquals(_n, 13);
 			p.parse(this, new String[] { "-n", "1000" });
-			assertEquals(1000, _n);
+			assertEquals(_n, 1000);
 			p.parse(this, new String[] { "-d", "-n" });
-			assertEquals(13, _n);
+			assertEquals(_n, 13);
 			p.parse(this, new String[] { "-d", "-n", "1000" });
-			assertEquals(1000, _n);
+			assertEquals(_n, 1000);
 			p.parse(this, new String[] { "-n", "1000", "-d" });
-			assertEquals(1000, _n);
+			assertEquals(_n, 1000);
 		}
 		catch(ConstraintException e) {
 			Assert.fail("Unexpected constraint exception thrown. " + e.getMessage(), e);
@@ -175,10 +175,10 @@ public class GlobalOptionTest
 		
 		try {
 			p.parse(this, new String[] { "--nums", "1", "--nums", "3", "--nums", "9", });
-			assertEquals(3, _nums.length);
-			assertEquals(1, _nums[0]);
-			assertEquals(3, _nums[1]);
-			assertEquals(9, _nums[2]);
+			assertEquals(_nums.length, 3);
+			assertEquals(_nums[0], 1);
+			assertEquals(_nums[1], 3);
+			assertEquals(_nums[2], 9);
 		}
 		catch(ConstraintException e) {
 			Assert.fail("Unexpected constraint exception thrown. " + e.getMessage(), e);

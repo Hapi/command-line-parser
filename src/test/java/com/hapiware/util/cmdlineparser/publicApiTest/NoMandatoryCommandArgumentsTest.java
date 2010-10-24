@@ -72,29 +72,29 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-a11", "-b22", "-c", "100", "200", "300" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), 300);
 		
 		_parser.parse(
 			new String[] { "pull", "-a", "11", "-b", "22", "-c", "100", "200", "300" }
 		);
 		command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -109,15 +109,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "100", "200", "300" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(false, command.optionExists("-a"));
-		assertEquals(null, command.getOptionValue("-a"));
-		assertEquals(false, command.optionExists("-b"));
-		assertEquals(null, command.getOptionValue("-b"));
-		assertEquals(false, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), false);
+		assertEquals(command.getOptionValue("-a"), null);
+		assertEquals(command.optionExists("-b"), false);
+		assertEquals(command.getOptionValue("-b"), null);
+		assertEquals(command.optionExists("-c"), false);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), 300);
 	}
 
 	
@@ -150,15 +150,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(false, command.optionExists("-a"));
-		assertEquals(null, command.getOptionValue("-a"));
-		assertEquals(false, command.optionExists("-b"));
-		assertEquals(null, command.getOptionValue("-b"));
-		assertEquals(false, command.optionExists("-c"));
-		assertEquals(-100, command.getArgumentValue("PID"));
-		assertEquals(-200, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), false);
+		assertEquals(command.getOptionValue("-a"), null);
+		assertEquals(command.optionExists("-b"), false);
+		assertEquals(command.getOptionValue("-b"), null);
+		assertEquals(command.optionExists("-c"), false);
+		assertEquals(command.getArgumentValue("PID"), -100);
+		assertEquals(command.getArgumentValue("TYPE"), -200);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test
@@ -173,15 +173,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-a", "11", "-b", "22", "-c" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(-100, command.getArgumentValue("PID"));
-		assertEquals(-200, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), -100);
+		assertEquals(command.getArgumentValue("TYPE"), -200);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test
@@ -196,15 +196,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "100" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(false, command.optionExists("-a"));
-		assertEquals(null, command.getOptionValue("-a"));
-		assertEquals(false, command.optionExists("-b"));
-		assertEquals(null, command.getOptionValue("-b"));
-		assertEquals(false, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(-200, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), false);
+		assertEquals(command.getOptionValue("-a"), null);
+		assertEquals(command.optionExists("-b"), false);
+		assertEquals(command.getOptionValue("-b"), null);
+		assertEquals(command.optionExists("-c"), false);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), -200);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test
@@ -219,15 +219,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "100", "200" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(false, command.optionExists("-a"));
-		assertEquals(null, command.getOptionValue("-a"));
-		assertEquals(false, command.optionExists("-b"));
-		assertEquals(null, command.getOptionValue("-b"));
-		assertEquals(false, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), false);
+		assertEquals(command.getOptionValue("-a"), null);
+		assertEquals(command.optionExists("-b"), false);
+		assertEquals(command.getOptionValue("-b"), null);
+		assertEquals(command.optionExists("-c"), false);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test
@@ -242,15 +242,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-a", "-b22", "-c", "100", "200", "300" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(-11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), -11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -265,15 +265,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-a", "-b22", "-c", "100", "200" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(-11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), -11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test
@@ -288,15 +288,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-a11", "100", "200", "300" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(11, command.getOptionValue("-a"));
-		assertEquals(false, command.optionExists("-b"));
-		assertEquals(null, command.getOptionValue("-b"));
-		assertEquals(false, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 11);
+		assertEquals(command.optionExists("-b"), false);
+		assertEquals(command.getOptionValue("-b"), null);
+		assertEquals(command.optionExists("-c"), false);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -311,15 +311,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-a11", "100", "200" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(11, command.getOptionValue("-a"));
-		assertEquals(false, command.optionExists("-b"));
-		assertEquals(null, command.getOptionValue("-b"));
-		assertEquals(false, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 11);
+		assertEquals(command.optionExists("-b"), false);
+		assertEquals(command.getOptionValue("-b"), null);
+		assertEquals(command.optionExists("-c"), false);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test
@@ -334,15 +334,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-a", "11", "100" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(11, command.getOptionValue("-a"));
-		assertEquals(false, command.optionExists("-b"));
-		assertEquals(null, command.getOptionValue("-b"));
-		assertEquals(false, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(-200, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 11);
+		assertEquals(command.optionExists("-b"), false);
+		assertEquals(command.getOptionValue("-b"), null);
+		assertEquals(command.optionExists("-c"), false);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), -200);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test
@@ -357,15 +357,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-a", "100", "200", "300" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(100, command.getOptionValue("-a"));
-		assertEquals(false, command.optionExists("-b"));
-		assertEquals(null, command.getOptionValue("-b"));
-		assertEquals(false, command.optionExists("-c"));
-		assertEquals(200, command.getArgumentValue("PID"));
-		assertEquals(300, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 100);
+		assertEquals(command.optionExists("-b"), false);
+		assertEquals(command.getOptionValue("-b"), null);
+		assertEquals(command.optionExists("-c"), false);
+		assertEquals(command.getArgumentValue("PID"), 200);
+		assertEquals(command.getArgumentValue("TYPE"), 300);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test
@@ -380,15 +380,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-b", "22", "-c", "100", "200", "300", "-a", "11" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -403,15 +403,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-b", "22", "100", "200", "300", "-a", "11", "-c" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -426,15 +426,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-b", "22", "100", "200", "300", "-a", "-c" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(-11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), -11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -449,15 +449,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-c", "100", "200", "300", "-a", "11", "-b", "22" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), 11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -472,15 +472,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-b", "22", "100", "200", "-a", "-c" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(-11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(200, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), -11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), 200);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test
@@ -495,15 +495,15 @@ public class NoMandatoryCommandArgumentsTest
 			new String[] { "pull", "-b", "22", "100", "-a", "-c" }
 		);
 		Command.Data command = _parser.getCommand();
-		assertEquals("pull", command.getName());
-		assertEquals(true, command.optionExists("-a"));
-		assertEquals(-11, command.getOptionValue("-a"));
-		assertEquals(true, command.optionExists("-b"));
-		assertEquals(22, command.getOptionValue("-b"));
-		assertEquals(true, command.optionExists("-c"));
-		assertEquals(100, command.getArgumentValue("PID"));
-		assertEquals(-200, command.getArgumentValue("TYPE"));
-		assertEquals(-300, command.getArgumentValue("ACTION"));
+		assertEquals(command.getName(), "pull");
+		assertEquals(command.optionExists("-a"), true);
+		assertEquals(command.getOptionValue("-a"), -11);
+		assertEquals(command.optionExists("-b"), true);
+		assertEquals(command.getOptionValue("-b"), 22);
+		assertEquals(command.optionExists("-c"), true);
+		assertEquals(command.getArgumentValue("PID"), 100);
+		assertEquals(command.getArgumentValue("TYPE"), -200);
+		assertEquals(command.getArgumentValue("ACTION"), -300);
 	}
 	
 	@Test(

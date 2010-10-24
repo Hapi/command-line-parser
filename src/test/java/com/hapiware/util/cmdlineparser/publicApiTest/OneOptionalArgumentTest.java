@@ -66,26 +66,26 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-a11", "-b22", "-c", "100", "200", "300" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(11, _parser.getOptionValue("-a"));
-		assertEquals(true, _parser.optionExists("-b"));
-		assertEquals(22, _parser.getOptionValue("-b"));
-		assertEquals(true, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), 11);
+		assertEquals(_parser.optionExists("-b"), true);
+		assertEquals(_parser.getOptionValue("-b"), 22);
+		assertEquals(_parser.optionExists("-c"), true);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), 200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 		
 		_parser.parse(
 			new String[] { "-a", "11", "-b", "22", "-c", "100", "200", "300" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(11, _parser.getOptionValue("-a"));
-		assertEquals(true, _parser.optionExists("-b"));
-		assertEquals(22, _parser.getOptionValue("-b"));
-		assertEquals(true, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), 11);
+		assertEquals(_parser.optionExists("-b"), true);
+		assertEquals(_parser.getOptionValue("-b"), 22);
+		assertEquals(_parser.optionExists("-c"), true);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), 200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -99,14 +99,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "100", "200", "300" }
 		);
-		assertEquals(false, _parser.optionExists("-a"));
-		assertEquals(null, _parser.getOptionValue("-a"));
-		assertEquals(false, _parser.optionExists("-b"));
-		assertEquals(null, _parser.getOptionValue("-b"));
-		assertEquals(false, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), false);
+		assertEquals(_parser.getOptionValue("-a"), null);
+		assertEquals(_parser.optionExists("-b"), false);
+		assertEquals(_parser.getOptionValue("-b"), null);
+		assertEquals(_parser.optionExists("-c"), false);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), 200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test(
@@ -154,14 +154,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "100", "300" }
 		);
-		assertEquals(false, _parser.optionExists("-a"));
-		assertEquals(null, _parser.getOptionValue("-a"));
-		assertEquals(false, _parser.optionExists("-b"));
-		assertEquals(null, _parser.getOptionValue("-b"));
-		assertEquals(false, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(-200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), false);
+		assertEquals(_parser.getOptionValue("-a"), null);
+		assertEquals(_parser.optionExists("-b"), false);
+		assertEquals(_parser.getOptionValue("-b"), null);
+		assertEquals(_parser.optionExists("-c"), false);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), -200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -175,14 +175,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-a", "-b22", "-c", "100", "200", "300" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(-11, _parser.getOptionValue("-a"));
-		assertEquals(true, _parser.optionExists("-b"));
-		assertEquals(22, _parser.getOptionValue("-b"));
-		assertEquals(true, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), -11);
+		assertEquals(_parser.optionExists("-b"), true);
+		assertEquals(_parser.getOptionValue("-b"), 22);
+		assertEquals(_parser.optionExists("-c"), true);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), 200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -196,14 +196,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-a", "-b22", "-c", "100", "300" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(-11, _parser.getOptionValue("-a"));
-		assertEquals(true, _parser.optionExists("-b"));
-		assertEquals(22, _parser.getOptionValue("-b"));
-		assertEquals(true, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(-200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), -11);
+		assertEquals(_parser.optionExists("-b"), true);
+		assertEquals(_parser.getOptionValue("-b"), 22);
+		assertEquals(_parser.optionExists("-c"), true);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), -200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -217,14 +217,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-a11", "100", "200", "300" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(11, _parser.getOptionValue("-a"));
-		assertEquals(false, _parser.optionExists("-b"));
-		assertEquals(null, _parser.getOptionValue("-b"));
-		assertEquals(false, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), 11);
+		assertEquals(_parser.optionExists("-b"), false);
+		assertEquals(_parser.getOptionValue("-b"), null);
+		assertEquals(_parser.optionExists("-c"), false);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), 200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -238,14 +238,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-a11", "100", "300" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(11, _parser.getOptionValue("-a"));
-		assertEquals(false, _parser.optionExists("-b"));
-		assertEquals(null, _parser.getOptionValue("-b"));
-		assertEquals(false, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(-200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), 11);
+		assertEquals(_parser.optionExists("-b"), false);
+		assertEquals(_parser.getOptionValue("-b"), null);
+		assertEquals(_parser.optionExists("-c"), false);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), -200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test(
@@ -276,14 +276,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-a", "100", "200", "300" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(100, _parser.getOptionValue("-a"));
-		assertEquals(false, _parser.optionExists("-b"));
-		assertEquals(null, _parser.getOptionValue("-b"));
-		assertEquals(false, _parser.optionExists("-c"));
-		assertEquals(200, _parser.getArgumentValue("PID"));
-		assertEquals(-200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), 100);
+		assertEquals(_parser.optionExists("-b"), false);
+		assertEquals(_parser.getOptionValue("-b"), null);
+		assertEquals(_parser.optionExists("-c"), false);
+		assertEquals(_parser.getArgumentValue("PID"), 200);
+		assertEquals(_parser.getArgumentValue("TYPE"), -200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -297,14 +297,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-b", "22", "-c", "100", "200", "300", "-a", "11" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(11, _parser.getOptionValue("-a"));
-		assertEquals(true, _parser.optionExists("-b"));
-		assertEquals(22, _parser.getOptionValue("-b"));
-		assertEquals(true, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), 11);
+		assertEquals(_parser.optionExists("-b"), true);
+		assertEquals(_parser.getOptionValue("-b"), 22);
+		assertEquals(_parser.optionExists("-c"), true);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), 200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -318,14 +318,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-b", "22", "100", "200", "300", "-a", "11", "-c" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(11, _parser.getOptionValue("-a"));
-		assertEquals(true, _parser.optionExists("-b"));
-		assertEquals(22, _parser.getOptionValue("-b"));
-		assertEquals(true, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), 11);
+		assertEquals(_parser.optionExists("-b"), true);
+		assertEquals(_parser.getOptionValue("-b"), 22);
+		assertEquals(_parser.optionExists("-c"), true);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), 200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -339,14 +339,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-b", "22", "100", "200", "300", "-a", "-c" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(-11, _parser.getOptionValue("-a"));
-		assertEquals(true, _parser.optionExists("-b"));
-		assertEquals(22, _parser.getOptionValue("-b"));
-		assertEquals(true, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), -11);
+		assertEquals(_parser.optionExists("-b"), true);
+		assertEquals(_parser.getOptionValue("-b"), 22);
+		assertEquals(_parser.optionExists("-c"), true);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), 200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -360,14 +360,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-c", "100", "200", "300", "-a", "11", "-b", "22" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(11, _parser.getOptionValue("-a"));
-		assertEquals(true, _parser.optionExists("-b"));
-		assertEquals(22, _parser.getOptionValue("-b"));
-		assertEquals(true, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), 11);
+		assertEquals(_parser.optionExists("-b"), true);
+		assertEquals(_parser.getOptionValue("-b"), 22);
+		assertEquals(_parser.optionExists("-c"), true);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), 200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test
@@ -381,14 +381,14 @@ public class OneOptionalArgumentTest
 		_parser.parse(
 			new String[] { "-b", "22", "100", "300", "-a", "-c" }
 		);
-		assertEquals(true, _parser.optionExists("-a"));
-		assertEquals(-11, _parser.getOptionValue("-a"));
-		assertEquals(true, _parser.optionExists("-b"));
-		assertEquals(22, _parser.getOptionValue("-b"));
-		assertEquals(true, _parser.optionExists("-c"));
-		assertEquals(100, _parser.getArgumentValue("PID"));
-		assertEquals(-200, _parser.getArgumentValue("TYPE"));
-		assertEquals(300, _parser.getArgumentValue("ACTION"));
+		assertEquals(_parser.optionExists("-a"), true);
+		assertEquals(_parser.getOptionValue("-a"), -11);
+		assertEquals(_parser.optionExists("-b"), true);
+		assertEquals(_parser.getOptionValue("-b"), 22);
+		assertEquals(_parser.optionExists("-c"), true);
+		assertEquals(_parser.getArgumentValue("PID"), 100);
+		assertEquals(_parser.getArgumentValue("TYPE"), -200);
+		assertEquals(_parser.getArgumentValue("ACTION"), 300);
 	}
 	
 	@Test(

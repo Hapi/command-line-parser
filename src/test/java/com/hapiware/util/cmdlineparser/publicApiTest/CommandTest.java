@@ -1,6 +1,9 @@
 package com.hapiware.util.cmdlineparser.publicApiTest;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+
+import java.util.List;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -8,6 +11,8 @@ import org.testng.annotations.Test;
 import com.hapiware.util.cmdlineparser.AnnotatedFieldSetException;
 import com.hapiware.util.cmdlineparser.Argument;
 import com.hapiware.util.cmdlineparser.Command;
+import com.hapiware.util.cmdlineparser.Command.Data;
+import com.hapiware.util.cmdlineparser.CommandExecutor;
 import com.hapiware.util.cmdlineparser.CommandLineParser;
 import com.hapiware.util.cmdlineparser.CommandNotFoundException;
 import com.hapiware.util.cmdlineparser.Description;
@@ -81,10 +86,10 @@ public class CommandTest
 			this,
 			new String[] { "set", "123", "2", "level" }
 		);
-		assertEquals("set", _parser.getCommand().getName());
-		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
-		assertEquals(2, _parser.getCommand().getArgument("TYPE").getValue());
-		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
+		assertEquals(_parser.getCommand().getName(), "set");
+		assertEquals(_parser.getCommand().getArgument("PID").getValue(), 123);
+		assertEquals(_parser.getCommand().getArgument("TYPE").getValue(), 2);
+		assertEquals(_parser.getCommand().getArgument("LEVEL").getValue(), "level");
 	}
 
 	@Test()
@@ -99,34 +104,34 @@ public class CommandTest
 			this,
 			new String[] { "set", "-a", "abc", "-b", "-2", "123", "2", "level" }
 		);
-		assertEquals("set", _parser.getCommand().getName());
-		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
-		assertEquals(2, _parser.getCommand().getArgument("TYPE").getValue());
-		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
-		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
+		assertEquals(_parser.getCommand().getName(), "set");
+		assertEquals(_parser.getCommand().getArgument("PID").getValue(), 123);
+		assertEquals(_parser.getCommand().getArgument("TYPE").getValue(), 2);
+		assertEquals(_parser.getCommand().getArgument("LEVEL").getValue(), "level");
+		assertEquals(_parser.getCommand().getOptionValue("-a"), "abc");
+		assertEquals(_parser.getCommand().getOptionValue("-b"), -2);
 
 		// Different option order.
 		_parser.parse(
 			this,
 			new String[] { "set", "-b", "-2", "123", "2", "level", "-a", "abc" }
 		);
-		assertEquals("set", _parser.getCommand().getName());
-		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
-		assertEquals(2, _parser.getCommand().getArgument("TYPE").getValue());
-		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
-		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
+		assertEquals(_parser.getCommand().getName(), "set");
+		assertEquals(_parser.getCommand().getArgument("PID").getValue(), 123);
+		assertEquals(_parser.getCommand().getArgument("TYPE").getValue(), 2);
+		assertEquals(_parser.getCommand().getArgument("LEVEL").getValue(), "level");
+		assertEquals(_parser.getCommand().getOptionValue("-a"), "abc");
+		assertEquals(_parser.getCommand().getOptionValue("-b"), -2);
 		_parser.parse(
 			this,
 			new String[] { "set", "123", "2", "level", "-b", "-2", "-a", "abc" }
 		);
-		assertEquals("set", _parser.getCommand().getName());
-		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
-		assertEquals(2, _parser.getCommand().getArgument("TYPE").getValue());
-		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
-		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
+		assertEquals(_parser.getCommand().getName(), "set");
+		assertEquals(_parser.getCommand().getArgument("PID").getValue(), 123);
+		assertEquals(_parser.getCommand().getArgument("TYPE").getValue(), 2);
+		assertEquals(_parser.getCommand().getArgument("LEVEL").getValue(), "level");
+		assertEquals(_parser.getCommand().getOptionValue("-a"), "abc");
+		assertEquals(_parser.getCommand().getOptionValue("-b"), -2);
 	}
 	
 	@Test(
@@ -180,10 +185,10 @@ public class CommandTest
 			this,
 			new String[] { "set", "123", "level" }
 		);
-		assertEquals("set", _parser.getCommand().getName());
-		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
-		assertEquals(4, _parser.getCommand().getArgument("TYPE").getValue());
-		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
+		assertEquals(_parser.getCommand().getName(), "set");
+		assertEquals(_parser.getCommand().getArgument("PID").getValue(), 123);
+		assertEquals(_parser.getCommand().getArgument("TYPE").getValue(), 4);
+		assertEquals(_parser.getCommand().getArgument("LEVEL").getValue(), "level");
 	}
 
 	
@@ -199,34 +204,34 @@ public class CommandTest
 			this,
 			new String[] { "set", "-a", "abc", "-b", "-2", "123", "level" }
 		);
-		assertEquals("set", _parser.getCommand().getName());
-		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
-		assertEquals(4, _parser.getCommand().getArgument("TYPE").getValue());
-		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
-		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
+		assertEquals(_parser.getCommand().getName(), "set");
+		assertEquals(_parser.getCommand().getArgument("PID").getValue(), 123);
+		assertEquals(_parser.getCommand().getArgument("TYPE").getValue(), 4);
+		assertEquals(_parser.getCommand().getArgument("LEVEL").getValue(), "level");
+		assertEquals(_parser.getCommand().getOptionValue("-a"), "abc");
+		assertEquals(_parser.getCommand().getOptionValue("-b"), -2);
 
 		// Different option order.
 		_parser.parse(
 			this,
 			new String[] { "set", "-b", "-2", "123", "level", "-a", "abc" }
 		);
-		assertEquals("set", _parser.getCommand().getName());
-		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
-		assertEquals(4, _parser.getCommand().getArgument("TYPE").getValue());
-		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
-		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
+		assertEquals(_parser.getCommand().getName(), "set");
+		assertEquals(_parser.getCommand().getArgument("PID").getValue(), 123);
+		assertEquals(_parser.getCommand().getArgument("TYPE").getValue(), 4);
+		assertEquals(_parser.getCommand().getArgument("LEVEL").getValue(), "level");
+		assertEquals(_parser.getCommand().getOptionValue("-a"), "abc");
+		assertEquals(_parser.getCommand().getOptionValue("-b"), -2);
 		_parser.parse(
 			this,
 			new String[] { "set", "123", "level", "-b", "-2", "-a", "abc" }
 		);
-		assertEquals("set", _parser.getCommand().getName());
-		assertEquals(123, _parser.getCommand().getArgument("PID").getValue());
-		assertEquals(4, _parser.getCommand().getArgument("TYPE").getValue());
-		assertEquals("level", _parser.getCommand().getArgument("LEVEL").getValue());
-		assertEquals("abc", _parser.getCommand().getOptionValue("-a"));
-		assertEquals(-2, _parser.getCommand().getOptionValue("-b"));
+		assertEquals(_parser.getCommand().getName(), "set");
+		assertEquals(_parser.getCommand().getArgument("PID").getValue(), 123);
+		assertEquals(_parser.getCommand().getArgument("TYPE").getValue(), 4);
+		assertEquals(_parser.getCommand().getArgument("LEVEL").getValue(), "level");
+		assertEquals(_parser.getCommand().getOptionValue("-a"), "abc");
+		assertEquals(_parser.getCommand().getOptionValue("-b"), -2);
 	}
 	
 	@Test(
@@ -411,7 +416,125 @@ public class CommandTest
 		);
 	}
 	
-	// TODO: Add command tests for non-defined commands.
-	// TODO: Add command tests for missing commands (i.e. no command at the command line).
-	// TODO: Add command tests adding options but "forgetting" a command.
+	@Test(
+		expectedExceptions = {CommandNotFoundException.class},
+		expectedExceptionsMessageRegExp =
+			"A command was expected but 'non-defined-command' cannot be interpreted as a command\\."
+	)
+	public void nonDefinedCommand()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			this,
+			new String[] { "non-defined-command", "123", "a", "level" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = {CommandNotFoundException.class},
+		expectedExceptionsMessageRegExp =
+			"A command was expected but 'non-defined-command' cannot be interpreted as a command\\."
+	)
+	public void nonDefinedCommandAndOptions()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			this,
+			new String[] { "non-defined-command", "-a", "abc", "-b", "-2", "123", "a", "level" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = {CommandNotFoundException.class},
+		expectedExceptionsMessageRegExp =
+			"A command was expected but '123' cannot be interpreted as a command\\."
+	)
+	public void noCommand()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			this,
+			new String[] { "123", "a", "level" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = {IllegalCommandLineArgumentException.class},
+		expectedExceptionsMessageRegExp =
+			"'-a' is not a valid option\\."
+	)
+	public void noCommandAndOptions()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		_parser.parse(
+			this,
+			new String[] { "-a", "abc", "-b", "-2", "123", "a", "level" }
+		);
+	}
+
+	@Test
+	public void testExecutor()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				CommandTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(new Option("a") {{
+			description("description");
+			set(String.class, new OptionArgument<String>());
+		}});
+		
+		p.add(
+			new Command(
+				"run",
+				"Short desc for run.",
+				new CommandExecutor() {
+					public void execute(
+						Data command,
+						List<Option.Data> globalOptions)
+					{
+						assertNotNull(command);
+						assertEquals(globalOptions.size(), 1);
+						assertEquals(globalOptions.get(0).getArgument().getValue(), "hapi");
+						assertEquals(command.getArgumentValue("PID"), 123);
+						assertEquals(command.getArgumentValue("TYPE"), "Java");
+					}
+				}
+			) {{
+			description("description");
+			add(Integer.class, new Argument<Integer>("PID") {{
+				description("PID description");
+			}});
+			add(String.class, new Argument<String>("TYPE") {{
+				description("TYPE description");
+			}});
+		}});
+		
+		p.parse(
+			this,
+			new String[] { "-a", "hapi", "run", "123", "Java" }
+		);
+	}
 }
