@@ -394,8 +394,9 @@ public class OneOptionalArgumentTest
 	@Test(
 		expectedExceptions = { IllegalCommandLineArgumentException.class },
 		expectedExceptionsMessageRegExp =
-			"Command line argument '300' is at the wrong position\\. All the arguments must "
-				+ "be sequentially positioned \\(i\\.e\\. options cannot be between arguments\\)\\."
+			"Command line argument '300' cannot be interpreted as a proper "
+				+ "command line argument\\. All the arguments must be sequentially positioned\\. "
+				+ "Check that there are no options between arguments\\."
 	)
 	public void optionBBetweenArgumentsAndMandatoryArgumentsOnly()
 		throws

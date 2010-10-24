@@ -584,13 +584,12 @@ public class TwoOptionalArgumentsTest
 		assertEquals(-400, _parser.getArgumentValue("LEVEL"));
 	}
 	
-	// TODO: Test options between arguments.
-	// TODO: The system does not recognize options between arguments (which is illegal). Figure out the algorithm.
 	@Test(
 		expectedExceptions = { IllegalCommandLineArgumentException.class },
 		expectedExceptionsMessageRegExp =
-			"Command line argument '400' is at the wrong position\\. All the arguments must "
-				+ "be sequentially positioned \\(i\\.e\\. options cannot be between arguments\\)\\."
+			"Command line argument '400' cannot be interpreted as a proper "
+				+ "command line argument\\. All the arguments must be sequentially positioned\\. "
+				+ "Check that there are no options between arguments\\."
 	)
 	public void optionBBetweenArgumentsAndMandatoryArgumentsOnly()
 		throws
@@ -607,8 +606,9 @@ public class TwoOptionalArgumentsTest
 	@Test(
 		expectedExceptions = { IllegalCommandLineArgumentException.class },
 		expectedExceptionsMessageRegExp =
-			"Command line argument '300' is at the wrong position\\. All the arguments must "
-				+ "be sequentially positioned \\(i\\.e\\. options cannot be between arguments\\)\\."
+			"Command line argument '300' cannot be interpreted as a proper "
+				+ "command line argument\\. All the arguments must be sequentially positioned\\. "
+				+ "Check that there are no options between arguments\\."
 	)
 	public void optionBBetweenArgumentsAndMandatoryArgumentsOnly2()
 		throws

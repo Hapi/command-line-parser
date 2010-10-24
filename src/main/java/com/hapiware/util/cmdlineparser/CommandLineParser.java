@@ -578,11 +578,15 @@ public class CommandLineParser
 					throw new IllegalCommandLineArgumentException(msg);
 				}
 				
-				if(_cmdLineCommand != null)
-					throw
-						new IllegalCommandLineArgumentException(
-							"'" + arg + "' cannot be interpreted as a proper command line parameter."
-						);
+				if(_cmdLineCommand != null) {
+					String msg =
+						"Command line argument '" + arg + "' "
+							+ "for command '" + _cmdLineCommand.name() + "' " 
+							+ "cannot be interpreted as a proper command line argument. "
+							+ "All the arguments must be sequentially positioned. "
+							+ "Check that there are no options between arguments.";
+					throw new IllegalCommandLineArgumentException(msg);
+				}
 			}
 					
 			if(_definedCommands.size() > 0) {
@@ -594,16 +598,16 @@ public class CommandLineParser
 								+ "as a command."
 						);
 				_cmdLineCommand = new Command.Internal(command);
-				// TODO: Check if options between command arguments tries to parse command again (which is illegal).
 				if(_cmdLineCommand.parse(cmdLineArgs))
 					continue;
 			}
 			else {
 				if(argumentsChecked) {
 					String msg =
-						"Command line argument '" + arg + "' is at the wrong position. "
-							+ "All the arguments must be sequentially positioned "
-							+ "(i.e. options cannot be between arguments).";
+						"Command line argument '" + arg + "' "
+							+ "cannot be interpreted as a proper command line argument. "
+							+ "All the arguments must be sequentially positioned. "
+							+ "Check that there are no options between arguments.";
 					throw new IllegalCommandLineArgumentException(msg);
 				}
 				if(Util.checkArguments(null, cmdLineArgs, _definedArguments, _cmdLineArguments)) {

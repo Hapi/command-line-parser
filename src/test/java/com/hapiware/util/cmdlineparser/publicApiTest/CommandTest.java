@@ -135,7 +135,7 @@ public class CommandTest
 			"Too few command line arguments for command 'set'. Expected min: 2 but was: 1\\. "
 				+ "Check that there are no options between arguments\\."
 	)
-	public void fullCommandLineWrongOptionLocations()
+	public void fullCommandLineWrongOptionPositions()
 		throws
 			ConstraintException,
 			AnnotatedFieldSetException,
@@ -151,9 +151,11 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {IllegalCommandLineArgumentException.class},
 		expectedExceptionsMessageRegExp =
-			"'level' cannot be interpreted as a proper command line parameter\\."
+			"Command line argument 'level' for command 'set' cannot be interpreted as a proper "
+				+ "command line argument\\. All the arguments must be sequentially positioned\\. "
+				+ "Check that there are no options between arguments\\."
 	)
-	public void fullCommandLineWrongOptionLocations2()
+	public void fullCommandLineWrongOptionPositions2()
 		throws
 			ConstraintException,
 			AnnotatedFieldSetException,
@@ -167,7 +169,7 @@ public class CommandTest
 	}
 	
 	@Test()
-	public void commandLineOptinalArgumentMissingNoOptions()
+	public void commandLineOptionalArgumentMissingNoOptions()
 		throws
 			ConstraintException,
 			AnnotatedFieldSetException,
@@ -186,7 +188,7 @@ public class CommandTest
 
 	
 	@Test()
-	public void commandLineOptinalArgumentMissingAllOptions()
+	public void commandLineOptionalArgumentMissingAllOptions()
 		throws
 			ConstraintException,
 			AnnotatedFieldSetException,
@@ -392,7 +394,9 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {IllegalCommandLineArgumentException.class},
 		expectedExceptionsMessageRegExp =
-			"'level' cannot be interpreted as a proper command line parameter\\."
+			"Command line argument 'level' for command 'set' cannot be interpreted as a proper "
+				+ "command line argument\\. All the arguments must be sequentially positioned\\. "
+				+ "Check that there are no options between arguments\\."
 	)
 	public void fullCommandLineAllOptionsArgumentTypeWrongType()
 		throws
@@ -406,4 +410,6 @@ public class CommandTest
 			new String[] { "set", "-a", "abc", "-b", "-2", "123", "a", "level" }
 		);
 	}
+	
+	// TODO: Add command tests with missing commands.
 }
