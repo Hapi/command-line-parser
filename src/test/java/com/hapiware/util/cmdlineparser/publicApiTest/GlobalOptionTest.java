@@ -2,7 +2,6 @@ package com.hapiware.util.cmdlineparser.publicApiTest;
 
 import static org.testng.Assert.assertEquals;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.hapiware.util.cmdlineparser.AnnotatedFieldSetException;
@@ -36,8 +35,14 @@ public class GlobalOptionTest
 	@Id("intarray")
 	private int[] _nums;
 	
+	
 	@Test
 	public void normalCase()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
 	{
 		CommandLineParser p =
 			new CommandLineParser(
@@ -73,41 +78,32 @@ public class GlobalOptionTest
 			}});
 		}});
 		
-		try {
-			p.parse(this, new String[] { "-sSpeed", "--verbose", "--number", "1000", "-d", "j" });
-			assertEquals(p.optionExists("-s"), true);
-			assertEquals(p.optionExists("-a"), false);
-			assertEquals(p.optionExists("-v"), true);
-			assertEquals(p.optionExists("--verbose"), true);
-			assertEquals(p.optionExists("-n"), true);
+		p.parse(this, new String[] { "-sSpeed", "--verbose", "--number", "1000", "-d", "j" });
+		assertEquals(p.optionExists("-s"), true);
+		assertEquals(p.optionExists("-a"), false);
+		assertEquals(p.optionExists("-v"), true);
+		assertEquals(p.optionExists("--verbose"), true);
+		assertEquals(p.optionExists("-n"), true);
+	
+		assertEquals(p.getOptionValue("-n"), 1000);
+		assertEquals(p.getOptionValue("--number"), 1000);
+		assertEquals(p.getOptionValue("-v"), null);
+		assertEquals(p.getOptionValue("-s"), "Speed");
+		assertEquals(p.getOptionValue("-d"), "j");
 		
-			assertEquals(p.getOptionValue("-n"), 1000);
-			assertEquals(p.getOptionValue("--number"), 1000);
-			assertEquals(p.getOptionValue("-v"), null);
-			assertEquals(p.getOptionValue("-s"), "Speed");
-			assertEquals(p.getOptionValue("-d"), "j");
-			
-			assertEquals(_ver, true);
-			assertEquals(_n, 1000);
-			assertEquals(_s, "Speed");
-			assertEquals(_d, "j");
-		}
-		catch(ConstraintException e) {
-			Assert.fail("Unexpected constraint exception thrown. " + e.getMessage(), e);
-		}
-		catch(AnnotatedFieldSetException e) {
-			Assert.fail("Unexpected annotation related exception thrown. " + e.getMessage(), e);
-		}
-		catch(CommandNotFoundException e) {
-			Assert.fail("Unexpected command related exception thrown. " + e.getMessage(), e);
-		}
-		catch(IllegalCommandLineArgumentException e) {
-			Assert.fail("Unexpected command line argument exception thrown. " + e.getMessage(), e);
-		}
+		assertEquals(_ver, true);
+		assertEquals(_n, 1000);
+		assertEquals(_s, "Speed");
+		assertEquals(_d, "j");
 	}
 	
 	@Test
 	public void defaultValuesForOptionalArguments()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
 	{
 		CommandLineParser p =
 			new CommandLineParser(
@@ -126,38 +122,29 @@ public class GlobalOptionTest
 			description("Description");
 		}});
 		
-		try {
-			p.parse(this, new String[] { "-d" });
-			assertEquals(_n, 0);
-			p.parse(this, new String[] { "-n" });
-			assertEquals(_n, 13);
-			p.parse(this, new String[] { "-n", "-d" });
-			assertEquals(_n, 13);
-			p.parse(this, new String[] { "-n", "1000" });
-			assertEquals(_n, 1000);
-			p.parse(this, new String[] { "-d", "-n" });
-			assertEquals(_n, 13);
-			p.parse(this, new String[] { "-d", "-n", "1000" });
-			assertEquals(_n, 1000);
-			p.parse(this, new String[] { "-n", "1000", "-d" });
-			assertEquals(_n, 1000);
-		}
-		catch(ConstraintException e) {
-			Assert.fail("Unexpected constraint exception thrown. " + e.getMessage(), e);
-		}
-		catch(AnnotatedFieldSetException e) {
-			Assert.fail("Unexpected annotation related exception thrown. " + e.getMessage(), e);
-		}
-		catch(CommandNotFoundException e) {
-			Assert.fail("Unexpected command related exception thrown. " + e.getMessage(), e);
-		}
-		catch(IllegalCommandLineArgumentException e) {
-			Assert.fail("Unexpected command line argument exception thrown. " + e.getMessage(), e);
-		}
+		p.parse(this, new String[] { "-d" });
+		assertEquals(_n, 0);
+		p.parse(this, new String[] { "-n" });
+		assertEquals(_n, 13);
+		p.parse(this, new String[] { "-n", "-d" });
+		assertEquals(_n, 13);
+		p.parse(this, new String[] { "-n", "1000" });
+		assertEquals(_n, 1000);
+		p.parse(this, new String[] { "-d", "-n" });
+		assertEquals(_n, 13);
+		p.parse(this, new String[] { "-d", "-n", "1000" });
+		assertEquals(_n, 1000);
+		p.parse(this, new String[] { "-n", "1000", "-d" });
+		assertEquals(_n, 1000);
 	}
 	
 	@Test
 	public void settingAnnotatedArray()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
 	{
 		CommandLineParser p =
 			new CommandLineParser(
@@ -173,24 +160,57 @@ public class GlobalOptionTest
 			}});
 		}});
 		
-		try {
-			p.parse(this, new String[] { "--nums", "1", "--nums", "3", "--nums", "9", });
-			assertEquals(_nums.length, 3);
-			assertEquals(_nums[0], 1);
-			assertEquals(_nums[1], 3);
-			assertEquals(_nums[2], 9);
-		}
-		catch(ConstraintException e) {
-			Assert.fail("Unexpected constraint exception thrown. " + e.getMessage(), e);
-		}
-		catch(AnnotatedFieldSetException e) {
-			Assert.fail("Unexpected annotation related exception thrown. " + e.getMessage(), e);
-		}
-		catch(CommandNotFoundException e) {
-			Assert.fail("Unexpected command related exception thrown. " + e.getMessage(), e);
-		}
-		catch(IllegalCommandLineArgumentException e) {
-			Assert.fail("Unexpected command line argument exception thrown. " + e.getMessage(), e);
-		}
+		p.parse(this, new String[] { "--nums", "1", "--nums", "3", "--nums", "9" });
+		assertEquals(_nums.length, 3);
+		assertEquals(_nums[0], 1);
+		assertEquals(_nums[1], 3);
+		assertEquals(_nums[2], 9);
+	}
+	
+	@Test
+	public void missingId()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				GlobalOptionTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(new Option("nums") {{
+			id("missing-id");
+			description("Description");
+			set(Integer.class, new OptionArgument<Integer>());
+		}});
+		p.parse(this, new String[] { "--nums", "1" });
+		
+		// So, everything is correct. 'missing-id' does not need to match, it just not used. 
+	}
+	
+	@Test(
+		expectedExceptions = { IllegalCommandLineArgumentException.class },
+		expectedExceptionsMessageRegExp =
+			"'--numbe' is not a valid option\\."
+	)
+	public void missingOptionName()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				GlobalOptionTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(new Option("number") {{
+			description("Description");
+			set(Integer.class, new OptionArgument<Integer>());
+		}});
+		p.parse(this, new String[] { "--numbe", "1" });
 	}
 }

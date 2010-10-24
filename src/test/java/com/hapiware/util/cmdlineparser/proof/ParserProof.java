@@ -116,13 +116,6 @@ public class ParserProof
 			//new String[] { "--help", "cmd=set" }
 			//new String[] { "--help", "all" }
 			//new String[] { "--version" }
-			
-			// TODO: Create a test case for these.
-			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--numbe", "1000" }
-			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "-10001" }
-			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number"}
-			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "2", "level", "--number", "1000" }
-			//new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "2", "level", "--number" }
 		);
 		
 		System.out.println(p.optionExists("-m"));
