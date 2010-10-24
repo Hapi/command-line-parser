@@ -574,7 +574,7 @@ public class CommandLineParser
 			)
 				continue;
 			else {
-				if(arg.startsWith("-")) {
+				if(arg.startsWith("-")&& !Pattern.matches(Util.NUMBER_PATTERN, arg)) {
 					String msg = "'" + arg + "' is not a valid option.";
 					throw new IllegalCommandLineArgumentException(msg);
 				}

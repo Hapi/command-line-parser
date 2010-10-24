@@ -29,7 +29,7 @@ public class MinValue<T extends Comparable<T>>
 	{
 		if(_minValue.compareTo(value) > 0) {
 			String str =
-				"[" + value + "] is smaller than the minimum value "
+				"'" + value + "' is smaller than the minimum value "
 					+ _minValue + " allowed for '" + argumentName + "'."; 
 			throw new ConstraintException(str);
 		}

@@ -435,7 +435,7 @@ public class Argument<T>
 			}
 			catch(NumberFormatException ex) {
 				String msg =
-					"[" + valueAsString + "] cannot be interpreted as "
+					"'" + valueAsString + "' cannot be interpreted as "
 						+ argumentTypeClass.getCanonicalName()
 						+ " for '" + name() + "'.";
 				throw new IllegalCommandLineArgumentException(msg, ex);

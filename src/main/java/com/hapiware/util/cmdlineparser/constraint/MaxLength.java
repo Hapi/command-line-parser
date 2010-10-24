@@ -23,7 +23,7 @@ public class MaxLength
 	{
 		if(value.length() > _maxLength) {
 			String str =
-				"Length of [" + value + "] is longer than the maximum length "
+				"Length of '" + value + "' is longer than the maximum length "
 					+ _maxLength + " allowed for '" + argumentName + "'."; 
 			throw new ConstraintException(str);
 		}

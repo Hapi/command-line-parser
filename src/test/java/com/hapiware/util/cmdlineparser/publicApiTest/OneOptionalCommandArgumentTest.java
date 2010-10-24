@@ -1,6 +1,6 @@
 package com.hapiware.util.cmdlineparser.publicApiTest;
 
-import static junit.framework.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

@@ -31,6 +31,8 @@ import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
  */
 public class Util
 {
+	public static final String NUMBER_PATTERN = "^-\\p{Digit}+$"; 
+	
 	private static final String CR = "\n";
 	
 	
@@ -173,7 +175,7 @@ public class Util
 		// There cannot be options between command arguments. Only before or after
 		// all the command arguments.
 		for(String cmdLineArg : cmdLineArgs) {
-			if(cmdLineArg.startsWith("-") && !Pattern.matches("^-\\p{Digit}+$", cmdLineArg))
+			if(cmdLineArg.startsWith("-") && !Pattern.matches(NUMBER_PATTERN, cmdLineArg))
 				break;
 			else
 				numberOfCmdLineArguments++;

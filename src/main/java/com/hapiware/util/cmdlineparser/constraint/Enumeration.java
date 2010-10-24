@@ -61,7 +61,7 @@ public class Enumeration<T>
 	{
 		if(!evaluate(value)) {
 			String msg =
-				"Value for '" + argumentName + "' was [" + value + "] but it must be"
+				"Value for '" + argumentName + "' was '" + value + "' but it must be"
 					+ " one of these:"
 					+ (_includeRanges.size() > 0 ? " " + _includeRanges.toString() : "")
 					+ (_excludeRanges.size() > 0 ? " !" + _excludeRanges.toString() : "")

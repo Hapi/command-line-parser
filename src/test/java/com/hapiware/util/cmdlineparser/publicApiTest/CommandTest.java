@@ -1,6 +1,6 @@
 package com.hapiware.util.cmdlineparser.publicApiTest;
 
-import static junit.framework.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -232,7 +232,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Length of \\[ab\\] is shorter than the minimum length 3 allowed for '-a'\\."
+			"Length of 'ab' is shorter than the minimum length 3 allowed for '-a'\\."
 	)
 	public void fullCommandLineAllOptionsOptionATooShort()
 		throws
@@ -250,7 +250,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Length of \\[abcdefg\\] is longer than the maximum length 6 allowed for '-a'\\."
+			"Length of 'abcdefg' is longer than the maximum length 6 allowed for '-a'\\."
 	)
 	public void fullCommandLineAllOptionsOptionATooLong()
 		throws
@@ -268,7 +268,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[-4\\] is smaller than the minimum value -3 allowed for '-b'\\."
+			"'-4' is smaller than the minimum value -3 allowed for '-b'\\."
 	)
 	public void fullCommandLineAllOptionsOptionBTooSmall()
 		throws
@@ -286,7 +286,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[7\\] is greater than the maximum value 6 allowed for '-b'\\."
+			"'7' is greater than the maximum value 6 allowed for '-b'\\."
 	)
 	public void fullCommandLineAllOptionsOptionBTooBig()
 		throws
@@ -304,7 +304,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[-3\\] is smaller than the minimum value -2 allowed for 'PID'\\."
+			"'-3' is smaller than the minimum value -2 allowed for 'PID'\\."
 	)
 	public void fullCommandLineAllOptionsArgumentPidTooSmall()
 		throws
@@ -322,7 +322,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[151\\] is greater than the maximum value 150 allowed for 'PID'\\."
+			"'151' is greater than the maximum value 150 allowed for 'PID'\\."
 	)
 	public void fullCommandLineAllOptionsArgumentPidTooBig()
 		throws
@@ -340,7 +340,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {IllegalCommandLineArgumentException.class},
 		expectedExceptionsMessageRegExp =
-			"\\[xyz\\] cannot be interpreted as java.lang.Integer for 'PID'\\."
+			"'xyz' cannot be interpreted as java.lang.Integer for 'PID'\\."
 	)
 	public void fullCommandLineAllOptionsArgumentPidWrongType()
 		throws
@@ -358,7 +358,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Value for 'TYPE' was \\[1\\] but it must be one of these: \\[2, 3, 4\\]."
+			"Value for 'TYPE' was '1' but it must be one of these: \\[2, 3, 4\\]."
 	)
 	public void fullCommandLineAllOptionsArgumentTypeOutOfRange()
 		throws
@@ -376,7 +376,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {ConstraintException.class},
 		expectedExceptionsMessageRegExp =
-			"Value for 'TYPE' was \\[6\\] but it must be one of these: \\[2, 3, 4\\]."
+			"Value for 'TYPE' was '6' but it must be one of these: \\[2, 3, 4\\]."
 	)
 	public void fullCommandLineAllOptionsArgumentTypeOutOfRange2()
 		throws
