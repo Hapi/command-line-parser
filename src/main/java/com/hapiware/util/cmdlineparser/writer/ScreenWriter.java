@@ -95,6 +95,7 @@ public class ScreenWriter
 	{
 		Util.write(text, TAB_SIZE * (level.ordinal() + 1), _screenWidth, STREAM);
 		STREAM.println();
+		STREAM.println();
 	}
 
 	public String strongBegin()

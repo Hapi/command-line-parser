@@ -43,8 +43,6 @@ public class Util
 	 * For example if {@code width} is 80 and {@code column} is 10 then every line has ten space
 	 * characters (one in every column between 0 -9) and characters from {@code text} are written
 	 * to columns 10 - 79.
-	 * <p>
-	 * Notice that this method adds a newline feed character at the end of the stream. 
 	 * 
 	 * @param text
 	 * 		Text to be written.
@@ -97,8 +95,6 @@ public class Util
 		}
 		if(toWrite.charAt(toWrite.length() - 1) == ' ')
 			toWrite.deleteCharAt(toWrite.length() - 1);
-		if(toWrite.toString().trim().length() > 0)
-			toWrite.append(CR);
 		try {
 			outStream.write(toWrite.toString().getBytes());
 		}

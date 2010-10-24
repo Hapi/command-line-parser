@@ -19,7 +19,7 @@ public class WriteTest
 		Util.write(_testString, 4, 80, outStream);
 		String hereDoc =
 			"    This option can occur several times. Argument is optional. Default value for\n"
-			+ "    the optional argument is '5'. Description for 'number' option.\n";
+			+ "    the optional argument is '5'. Description for 'number' option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 	
@@ -31,7 +31,7 @@ public class WriteTest
 		String hereDoc =
 			"          This option can occur several times. Argument is optional. Default\n"
 			+ "          value for the optional argument is '5'. Description for 'number'\n"
-			+ "          option.\n";
+			+ "          option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 	
@@ -48,7 +48,7 @@ public class WriteTest
 			+ "value for the\n"
 			+ "optional argument is\n"
 			+ "'5'. Description for\n"
-			+ "'number' option.\n";
+			+ "'number' option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 	
@@ -66,7 +66,7 @@ public class WriteTest
 			+ "    for the optional\n"
 			+ "    argument is '5'.\n"
 			+ "    Description for\n"
-			+ "    'number' option.\n";
+			+ "    'number' option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 	
@@ -79,7 +79,7 @@ public class WriteTest
 			"     Thisoptioncanoccurseveraltimes.Argu\n"
 			+ "     mentisoptional.Defaultvaluefortheop\n"
 			+ "     tionalargumentis'5'.Descriptionfor'\n"
-			+ "     number'option.\n";
+			+ "     number'option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 	
@@ -90,7 +90,7 @@ public class WriteTest
 		Util.write(_testString.replaceAll(" ", ""), 4, 80, outStream);
 		String hereDoc =
 			"    Thisoptioncanoccurseveraltimes.Argumentisoptional.Defaultvaluefortheoptional\n"
-			+ "    argumentis'5'.Descriptionfor'number'option.\n";
+			+ "    argumentis'5'.Descriptionfor'number'option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 	
@@ -108,7 +108,7 @@ public class WriteTest
 			+ "    rtheoptionalargu\n"
 			+ "    mentis'5'.Descri\n"
 			+ "    ptionfor'number'\n"
-			+ "    option.\n";
+			+ "    option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 	
@@ -124,7 +124,7 @@ public class WriteTest
 			"     Thisoptioncanoccurseveraltimes.Argu\n"
 			+ "     mentisoptional. Default value for\n"
 			+ "     the optional argument is '5'.\n"
-			+ "     Description for 'number' option.\n";
+			+ "     Description for 'number' option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 	
@@ -141,7 +141,7 @@ public class WriteTest
 			+ "     times.\n"
 			+ "     Argumentisoptional.Defaultvaluefort\n"
 			+ "     heoptional argument is '5'.\n"
-			+ "     Description for 'number' option.\n";
+			+ "     Description for 'number' option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 	
@@ -158,7 +158,7 @@ public class WriteTest
 			+ "     times. Argument is optional.\n"
 			+ "     Default value for the optional\n"
 			+ "     argumentis'5'.Descriptionfor'number\n"
-			+ "     'option.\n";
+			+ "     'option.";
 		assertEquals(hereDoc, outStream.toString());
 	}
 }
