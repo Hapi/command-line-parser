@@ -20,7 +20,7 @@ public class Argument<T>
 	private List<Constraint<T>> _constraints = new LinkedList<Constraint<T>>();
 	private boolean _hasEnumConstraint = false;
 	private boolean _optional;
-	private String _defaultForOptional;
+	private T _defaultForOptional;
 	
 	private Argument(Argument<T> argument)
 	{
@@ -141,7 +141,7 @@ public class Argument<T>
 					"'defaultValue' for '" + _argument.name() + "' cannot be null."
 				);
 		
-		_defaultForOptional = defaultValue.toString();
+		_defaultForOptional = defaultValue;
 		_optional = true;
 		return this;
 	}
@@ -297,10 +297,6 @@ public class Argument<T>
 		{
 			return _outer._argument.description();
 		}
-		private void value(T value)
-		{
-			_value = value;
-		}
 		public T value()
 		{
 			return _value;
@@ -319,7 +315,7 @@ public class Argument<T>
 		}
 		public String defaultValueAsString()
 		{
-			return _outer._defaultForOptional;
+			return _outer._defaultForOptional.toString();
 		}
 		public String defaultValueDescription()
 		{
@@ -327,7 +323,7 @@ public class Argument<T>
 				return 
 					new Description()
 						.d("Default value for the optional argument is ")
-						.b(_outer._defaultForOptional)
+						.b(defaultValueAsString())
 						.d(".")
 						.toParagraphs()
 						.get(0);
@@ -415,10 +411,21 @@ public class Argument<T>
 			return "{" + name() + "(" + id() + ") = " + value() + " (" + optional() + ")}";
 		}
 		
-		private T defaultValue() throws IllegalCommandLineArgumentException
+		void setDefaultValue()
 		{
-			return _argumentTypeClass.cast(valueOf(_outer._defaultForOptional, _argumentTypeClass));
+			value(defaultValue());
 		}
+		
+		private void value(T value)
+		{
+			_value = value;
+		}
+
+		private T defaultValue()
+		{
+			return _outer._defaultForOptional;
+		}
+		
 		private Object valueOf(String valueAsString, Class<?> argumentTypeClass)
 			throws
 				IllegalCommandLineArgumentException

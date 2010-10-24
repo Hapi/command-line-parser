@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -620,8 +621,24 @@ public class CommandLineParser
 			// the command line argument is undefined.
 			throw new IllegalCommandLineArgumentException("'" + arg + "' not defined.");
 		}
+
+		// There are no command line arguments and all the arguments are optional.
+		if(_cmdLineArguments.size() == 0 && _definedArguments.size() > 0 && !_mandatoryArguments) {
+			Set<Entry<String, Argument.Internal<?>>> entrySet = _definedArguments.entrySet();
+			for(Iterator<?> it = entrySet.iterator(); it.hasNext();) {
+				@SuppressWarnings("unchecked")
+				Argument.Internal<?> argument =
+					((Entry<String, Argument.Internal<?>>)it.next()).getValue();
+				argument.setDefaultValue();
+				_cmdLineArguments.add(argument);
+			}
+		}
+		
 		if(_mandatoryArguments && _cmdLineArguments.size() == 0)
-			throw new IllegalCommandLineArgumentException("A mandatory command line argument is missing.");
+			throw
+				new IllegalCommandLineArgumentException(
+					"A mandatory command line argument is missing."
+				);
 		if(_definedCommands.size() > 0 && _cmdLineCommand == null)
 			throw new CommandNotFoundException("No command found from the command line.");
 

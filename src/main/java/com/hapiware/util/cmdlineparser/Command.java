@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import com.hapiware.util.cmdlineparser.constraint.Constraint;
 import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
@@ -568,6 +570,24 @@ public class Command
 				
 				return false;
 			}
+			
+			// There are no command line arguments and all the arguments are optional.
+			if(
+				_outer._cmdLineArguments.size() == 0
+				&& _outer._definedArguments.size() > 0
+				&& !_outer._mandatoryArguments)
+			{
+				Set<Entry<String, Argument.Internal<?>>> entrySet =
+					_outer._definedArguments.entrySet();
+				for(Iterator<?> it = entrySet.iterator(); it.hasNext();) {
+					@SuppressWarnings("unchecked")
+					Argument.Internal<?> argument =
+						((Entry<String, Argument.Internal<?>>)it.next()).getValue();
+					argument.setDefaultValue();
+					_outer._cmdLineArguments.add(argument);
+				}
+			}
+			
 			
 			return true;
 		}

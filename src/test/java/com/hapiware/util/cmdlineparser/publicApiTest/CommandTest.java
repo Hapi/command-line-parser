@@ -411,5 +411,7 @@ public class CommandTest
 		);
 	}
 	
-	// TODO: Add command tests with missing commands.
+	// TODO: Add command tests for non-defined commands.
+	// TODO: Add command tests for missing commands (i.e. no command at the command line).
+	// TODO: Add command tests adding options but "forgetting" a command.
 }
