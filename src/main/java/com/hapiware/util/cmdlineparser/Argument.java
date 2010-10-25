@@ -322,7 +322,7 @@ public class Argument<T>
 			if(hasDefaultValueForOptional())
 				return 
 					new Description()
-						.d("Default value for the optional argument is ")
+						.d("Default value is ")
 						.b(defaultValueAsString())
 						.d(".")
 						.toParagraphs()

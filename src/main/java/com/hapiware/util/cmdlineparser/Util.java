@@ -118,7 +118,7 @@ public class Util
 	 */
 	public static boolean checkName(String name)
 	{
-		return Pattern.matches("^\\p{Alpha}[-\\p{Alnum}]*$", name);
+		return Pattern.matches("^\\p{Alpha}[-_\\p{Alnum}]*$", name);
 	}
 	
 	static boolean checkOption(

@@ -15,16 +15,16 @@ import com.hapiware.util.cmdlineparser.Util;
  * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
  *
  */
-public class ScreenWriter
+public final class ScreenWriter
 	implements
 		Writer
 {
 	private final static int TAB_SIZE = 4;
 	private final static int MIN_SCREEN_WIDTH = 40;
 	private final static int MAX_SCREEN_WIDTH = 250;
-	private final static PrintStream STREAM = System.out;
 	private static final String SCREEN_WIDTH_PROPERTY = "screenwidth.default";
 	private static final int DEFAULT_SCREEN_WIDTH;
+	private final PrintStream _printStream;
 	
 	static {
 		int screenWidth = 100;
@@ -43,6 +43,18 @@ public class ScreenWriter
 	private Level _levelForListItems;
 	private Level _levelForCodeLines;
 	
+	private ScreenWriter(PrintStream stream, int screenWidth)
+	{
+		_printStream = stream;
+		_screenWidth = screenWidth;
+	}
+	
+	@SuppressWarnings("unused")
+	private static ScreenWriter createForTesting(PrintStream stream, int screenWidth)
+	{
+		return new ScreenWriter(stream, screenWidth);
+	}
+	
 	public ScreenWriter()
 	{
 		this(DEFAULT_SCREEN_WIDTH);
@@ -57,11 +69,12 @@ public class ScreenWriter
 						+ " Value must be " + MIN_SCREEN_WIDTH + " - " + MAX_SCREEN_WIDTH + "."
 				);
 		_screenWidth = screenWidth;
+		_printStream = System.out;
 	}
 
 	public void level1Begin(String text)
 	{
-		STREAM.println(cut(text));
+		_printStream.println(cut(text));
 	}
 	
 	public void level1End()
@@ -71,7 +84,7 @@ public class ScreenWriter
 
 	public void level2Begin(String text)
 	{
-		STREAM.println(cut(tab(Level.L1) + text));
+		_printStream.println(cut(tab(Level.L1) + text));
 	}
 
 	public void level2End()
@@ -81,7 +94,7 @@ public class ScreenWriter
 
 	public void level3Begin(String text)
 	{
-		STREAM.println(cut(tab(Level.L2) + text));
+		_printStream.println(cut(tab(Level.L2) + text));
 	}
 
 	public void level3End()
@@ -91,7 +104,7 @@ public class ScreenWriter
 
 	public void level4Begin(String text)
 	{
-		STREAM.println(cut(tab(Level.L3) + text));
+		_printStream.println(cut(tab(Level.L3) + text));
 	}
 
 	public void level4End()
@@ -101,7 +114,7 @@ public class ScreenWriter
 
 	public void level5Begin(String text)
 	{
-		STREAM.println(cut(tab(Level.L4) + text));
+		_printStream.println(cut(tab(Level.L4) + text));
 	}
 
 	public void level5End()
@@ -111,14 +124,14 @@ public class ScreenWriter
 
 	public void line(Level level, String text)
 	{
-		STREAM.println(cut(tab(level) + text));
+		_printStream.println(cut(tab(level) + text));
 	}
 
 	public void paragraph(Level level, String text)
 	{
-		Util.write(text, TAB_SIZE * (level.ordinal() + 1), _screenWidth, STREAM);
-		STREAM.println();
-		STREAM.println();
+		Util.write(text, TAB_SIZE * (level.ordinal() + 1), _screenWidth, _printStream);
+		_printStream.println();
+		_printStream.println();
 	}
 
 	public String strongBegin()
@@ -138,12 +151,12 @@ public class ScreenWriter
 
 	public void listItem(String text)
 	{
-		STREAM.println(cut(tab(_levelForListItems) + "* " + text));
+		_printStream.println(cut(tab(_levelForListItems) + "* " + text));
 	}
 
 	public void listEnd()
 	{
-		STREAM.println();
+		_printStream.println();
 	}
 
 	public void codeBegin(Level level)
@@ -158,7 +171,7 @@ public class ScreenWriter
 	
 	public void codeEnd()
 	{
-		STREAM.println();
+		_printStream.println();
 	}
 	
 	public void footer()

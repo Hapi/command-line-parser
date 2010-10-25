@@ -48,10 +48,10 @@ abstract public class TestBase
 				(Package)constructor.newInstance(
 					key,
 					"TestBase",
-					"1.0.0",
+					"1.0.0-for-testing",
 					"hapi",
 					"cmd-parser",
-					"1.0.0",
+					"1.0.0-for-testing",
 					"http://www.hapiware.com",
 					null,
 					baseClass.getClassLoader()

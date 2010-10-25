@@ -68,6 +68,16 @@ public class CommandLineParser
 	private List<String> _exampleArguments = new LinkedList<String>();
 	private final Writer _writer;
 	
+	// This is overridden in tests by using reflection.
+	private final ExitHandler _exitHandler =
+		new ExitHandler()
+		{
+			public void exit(int status)
+			{
+				System.exit(status);
+			}
+		};
+	
 	
 	public CommandLineParser(Class<?> mainClass, Description description)
 	{
@@ -234,7 +244,7 @@ public class CommandLineParser
 
 	public void addExampleArguments(String exampleArguments)
 	{
-		if(exampleArguments == null || exampleArguments.trim().length() == 0)
+		if(exampleArguments == null)
 			throw new ConfigurationException("'exampleArguments' must have a value.");
 		
 		_exampleArguments.add(exampleArguments);
@@ -374,23 +384,23 @@ public class CommandLineParser
 		}
 		catch(ConstraintException e) {
 			printErrorWithShortHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(AnnotatedFieldSetException e) {
 			printErrorMessageWithoutHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(CommandNotFoundException e) {
 			printErrorWithCommandsHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(IllegalCommandLineArgumentException e) {
 			printErrorWithShortHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(Throwable t) {
 			printThrowable(t);
-			System.exit(-2);
+			_exitHandler.exit(-2);
 		}
 	}
 
@@ -402,23 +412,23 @@ public class CommandLineParser
 		}
 		catch(ConstraintException e) {
 			printErrorWithShortHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(AnnotatedFieldSetException e) {
 			printErrorMessageWithoutHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(CommandNotFoundException e) {
 			printErrorWithCommandsHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(IllegalCommandLineArgumentException e) {
 			printErrorWithShortHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(Throwable t) {
 			printThrowable(t);
-			System.exit(-2);
+			_exitHandler.exit(-2);
 		}
 	}
 	
@@ -429,23 +439,23 @@ public class CommandLineParser
 		}
 		catch(ConstraintException e) {
 			printErrorWithShortHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(AnnotatedFieldSetException e) {
 			printErrorMessageWithoutHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(CommandNotFoundException e) {
 			printErrorWithCommandsHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(IllegalCommandLineArgumentException e) {
 			printErrorWithShortHelp(e);
-			System.exit(-1);
+			_exitHandler.exit(-1);
 		}
 		catch(Throwable t) {
 			printThrowable(t);
-			System.exit(-2);
+			_exitHandler.exit(-2);
 		}
 	}
 	
@@ -490,21 +500,21 @@ public class CommandLineParser
 		) {
 			if(args.length == 1) {
 				printShortHelp();
-				System.exit(0);
+				_exitHandler.exit(0);
 			}
 			
 			String helpCommand = args[1];
 			if(helpCommand.equals(COMPLETE_HELP_COMMAND)) {
 				printCompleteHelp();
-				System.exit(0);
+				_exitHandler.exit(0);
 			}
 			if(_definedGlobalOptions.size() > 0 && helpCommand.equals(OPTS_HELP_COMMAND)) {
 				printGlobalOptionsHelp();
-				System.exit(0);
+				_exitHandler.exit(0);
 			}
 			if(_definedCommands.size() > 0 && helpCommand.equals(CMDS_HELP_COMMAND)) {
 				printCommandsHelp();
-				System.exit(0);
+				_exitHandler.exit(0);
 			}
 			if(_definedCommands.size() > 0 && helpCommand.startsWith(CMD_HELP_COMMAND)) {
 				String[] afterSplit = helpCommand.split("=");
@@ -512,11 +522,11 @@ public class CommandLineParser
 					printCommandHelp(afterSplit[1]);
 				else
 					printCommandHelp("");
-				System.exit(0);
+				_exitHandler.exit(0);
 			}
 			if(_definedArguments.size() > 0 && helpCommand.equals(ARGS_HELP_COMMAND)) {
 				printGlobalArgumentsHelp();
-				System.exit(0);
+				_exitHandler.exit(0);
 			}
 
 			_writer.header();
@@ -526,7 +536,7 @@ public class CommandLineParser
 			_writer.level1End();
 			printUsage();
 			_writer.footer();
-			System.exit(0);
+			_exitHandler.exit(0);
 		}
 	}
 	
@@ -668,7 +678,7 @@ public class CommandLineParser
 		_writer.level1Begin("Version: " + _mainClass.getPackage().getImplementationVersion());
 		_writer.level1End();
 		_writer.footer();
-		System.exit(0);
+		_exitHandler.exit(0);
 	}
 
 	
@@ -868,12 +878,11 @@ public class CommandLineParser
 			for(String paragraph : option.description()) {
 				if(isFirstParagraph) {
 					if(option.argument() != null && option.argument().optional())
-						paragraph = 
-							"Argument is optional. " 
-								+ option.argument().defaultValueDescription() + " " 
-								+ paragraph;
+						paragraph += 
+							" Argument is optional. " 
+								+ option.argument().defaultValueDescription(); 
 					if(option.multiple())
-						paragraph = "This option can occur several times. " + paragraph;
+						paragraph += " This option can occur several times.";
 					
 					isFirstParagraph = false;
 				}
@@ -967,10 +976,9 @@ public class CommandLineParser
 			Level level = isCommand ? Level.L4 : Level.L2;
 			for(String paragraph : argument.description()) {
 				if(isFirstParagraph && argument.optional()) {
-					paragraph = 
-						"Argument is optional. " 
-							+ argument.defaultValueDescription() + " " 
-							+ paragraph;
+					paragraph += 
+						" Argument is optional. " 
+							+ argument.defaultValueDescription(); 
 					isFirstParagraph = false;
 				}
 				_writer.paragraph(level, replaceStrong(paragraph));
@@ -1050,7 +1058,7 @@ public class CommandLineParser
 		for(String alternative : command.alternatives())
 			commandNames += ", " + alternative;
 		commandNames +=
-			_definedArgumentTypes.contains(HelpType.COMMAND_OPTIONS) ? " [CMD-OPTS]" : "";
+			command.definedOptions().size() > 0 ? " [CMD-OPTS]" : "";
 		for(Entry<String, Argument.Internal<?>> argumentEntry : command.definedArguments().entrySet()) {
 			Argument.Internal<?> argument = argumentEntry.getValue();
 			if(argument.optional())
@@ -1118,7 +1126,7 @@ public class CommandLineParser
 		_writer.level1End();
 	}
 	
-	private Writer createSystemPropertyWriter()
+	private static Writer createSystemPropertyWriter()
 	{
 		String propertyClassName = "";
 		try {
