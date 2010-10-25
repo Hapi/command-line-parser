@@ -1,5 +1,7 @@
 package com.hapiware.util.cmdlineparser;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,7 +24,14 @@ import com.hapiware.util.cmdlineparser.writer.Writer.Level;
 
 
 /**
- * System property {@code screenwidth.default}.
+ * System property {@code writer.class} overrides the hard coded {@link Writer}. {@code writer.class}
+ * must have a full class name implementing {@link Writer} interface and have the default constructor. 
+ * {@code writer.class} also recognizes a special format to use internal writer implementations.
+ * Internal writers are recognized by their class name prefixes (i.e. Screen, Html, Xml, Wikidot,
+ * Confluence, GitHub). The naming convention is that if the package name is
+ * {@code com.hapiware.util.cmdlineparser.writer} and the implementation class name ends with word
+ * {@code Writer} then the part before word {@code Writer} can be used as a parameter for
+ * {@code writer.class}.
  * 
  * 
  * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
@@ -37,22 +46,8 @@ public class CommandLineParser
 	private static final String CMDS_HELP_COMMAND = "cmds";
 	private static final String CMD_HELP_COMMAND = "cmd=";
 	private static final String ARGS_HELP_COMMAND = "args";
-	private static final String SCREEN_WIDTH_PROPERTY = "screenwidth.default";
-	private static final int DEFAULT_SCREEN_WIDTH;
-	
-	static {
-		int screenWidth = 100;
-		try {
-			 screenWidth = Integer.parseInt(System.getProperty(SCREEN_WIDTH_PROPERTY));
-		}
-		catch(Throwable ignore) {
-			// Does nothing.
-		}
-		finally {
-			DEFAULT_SCREEN_WIDTH = screenWidth;
-		}
-	}
-	
+	private static final String WRITER_CLASS_PROPERTY = "writer.class";
+
 	
 	private final Description _description;
 	private Map<String, Option.Internal> _definedGlobalOptions = new LinkedHashMap<String, Option.Internal>();
@@ -76,7 +71,7 @@ public class CommandLineParser
 	
 	public CommandLineParser(Class<?> mainClass, Description description)
 	{
-		this(mainClass, DEFAULT_SCREEN_WIDTH, description);
+		this(mainClass, new ScreenWriter(), description);
 	}
 	
 	public CommandLineParser(Class<?> mainClass, int screenWidth, Description description)
@@ -102,7 +97,8 @@ public class CommandLineParser
 			throw new ConfigurationException("Implementation-Version: is missing from MANIFEST.MF.");
 		
 		_mainClass = mainClass;
-		_writer = writer;
+		Writer writerFromSystemProperty = createSystemPropertyWriter();
+		_writer = writerFromSystemProperty != null ? writerFromSystemProperty : writer;
 		_javaCommand = "java -jar " + _mainClass.getPackage().getImplementationTitle() + ".jar";
 		_description = description;
 	}
@@ -1120,5 +1116,59 @@ public class CommandLineParser
 			_writer.codeLine(_javaCommand + " " + example);
 		_writer.codeEnd();
 		_writer.level1End();
+	}
+	
+	private Writer createSystemPropertyWriter()
+	{
+		String propertyClassName = "";
+		try {
+			propertyClassName = System.getProperty(WRITER_CLASS_PROPERTY);
+			if(propertyClassName == null)
+				return null;
+		}
+		catch(Throwable ignore) {
+			return null;
+		}
+		
+		Class<?> writerClass = null;
+		try {
+			writerClass = Class.forName(propertyClassName);
+		}
+		catch(ClassNotFoundException e) {
+			try {
+				String className =
+					Writer.class.getPackage().getName() + "." + propertyClassName + "Writer";
+				writerClass = Class.forName(className);
+			}
+			catch(ClassNotFoundException e2) {
+				return null;
+			}
+		}
+		
+		Writer writer = null;
+		try {
+			Constructor<?> constructor = writerClass.getDeclaredConstructor((Class<?>[])null);
+			writer = (Writer)constructor.newInstance((Object[])null);
+		}
+		catch(SecurityException e) {
+			// Does nothing.
+		}
+		catch(NoSuchMethodException e) {
+			// Does nothing.
+		}
+		catch(IllegalArgumentException e) {
+			// Does nothing.
+		}
+		catch(InstantiationException e) {
+			// Does nothing.
+		}
+		catch(IllegalAccessException e) {
+			// Does nothing.
+		}
+		catch(InvocationTargetException e) {
+			// Does nothing.
+		}
+
+		return writer;
 	}
 }

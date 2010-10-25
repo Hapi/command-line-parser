@@ -6,8 +6,11 @@ import com.hapiware.util.cmdlineparser.Util;
 
 
 /**
+ * System property {@code screenwidth.default}.
+ * 
+ * 
  * Headings and list items are one liners only (i.e. if they are longer than defined screen
- * width they are just cut).
+ * width they are just cut off).
  * 
  * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
  *
@@ -20,10 +23,30 @@ public class ScreenWriter
 	private final static int MIN_SCREEN_WIDTH = 40;
 	private final static int MAX_SCREEN_WIDTH = 250;
 	private final static PrintStream STREAM = System.out;
+	private static final String SCREEN_WIDTH_PROPERTY = "screenwidth.default";
+	private static final int DEFAULT_SCREEN_WIDTH;
+	
+	static {
+		int screenWidth = 100;
+		try {
+			screenWidth = Integer.parseInt(System.getProperty(SCREEN_WIDTH_PROPERTY));
+		}
+		catch(Throwable ignore) {
+			// Does nothing.
+		}
+		finally {
+			DEFAULT_SCREEN_WIDTH = screenWidth;
+		}
+	}
 	
 	private final int _screenWidth;
 	private Level _levelForListItems;
 	private Level _levelForCodeLines;
+	
+	public ScreenWriter()
+	{
+		this(DEFAULT_SCREEN_WIDTH);
+	}
 	
 	public ScreenWriter(int screenWidth)
 	{
