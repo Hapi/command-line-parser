@@ -37,7 +37,7 @@ import com.hapiware.util.cmdlineparser.writer.Writer.Level;
  * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
  *
  */
-public class CommandLineParser
+public final class CommandLineParser
 {
 	private enum HelpType { OPTIONS, ARGUMENTS, COMMANDS, COMMAND_OPTIONS, COMMAND_ARGUMENTS };
 	
@@ -334,6 +334,11 @@ public class CommandLineParser
 	public Command.Data getCommand()
 	{
 		return new Command.Data(_cmdLineCommand);
+	}
+	
+	public Writer getWriter()
+	{
+		return _writer;
 	}
 	
 	public void parse(String[] args)
