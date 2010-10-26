@@ -26,6 +26,7 @@ public final class ScreenWriter
 	private static final int DEFAULT_SCREEN_WIDTH;
 	private final PrintStream _printStream;
 	
+	
 	static {
 		int screenWidth = 100;
 		try {
@@ -43,6 +44,12 @@ public final class ScreenWriter
 	private Level _levelForListItems;
 	private Level _levelForCodeLines;
 	
+	
+	/**
+	 * This constructor is for testing purpouses only.
+	 * 
+	 * @see #createForTesting(PrintStream, int)
+	 */
 	private ScreenWriter(PrintStream stream, int screenWidth)
 	{
 		_printStream = stream;
@@ -74,7 +81,8 @@ public final class ScreenWriter
 
 	public void level1Begin(String text)
 	{
-		_printStream.println(cut(text));
+		Util.write(text, 0, _screenWidth, _printStream);
+		_printStream.println();
 	}
 	
 	public void level1End()
@@ -84,7 +92,8 @@ public final class ScreenWriter
 
 	public void level2Begin(String text)
 	{
-		_printStream.println(cut(tab(Level.L1) + text));
+		Util.write(text, TAB_SIZE * (Level.L1.ordinal()), _screenWidth, _printStream);
+		_printStream.println();
 	}
 
 	public void level2End()
@@ -94,7 +103,8 @@ public final class ScreenWriter
 
 	public void level3Begin(String text)
 	{
-		_printStream.println(cut(tab(Level.L2) + text));
+		Util.write(text, TAB_SIZE * (Level.L2.ordinal()), _screenWidth, _printStream);
+		_printStream.println();
 	}
 
 	public void level3End()
@@ -104,7 +114,8 @@ public final class ScreenWriter
 
 	public void level4Begin(String text)
 	{
-		_printStream.println(cut(tab(Level.L3) + text));
+		Util.write(text, TAB_SIZE * (Level.L3.ordinal()), _screenWidth, _printStream);
+		_printStream.println();
 	}
 
 	public void level4End()
@@ -114,7 +125,8 @@ public final class ScreenWriter
 
 	public void level5Begin(String text)
 	{
-		_printStream.println(cut(tab(Level.L4) + text));
+		Util.write(text, TAB_SIZE * (Level.L4.ordinal()), _screenWidth, _printStream);
+		_printStream.println();
 	}
 
 	public void level5End()
@@ -124,12 +136,13 @@ public final class ScreenWriter
 
 	public void line(Level level, String text)
 	{
-		_printStream.println(cut(tab(level) + text));
+		Util.write(text, TAB_SIZE * (level.ordinal()), _screenWidth, _printStream);
+		_printStream.println();
 	}
 
 	public void paragraph(Level level, String text)
 	{
-		Util.write(text, TAB_SIZE * (level.ordinal() + 1), _screenWidth, _printStream);
+		Util.write(text, TAB_SIZE * (level.ordinal()), _screenWidth, _printStream);
 		_printStream.println();
 		_printStream.println();
 	}
@@ -151,7 +164,9 @@ public final class ScreenWriter
 
 	public void listItem(String text)
 	{
-		_printStream.println(cut(tab(_levelForListItems) + "* " + text));
+		int tabSize = TAB_SIZE * (_levelForListItems.ordinal());
+		Util.write("* " + text, tabSize, tabSize + 2, _screenWidth, _printStream);
+		_printStream.println();
 	}
 
 	public void listEnd()
@@ -182,18 +197,5 @@ public final class ScreenWriter
 	public void header()
 	{
 		// Does nothing.
-	}
-	
-	private static String tab(Level level)
-	{
-		String tab = "";
-		for(int i = 0; i < (level.ordinal() + 1) * TAB_SIZE; i++)
-			tab += " ";
-		return tab;
-	}
-
-	private String cut(String text)
-	{
-		return text.length() > _screenWidth ? text.substring(0, _screenWidth - 3) + "..." : text;
 	}
 }

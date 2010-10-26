@@ -31,20 +31,20 @@ import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
  */
 public class Util
 {
-	public static final String NUMBER_PATTERN = "^-\\p{Digit}+$"; 
+	public static final String NEGATIVE_NUMBER_PATTERN = "^-\\p{Digit}+$"; 
 	
 	private static final String CR = "\n";
-	
+
 	
 	/**
-	 * Writes left and right justified {@code text} to an output stream (usually {@link System.out})
-	 * creating new lines when necessary. Justifying the left side is done by adding space
-	 * characters until the left {@code column} is reached. {@code width} tells the width of
-	 * the write area (e.g. screen).
+	 * Writes right justified and left indented {@code text} to an output stream (usually
+	 * {@link System.out}) creating new lines when necessary. Indenting the left side is done
+	 * by adding space characters until the left {@code column} is reached. {@code width} tells
+	 * the width of the write area (e.g. screen).
 	 * <p>
-	 * For example if {@code width} is 80 and {@code column} is 10 then every line has ten space
-	 * characters (one in every column between 0 -9) and characters from {@code text} are written
-	 * to columns 10 - 79.
+	 * For example if {@code width} is 80 and {@code column} is 10 then every line has ten (10)
+	 * space characters (one in every column between 0 - 9) and characters from {@code text} are
+	 * written to columns 10 - 79.
 	 * 
 	 * @param text
 	 * 		Text to be written.
@@ -64,39 +64,120 @@ public class Util
 	 */
 	public static void write(String text, int column, int width, OutputStream outStream)
 	{
-		if(column >= width)
-			throw new IllegalArgumentException("'width' must be greater than 'column'.");
+		write(text, column, column, width, outStream);
+	}
+	
+	
+	/**
+	 * Writes right justified and left indented {@code text} to an output stream (usually
+	 * {@link System.out}) creating new lines when necessary. The first line can have different
+	 * indentation column than the remainder of lines. Indenting the left side is done by adding
+	 * space characters until the left {@code columnFirstLine} or {@code columnRemainderLines}
+	 * are reached. {@code width} tells the width of the write area (e.g. screen).
+	 * <p>
+	 * For example if {@code width} is 80, {@code columnFirstLine} is 10 and
+	 * {@code columnRemainderLines} is 5 then the first line will have ten (10) space characters
+	 * (one in every column between 0 - 9) and characters from {@code text} are written to columns
+	 * 10 - 79. The remainder of lines will have five (5) space characters (columns 0 - 4) and
+	 * characters from {@code text} are written to columns 5 - 79.
+	 * 
+	 * @param text
+	 * 		Text to be written.
+	 * 
+	 * @param columnFirstLine
+	 * 		A zero-based position of the leftmost characters (in number of characters) of
+	 * 		the first line.
+	 * 
+	 * @param columnRemainderLines
+	 * 		A zero-based position of the leftmost characters (in number of characters) of
+	 * 		the remainder of lines if they exists.
+	 * 
+	 * @param width
+	 * 		Width of the write area in characters.
+	 * 
+	 * @param outStream
+	 * 		A stream where the justified text is to be written. Most usually {@link System.out}.
+	 * 
+	 * @throws RuntimeException
+	 * 		If something goes wrong with writing to {@code outStream}. In practice this just
+	 * 		re-throws {@link IOException}.
+	 */
+	public static void write(
+		String text,
+		int columnFirstLine,
+		int columnRemainderLines,
+		int width,
+		OutputStream outStream
+	)
+	{
+		if(text == null)
+			throw new NullPointerException("'text' must have a value.");
+		if(outStream == null)
+			throw new NullPointerException("'outStream' must have a value.");
+		if(columnFirstLine < 0)
+			throw
+				new IllegalArgumentException(
+					"'columnFirstLine' must be greater or equal than zero (0)."
+				);
+		if(columnRemainderLines < 0)
+			throw
+				new IllegalArgumentException(
+					"'columnRemainderLines' must be greater or equal than zero (0)."
+				);
+		if(width < 0)
+			throw
+				new IllegalArgumentException(
+					"'width' must be greater or equal than zero (0)."
+				);
+		if(columnFirstLine >= width)
+			throw new IllegalArgumentException("'width' must be greater than 'columnFirstLine'.");
+		if(columnRemainderLines >= width)
+			throw
+				new IllegalArgumentException(
+					"'width' must be greater than 'columnRemainderLines'."
+				);
 		
-		StringBuilder tab = new StringBuilder();
-		for(int i = 0; i < column; i++)
-			tab.append(" ");
+		StringBuilder firstLineTab = new StringBuilder();
+		for(int i = 0; i < columnFirstLine; i++)
+			firstLineTab.append(" ");
+		StringBuilder remainderLinesTab = new StringBuilder();
+		for(int i = 0; i < columnRemainderLines; i++)
+			remainderLinesTab.append(" ");
 
-		StringBuilder toWrite = new StringBuilder(tab);
-		int pos = column;
+		StringBuilder toWrite = new StringBuilder(firstLineTab);
 		StringTokenizer tokenizer = new StringTokenizer(text);
+		int columnUnderWork = columnFirstLine;
+		int pos = columnUnderWork;
 		while(tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if(pos + token.length() > width) {
-				if(pos != column) {
+				if(pos != columnUnderWork) {
 					if(toWrite.charAt(toWrite.length() - 1) == ' ')
 						toWrite.deleteCharAt(toWrite.length() - 1);
-					pos = column;
-					toWrite.append(CR).append(tab);
+					toWrite.append(CR).append(remainderLinesTab);
+					columnUnderWork = columnRemainderLines;
+					pos = columnUnderWork;
 				}
-				if(token.length() > width - column) {
+				if(token.length() > width - columnUnderWork) {
 					String rest = token;
-					while(rest.length() > width - column) {
-						toWrite.append(rest.substring(0, width - column)).append(CR).append(tab);
-						rest = rest.substring(width - column);
+					while(rest.length() > width - columnUnderWork) {
+						toWrite.append(
+							rest.substring(0, width - columnUnderWork)
+						).append(CR).append(remainderLinesTab);
+						rest = rest.substring(width - columnUnderWork);
+						columnUnderWork = columnRemainderLines;
+						pos = columnUnderWork;
 					}
 					token = rest;
 				}
 			}
-			pos += token.length() + 1;
-			toWrite.append(token).append(" ");
+			pos += token.length();
+			toWrite.append(token);
+			if(tokenizer.hasMoreTokens()) {
+				pos++;
+				toWrite.append(" ");
+			}
 		}
-		if(toWrite.charAt(toWrite.length() - 1) == ' ')
-			toWrite.deleteCharAt(toWrite.length() - 1);
 		try {
 			outStream.write(toWrite.toString().getBytes());
 		}
@@ -108,7 +189,7 @@ public class Util
 	
 	/**
 	 * Checks the name pattern.
-	 * {@code name} must match this RE pattern: <code>^\\p{Alpha}[-\\p{Alnum}]*$</code>.
+	 * {@code name} must match this RE pattern: <code>^\\p{Alpha}[-_\\p{Alnum}]*$</code>.
 	 * 
 	 * @param name
 	 * 		A name to be checked.
@@ -175,7 +256,7 @@ public class Util
 		// There cannot be options between command arguments. Only before or after
 		// all the command arguments.
 		for(String cmdLineArg : cmdLineArgs) {
-			if(cmdLineArg.startsWith("-") && !Pattern.matches(NUMBER_PATTERN, cmdLineArg))
+			if(cmdLineArg.startsWith("-") && !Pattern.matches(NEGATIVE_NUMBER_PATTERN, cmdLineArg))
 				break;
 			else
 				numberOfCmdLineArguments++;

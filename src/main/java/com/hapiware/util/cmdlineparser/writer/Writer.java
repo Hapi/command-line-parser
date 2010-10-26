@@ -2,7 +2,7 @@ package com.hapiware.util.cmdlineparser.writer;
 
 public interface Writer
 {
-	public enum Level { L1, L2, L3, L4, L5 };
+	public enum Level { NONE, L1, L2, L3, L4, L5 };
 	
 	public void header();
 	public void level1Begin(String text);

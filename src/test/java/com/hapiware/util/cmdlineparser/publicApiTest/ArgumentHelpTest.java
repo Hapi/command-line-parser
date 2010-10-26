@@ -211,7 +211,7 @@ public class ArgumentHelpTest
 				+ "Examples:\n"
 				+ "    java -jar cmd-parser.jar -? all\n"
 				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar \n"
+				+ "    java -jar cmd-parser.jar\n"
 				+ "    java -jar cmd-parser.jar 50001\n"
 				+ "    java -jar cmd-parser.jar 50001 35\n"
 				+ "\n";

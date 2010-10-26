@@ -129,7 +129,7 @@ public class XmlWriter
 
 	public void listItem(String text)
 	{
-		println(tab(_levelForListItems.ordinal() + 3) + "<item>" + text + "</item>");
+		println(tab(_levelForListItems.ordinal() + 2) + "<item>" + text + "</item>");
 	}
 
 	public void listEnd()
@@ -145,7 +145,7 @@ public class XmlWriter
 	
 	public void codeLine(String code)
 	{
-		println(tab(_levelForCodeLines.ordinal() + 3) + "<line>" + code + "</line>");
+		println(tab(_levelForCodeLines.ordinal() + 2) + "<line>" + code + "</line>");
 	}
 	
 	public void codeEnd()
@@ -199,6 +199,6 @@ public class XmlWriter
 	}
 	private static String tab(Level level)
 	{
-		return tab(level.ordinal() + 2);
+		return tab(level.ordinal() + 1);
 	}
 }
