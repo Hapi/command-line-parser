@@ -250,8 +250,82 @@ public class ConstraintTest
 			new String[] { "1" , "1234567890", "4", "-15", "-15" }
 		);
 	}
-	// LENGTH End
 	
+	@Test
+	public void testLengthExactSuccess()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				ConstraintTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(String.class, new Argument<String>("LENGTH") {{
+			description("Description for LENGTH.");
+			length(5);
+		}});
+		p.parse(
+			new String[] { "12345" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = { ConstraintException.class },
+		expectedExceptionsMessageRegExp =
+			"Length of '1234' differs from the length 5 allowed for 'LENGTH'\\."
+	)
+	public void testLengthExactTooShort()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				ConstraintTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(String.class, new Argument<String>("LENGTH") {{
+			description("Description for LENGTH.");
+			length(5);
+		}});
+		p.parse(
+			new String[] { "1234" }
+		);
+	}
+	
+	@Test(
+		expectedExceptions = { ConstraintException.class },
+		expectedExceptionsMessageRegExp =
+			"Length of '123456' differs from the length 5 allowed for 'LENGTH'\\."
+	)
+	public void testLengthExactTooLong()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				ConstraintTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(String.class, new Argument<String>("LENGTH") {{
+			description("Description for LENGTH.");
+			length(5);
+		}});
+		p.parse(
+			new String[] { "123456" }
+		);
+	}
+	// LENGTH End
+
 	
 	
 	/************************************

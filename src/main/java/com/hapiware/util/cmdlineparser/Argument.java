@@ -8,6 +8,7 @@ import java.util.List;
 import com.hapiware.util.cmdlineparser.constraint.Constraint;
 import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
 import com.hapiware.util.cmdlineparser.constraint.Enumeration;
+import com.hapiware.util.cmdlineparser.constraint.Length;
 import com.hapiware.util.cmdlineparser.constraint.MaxLength;
 import com.hapiware.util.cmdlineparser.constraint.MaxValue;
 import com.hapiware.util.cmdlineparser.constraint.MinLength;
@@ -165,6 +166,12 @@ public class Argument<T>
 		return this;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Argument<T> length(int length)
+	{
+		return constraint((Constraint<T>)new Length(length));
+	}
+	
 	@SuppressWarnings("unchecked")
 	public Argument<T> minLength(int minLength)
 	{

@@ -166,4 +166,96 @@ public class ExceptionTest
 	{
 		_parser.parse(this, new String[] { "set", "1234" });
 	}
+	
+	@Test(
+		expectedExceptions = {IllegalCommandLineArgumentException.class},
+		expectedExceptionsMessageRegExp =
+			"'128' cannot be interpreted as java.lang.Byte for 'BYTE'\\."
+	)
+	public void moreThanByteAllows()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				ExceptionTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(Byte.class, new Argument<Byte>("BYTE") {{
+			description("description");
+		}});
+		p.parse(this, new String[] { "128" });
+	}
+	
+	@Test(
+		expectedExceptions = {IllegalCommandLineArgumentException.class},
+		expectedExceptionsMessageRegExp =
+			"'-129' cannot be interpreted as java.lang.Byte for 'BYTE'\\."
+	)
+	public void lessThanByteAllows()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				ExceptionTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(Byte.class, new Argument<Byte>("BYTE") {{
+			description("description");
+		}});
+		p.parse(this, new String[] { "-129" });
+	}
+	
+	@Test(
+		expectedExceptions = {IllegalCommandLineArgumentException.class},
+		expectedExceptionsMessageRegExp =
+			"'2147483648' cannot be interpreted as java.lang.Integer for 'INT'\\."
+	)
+	public void moreThanIntegerAllows()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				ExceptionTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(Integer.class, new Argument<Integer>("INT") {{
+			description("description");
+		}});
+		p.parse(this, new String[] { "2147483648" });
+	}
+	
+	@Test(
+		expectedExceptions = {IllegalCommandLineArgumentException.class},
+		expectedExceptionsMessageRegExp =
+			"'-2147483649' cannot be interpreted as java.lang.Integer for 'INT'\\."
+	)
+	public void lessThanIntegerAllows()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				ExceptionTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(Integer.class, new Argument<Integer>("INT") {{
+			description("description");
+		}});
+		p.parse(this, new String[] { "-2147483649" });
+	}
 }

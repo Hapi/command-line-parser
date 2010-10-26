@@ -66,6 +66,12 @@ public class OptionArgument<T>
 		return this;
 	}
 	
+	public OptionArgument<T> length(int length)
+	{
+		super.length(length);
+		return this;
+	}
+	
 	public OptionArgument<T> minLength(int minLength)
 	{
 		super.minLength(minLength);
