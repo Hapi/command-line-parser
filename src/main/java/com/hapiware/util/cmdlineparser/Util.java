@@ -290,7 +290,7 @@ public class Util
 			if(argument.optional() && numberOfCmdLineArguments < entrySet.size())
 				if(mandatoryOptionalDiff == 1) {
 					// Adds a default value to one optional argument.
-					if(it.hasNext())
+					if(it.hasNext() || cmdLineArgs.size() == 0)
 						((LinkedList<String>)cmdLineArgs).addFirst(argument.defaultValueAsString());
 					else
 						break;

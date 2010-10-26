@@ -445,4 +445,112 @@ public class OneOptionalArgumentTest
 			new String[] { "100", "-c", "200", "300" }
 		);
 	}
+	
+	@Test
+	public void optionalArgumentIsLast()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				OneOptionalArgumentTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(Integer.class, new Argument<Integer>("PID") {{
+			description("Description for PID.");
+		}});
+		p.add(Integer.class, new Argument<Integer>("TYPE") {{
+			description("Description for TYPE.");
+		}});
+		p.add(Integer.class, new Argument<Integer>("ACTION") {{
+			optional(-300);
+			description("Description for ACTION.");
+		}});
+		p.parse(
+			new String[] { "100", "200", "300" }
+		);
+		assertEquals(p.getArgumentValue("PID"), 100);
+		assertEquals(p.getArgumentValue("TYPE"), 200);
+		assertEquals(p.getArgumentValue("ACTION"), 300);
+	}
+	
+	@Test
+	public void optionalArgumentIsLastAndLastArgumentIsAbsent()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				OneOptionalArgumentTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(Integer.class, new Argument<Integer>("PID") {{
+			description("Description for PID.");
+		}});
+		p.add(Integer.class, new Argument<Integer>("TYPE") {{
+			description("Description for TYPE.");
+		}});
+		p.add(Integer.class, new Argument<Integer>("ACTION") {{
+			optional(-300);
+			description("Description for ACTION.");
+		}});
+		p.parse(
+			new String[] { "100", "200" }
+		);
+		assertEquals(p.getArgumentValue("PID"), 100);
+		assertEquals(p.getArgumentValue("TYPE"), 200);
+		assertEquals(p.getArgumentValue("ACTION"), -300);
+	}
+	
+	@Test
+	public void onlyOneOptionalArgument()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				OneOptionalArgumentTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(Integer.class, new Argument<Integer>("PID") {{
+			description("Description for PID.");
+			optional(-100);
+		}});
+		p.parse(
+			new String[] { "100" }
+		);
+		assertEquals(p.getArgumentValue("PID"), 100);
+	}
+	
+	@Test
+	public void onlyOneOptionalArgumentAndItIsAbsent()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				OneOptionalArgumentTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(Integer.class, new Argument<Integer>("PID") {{
+			description("Description for PID.");
+			optional(-100);
+		}});
+		p.parse(
+			new String[] {  }
+		);
+		assertEquals(p.getArgumentValue("PID"), -100);
+	}
 }
