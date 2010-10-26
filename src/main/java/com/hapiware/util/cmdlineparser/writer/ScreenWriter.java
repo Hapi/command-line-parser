@@ -6,7 +6,7 @@ import com.hapiware.util.cmdlineparser.Util;
 
 
 /**
- * System property {@code screenwidth.default}.
+ * System property {@code screenwidth}.
  * 
  * 
  * Headings and list items are one liners only (i.e. if they are longer than defined screen
@@ -22,24 +22,10 @@ public final class ScreenWriter
 	private final static int TAB_SIZE = 4;
 	private final static int MIN_SCREEN_WIDTH = 40;
 	private final static int MAX_SCREEN_WIDTH = 250;
-	private static final String SCREEN_WIDTH_PROPERTY = "screenwidth.default";
-	private static final int DEFAULT_SCREEN_WIDTH;
+	private static final String SCREEN_WIDTH_PROPERTY = "screenwidth";
+	private static final int DEFAULT_SCREEN_WIDTH = 100;
+	
 	private final PrintStream _printStream;
-	
-	
-	static {
-		int screenWidth = 100;
-		try {
-			screenWidth = Integer.parseInt(System.getProperty(SCREEN_WIDTH_PROPERTY));
-		}
-		catch(Throwable ignore) {
-			// Does nothing.
-		}
-		finally {
-			DEFAULT_SCREEN_WIDTH = screenWidth;
-		}
-	}
-	
 	private final int _screenWidth;
 	private Level _levelForListItems;
 	private Level _levelForCodeLines;
@@ -75,6 +61,12 @@ public final class ScreenWriter
 					screenWidth + " is not an appropriate value for 'screenWidth'. "
 						+ " Value must be " + MIN_SCREEN_WIDTH + " - " + MAX_SCREEN_WIDTH + "."
 				);
+		try {
+			screenWidth = Integer.parseInt(System.getProperty(SCREEN_WIDTH_PROPERTY));
+		}
+		catch(Throwable ignore) {
+			// Does nothing.
+		}
 		_screenWidth = screenWidth;
 		_printStream = System.out;
 	}

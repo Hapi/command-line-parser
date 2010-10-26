@@ -4,7 +4,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
-import org.testng.annotations.AfterTest;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import com.hapiware.util.cmdlineparser.writer.ConfluenceWriter;
@@ -18,7 +18,7 @@ import com.hapiware.util.publisher.Publisher;
 
 public class CommandLineParserPrivateMethodsTest
 {
-	private static final String WRITER_CLASS_PROPERTY = "writer.class";
+	private static final String WRITER_CLASS_PROPERTY = "writerclass";
 
 
 	private interface SCommandLineParser
@@ -30,7 +30,7 @@ public class CommandLineParserPrivateMethodsTest
 		Publisher.publish(SCommandLineParser.class, CommandLineParser.class);
 	
 
-	@AfterTest
+	@AfterClass
 	public void removeProperty()
 	{
 		System.clearProperty(WRITER_CLASS_PROPERTY);

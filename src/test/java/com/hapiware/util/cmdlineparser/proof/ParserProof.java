@@ -111,7 +111,7 @@ public class ParserProof
 		System.out.println();*/
 		
 		
-		p.parsePrintAndExitOnError(
+		p.parsech(
 			new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "1000" }
 			//new String[] { "--help", "cmd=set" }
 			//new String[] { "--help", "all" }

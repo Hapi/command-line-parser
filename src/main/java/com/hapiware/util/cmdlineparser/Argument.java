@@ -326,7 +326,7 @@ public class Argument<T>
 		}
 		public String defaultValueDescription()
 		{
-			if(hasDefaultValueForOptional())
+			if(hasDefaultValueForOptional() && defaultValueAsString().length() > 0)
 				return 
 					new Description()
 						.d("Default value is ")

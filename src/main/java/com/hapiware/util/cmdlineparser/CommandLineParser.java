@@ -24,9 +24,9 @@ import com.hapiware.util.cmdlineparser.writer.Writer.Level;
 
 
 /**
- * System property {@code writer.class} overrides the hard coded {@link Writer}. {@code writer.class}
+ * System property {@code writerclass} overrides the hard coded {@link Writer}. {@code writerclass}
  * must have a full class name implementing {@link Writer} interface and have the default constructor. 
- * {@code writer.class} also recognizes a special format to use internal writer implementations.
+ * {@code writerclass} also recognizes a special format to use internal writer implementations.
  * Internal writers are recognized by their class name prefixes (i.e. Screen, Html, Xml, Wikidot,
  * Confluence, GitHub). The naming convention is that if the package name is
  * {@code com.hapiware.util.cmdlineparser.writer} and the implementation class name ends with word
@@ -46,7 +46,7 @@ public class CommandLineParser
 	private static final String CMDS_HELP_COMMAND = "cmds";
 	private static final String CMD_HELP_COMMAND = "cmd=";
 	private static final String ARGS_HELP_COMMAND = "args";
-	private static final String WRITER_CLASS_PROPERTY = "writer.class";
+	private static final String WRITER_CLASS_PROPERTY = "writerclass";
 
 	
 	private final Description _description;
@@ -376,7 +376,13 @@ public class CommandLineParser
 	}
 
 	
-	public void parsePrintAndExitOnError(String[] args)
+	/**
+	 * Parses command line arguments, catches exceptions, prints error message and shows help.
+	 * 
+	 * TODO: Add more information...
+	 * @param args
+	 */
+	public void parsech(String[] args)
 	{
 		try {
 			String className = Thread.currentThread().getStackTrace()[2].getClassName();
@@ -405,7 +411,7 @@ public class CommandLineParser
 	}
 
 	
-	public void parsePrintAndExitOnError(Object callerObject, String[] args)
+	public void parsech(Object callerObject, String[] args)
 	{
 		try {
 			parse(callerObject, args);
@@ -432,7 +438,7 @@ public class CommandLineParser
 		}
 	}
 	
-	public void parsePrintAndExitOnError(Class<?> callerClass, String[] args)
+	public void parsech(Class<?> callerClass, String[] args)
 	{
 		try {
 			parse(callerClass, args);
@@ -451,6 +457,96 @@ public class CommandLineParser
 		}
 		catch(IllegalCommandLineArgumentException e) {
 			printErrorWithShortHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(Throwable t) {
+			printThrowable(t);
+			_exitHandler.exit(-2);
+		}
+	}
+	
+
+	/**
+	 * Parses command line arguments, catches exceptions and prints error message. Does not show help.
+	 * 
+	 * TODO: Add more information...
+	 * @param args
+	 */
+	public void parsec(String[] args)
+	{
+		try {
+			String className = Thread.currentThread().getStackTrace()[2].getClassName();
+			parse(className, args);
+		}
+		catch(ConstraintException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(AnnotatedFieldSetException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(CommandNotFoundException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(IllegalCommandLineArgumentException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(Throwable t) {
+			printThrowable(t);
+			_exitHandler.exit(-2);
+		}
+	}
+
+	
+	public void parsec(Object callerObject, String[] args)
+	{
+		try {
+			parse(callerObject, args);
+		}
+		catch(ConstraintException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(AnnotatedFieldSetException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(CommandNotFoundException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(IllegalCommandLineArgumentException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(Throwable t) {
+			printThrowable(t);
+			_exitHandler.exit(-2);
+		}
+	}
+	
+	public void parsec(Class<?> callerClass, String[] args)
+	{
+		try {
+			parse(callerClass, args);
+		}
+		catch(ConstraintException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(AnnotatedFieldSetException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(CommandNotFoundException e) {
+			printErrorMessageWithoutHelp(e);
+			_exitHandler.exit(-1);
+		}
+		catch(IllegalCommandLineArgumentException e) {
+			printErrorMessageWithoutHelp(e);
 			_exitHandler.exit(-1);
 		}
 		catch(Throwable t) {

@@ -58,7 +58,7 @@ public class ArgumentHelpTest
 	{
 		_parser =
 			new CommandLineParser(
-				CommandHelpTest.class,
+				ArgumentHelpTest.class,
 				_writer,
 				new Description()
 					.d("A small and customisable web server for publishing a directory tree")
@@ -321,6 +321,58 @@ public class ArgumentHelpTest
 				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
 				+ "\n";
 			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	@Test
+	public void optionalArgumentEmptyStringHelp()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		SScreenWriter sWriter = Publisher.publish(SScreenWriter.class, ScreenWriter.class);
+		CommandLineParser p =
+			new CommandLineParser(
+				ArgumentHelpTest.class,
+				sWriter.createForTesting(new PrintStream(os), 100),
+				new Description().d("Description")
+			);
+		p.add(String.class, new Argument<String>("TYPE") {{
+			optional("");
+			description("Description for TYPE.");
+		}});
+		TestUtil.replaceExitHandler(p);
+		
+		try {
+			p.parse(
+				new String[] { "--help", "all" }
+			);
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'args']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar ARGS\n"
+				+ "\n"
+				+ "Description:\n"
+				+ "    Description\n"
+				+ "\n"
+				+ "ARGS:\n"
+				+ "    TYPE\n"
+				+ "        Description for TYPE. Argument is optional.\n"
+				+ "\n"
+				+ "Examples:\n"
+				+ "    java -jar cmd-parser.jar -? all\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "\n";
+			assertEquals(os.toString(), hereDoc);
 			return;
 		}
 		fail("Should throw ExitException.");
