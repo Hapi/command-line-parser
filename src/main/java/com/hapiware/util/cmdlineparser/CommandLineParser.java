@@ -838,7 +838,6 @@ public final class CommandLineParser
 	public void printGlobalOptionsHelp()
 	{
 		_writer.header();
-		printUsage();
 		printGlobalOptions();
 		_writer.footer();
 	}
@@ -846,7 +845,6 @@ public final class CommandLineParser
 	public void printGlobalArgumentsHelp()
 	{
 		_writer.header();
-		printUsage();
 		printGlobalArguments();
 		_writer.footer();
 	}
@@ -950,7 +948,10 @@ public final class CommandLineParser
 		command += _definedArgumentTypes.contains(HelpType.COMMANDS) ? " CMD" : "";
 		command += _definedArgumentTypes.contains(HelpType.COMMAND_OPTIONS) ? " [CMD-OPTS]" : "";
 		command += _definedArgumentTypes.contains(HelpType.COMMAND_ARGUMENTS) ? " CMD-ARGS" : "";
-		command += _definedArgumentTypes.contains(HelpType.ARGUMENTS) ? " ARGS" : "";
+		command +=
+			_definedArgumentTypes.contains(HelpType.ARGUMENTS) ? 
+				(_definedArguments.size() > 0 && !_mandatoryArguments ? " [ARGS]" : " ARGS") 
+				: "";
 		_writer.level1Begin("Usage:");
 		_writer.codeBegin(Level.L1);
 		_writer.codeLine(_javaCommand + helpCommand);
@@ -1087,10 +1088,12 @@ public final class CommandLineParser
 			Argument.Internal<?> argument = argumentEntry.getValue();
 			
 			// Adds argument name.
+			String argumentName =
+				argument.optional() ? "[" + argument.name() + "]" : argument.name();
 			if(isCommand)
-				_writer.level4Begin(argument.name());
+				_writer.level4Begin(argumentName);
 			else
-				_writer.level2Begin(argument.name());
+				_writer.level2Begin(argumentName);
 
 			// Adds description and handles optional arguments and possible default values.
 			boolean isFirstParagraph = true;

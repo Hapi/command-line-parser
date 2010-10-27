@@ -133,20 +133,20 @@ public class ArgumentHelpTest
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
+				+ "    java -jar cmd-parser.jar [OPTS] [ARGS]\n"
 				+ "\n"
 				+ "Description:\n"
 				+ "    A small and customisable web server for publishing a directory tree over (local) net. Web root\n"
 				+ "    directory will be the directory where 'fileweb' was started.\n"
 				+ "\n"
 				+ "ARGS:\n"
-				+ "    PORT\n"
+				+ "    [PORT]\n"
 				+ "        A port number. Argument is optional. Default value is '80'.\n"
 				+ "\n"
 				+ "        Constraints:\n"
 				+ "            * Minimum value is '1'.\n"
 				+ "\n"
-				+ "    NUM_OF_THREADS\n"
+				+ "    [NUM_OF_THREADS]\n"
 				+ "        Maximum number of threads in the thread pool. Argument is optional. Default value is '20'.\n"
 				+ "\n"
 				+ "        Constraints:\n"
@@ -183,7 +183,7 @@ public class ArgumentHelpTest
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
+				+ "    java -jar cmd-parser.jar [OPTS] [ARGS]\n"
 				+ "\n";
 			assertEquals(_os.toString(), hereDoc);
 			return;
@@ -240,7 +240,7 @@ public class ArgumentHelpTest
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
+				+ "    java -jar cmd-parser.jar [OPTS] [ARGS]\n"
 				+ "\n"
 				+ "Description:\n"
 				+ "    A small and customisable web server for publishing a directory tree over (local) net. Web root\n"
@@ -254,13 +254,13 @@ public class ArgumentHelpTest
 				+ "        Logs every step of the process.\n"
 				+ "\n"
 				+ "ARGS:\n"
-				+ "    PORT\n"
+				+ "    [PORT]\n"
 				+ "        A port number. Argument is optional. Default value is '80'.\n"
 				+ "\n"
 				+ "        Constraints:\n"
 				+ "            * Minimum value is '1'.\n"
 				+ "\n"
-				+ "    NUM_OF_THREADS\n"
+				+ "    [NUM_OF_THREADS]\n"
 				+ "        Maximum number of threads in the thread pool. Argument is optional. Default value is '20'.\n"
 				+ "\n"
 				+ "        Constraints:\n"
@@ -296,13 +296,7 @@ public class ArgumentHelpTest
 		catch(ExitException e) {
 			assertEquals(e.exitStatus, 0);
 			String hereDoc =
-				"Usage:\n"
-				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
-				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
-				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
-				+ "\n"
-				+ "OPTS:\n"
+				"OPTS:\n"
 				+ "    -v, --verbose\n"
 				+ "        Prints more verbose output. This option can occur several times.\n"
 				+ "\n"
@@ -331,20 +325,14 @@ public class ArgumentHelpTest
 		catch(ExitException e) {
 			assertEquals(e.exitStatus, 0);
 			String hereDoc =
-				"Usage:\n"
-				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
-				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
-				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
-				+ "\n"
-				+ "ARGS:\n"
-				+ "    PORT\n"
+				"ARGS:\n"
+				+ "    [PORT]\n"
 				+ "        A port number. Argument is optional. Default value is '80'.\n"
 				+ "\n"
 				+ "        Constraints:\n"
 				+ "            * Minimum value is '1'.\n"
 				+ "\n"
-				+ "    NUM_OF_THREADS\n"
+				+ "    [NUM_OF_THREADS]\n"
 				+ "        Maximum number of threads in the thread pool. Argument is optional. Default value is '20'.\n"
 				+ "\n"
 				+ "        Constraints:\n"
@@ -380,9 +368,77 @@ public class ArgumentHelpTest
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
+				+ "    java -jar cmd-parser.jar [OPTS] [ARGS]\n"
 				+ "\n";
 			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	
+	@Test
+	public void twoMandatoryAndOneOptionalArgumentHelp()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		SScreenWriter sWriter = Publisher.publish(SScreenWriter.class, ScreenWriter.class);
+		CommandLineParser p =
+			new CommandLineParser(
+				ArgumentHelpTest.class,
+				sWriter.createForTesting(new PrintStream(os), 100),
+				new Description()
+					.d("Testing two mandatory arguments")
+					.d("and single optional argument.")
+			);
+		p.add(Integer.class, new Argument<Integer>("TYPE") {{
+			description("Description for TYPE.");
+		}});
+		p.add(Integer.class, new Argument<Integer>("ACTION") {{
+			optional(1);
+			description("Description for ACTION.");
+		}});
+		p.add(Integer.class, new Argument<Integer>("LEVEL") {{
+			description("Description for LEVEL.");
+		}});
+		TestUtil.replaceExitHandler(p);
+		
+		try {
+			p.parse(
+				new String[] { "--help", "all" }
+			);
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar ARGS\n"
+				+ "\n"
+				+ "Description:\n"
+				+ "    Testing two mandatory arguments and single optional argument.\n"
+				+ "\n"
+				+ "ARGS:\n"
+				+ "    TYPE\n"
+				+ "        Description for TYPE.\n"
+				+ "\n"
+				+ "    [ACTION]\n"
+				+ "        Description for ACTION. Argument is optional. Default value is '1'.\n"
+				+ "\n"
+				+ "    LEVEL\n"
+				+ "        Description for LEVEL.\n"
+				+ "\n"
+				+ "Examples:\n"
+				+ "    java -jar cmd-parser.jar -? all\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "\n";
+			assertEquals(os.toString(), hereDoc);
 			return;
 		}
 		fail("Should throw ExitException.");
@@ -402,7 +458,9 @@ public class ArgumentHelpTest
 			new CommandLineParser(
 				ArgumentHelpTest.class,
 				sWriter.createForTesting(new PrintStream(os), 100),
-				new Description().d("Description")
+				new Description()
+					.d("Testing two mandatory arguments")
+					.d("and single optional argument.")
 			);
 		p.add(String.class, new Argument<String>("TYPE") {{
 			optional("");
@@ -422,13 +480,13 @@ public class ArgumentHelpTest
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'args']\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar ARGS\n"
+				+ "    java -jar cmd-parser.jar [ARGS]\n"
 				+ "\n"
 				+ "Description:\n"
-				+ "    Description\n"
+				+ "    Testing two mandatory arguments and single optional argument.\n"
 				+ "\n"
 				+ "ARGS:\n"
-				+ "    TYPE\n"
+				+ "    [TYPE]\n"
 				+ "        Description for TYPE. Argument is optional. Default value is an empty string.\n"
 				+ "\n"
 				+ "Examples:\n"
@@ -455,7 +513,9 @@ public class ArgumentHelpTest
 			new CommandLineParser(
 				ArgumentHelpTest.class,
 				sWriter.createForTesting(new PrintStream(os), 100),
-				new Description().d("Description")
+				new Description()
+					.d("Testing two mandatory arguments")
+					.d("and single optional argument.")
 			);
 		p.add(String.class, new Argument<String>("TYPE") {{
 			optional("", false);
@@ -475,13 +535,13 @@ public class ArgumentHelpTest
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'args']\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar ARGS\n"
+				+ "    java -jar cmd-parser.jar [ARGS]\n"
 				+ "\n"
 				+ "Description:\n"
-				+ "    Description\n"
+				+ "    Testing two mandatory arguments and single optional argument.\n"
 				+ "\n"
 				+ "ARGS:\n"
-				+ "    TYPE\n"
+				+ "    [TYPE]\n"
 				+ "        Description for TYPE. Argument is optional.\n"
 				+ "\n"
 				+ "Examples:\n"
@@ -508,7 +568,9 @@ public class ArgumentHelpTest
 			new CommandLineParser(
 				ArgumentHelpTest.class,
 				sWriter.createForTesting(new PrintStream(os), 100),
-				new Description().d("Description")
+				new Description()
+					.d("Testing two mandatory arguments")
+					.d("and single optional argument.")
 			);
 		p.add(Integer.class, new Argument<Integer>("TYPE") {{
 			optional(1, false);
@@ -528,13 +590,13 @@ public class ArgumentHelpTest
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'args']\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar ARGS\n"
+				+ "    java -jar cmd-parser.jar [ARGS]\n"
 				+ "\n"
 				+ "Description:\n"
-				+ "    Description\n"
+				+ "    Testing two mandatory arguments and single optional argument.\n"
 				+ "\n"
 				+ "ARGS:\n"
-				+ "    TYPE\n"
+				+ "    [TYPE]\n"
 				+ "        Description for TYPE. Argument is optional.\n"
 				+ "\n"
 				+ "Examples:\n"

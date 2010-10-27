@@ -427,13 +427,7 @@ public class CommandHelpTest
 		catch(ExitException e) {
 			assertEquals(e.exitStatus, 0);
 			String hereDoc =
-				"Usage:\n"
-				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'cmds' | cmd=CMD]\n"
-				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
-				+ "    java -jar cmd-parser.jar --version\n"
-				+ "    java -jar cmd-parser.jar [OPTS] CMD [CMD-OPTS] CMD-ARGS\n"
-				+ "\n"
-				+ "OPTS:\n"
+				"OPTS:\n"
 				+ "    -v, --verbose\n"
 				+ "        Prints more verbose output. This option can occur several times.\n"
 				+ "\n"
@@ -664,6 +658,81 @@ public class CommandHelpTest
 				+ "    java -jar cmd-parser.jar [OPTS] CMD [CMD-OPTS] CMD-ARGS\n"
 				+ "\n";
 			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	@Test
+	public void twoMandatoryAndOneOptionalCommandArgumentHelp()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		SScreenWriter sWriter = Publisher.publish(SScreenWriter.class, ScreenWriter.class);
+		CommandLineParser p =
+			new CommandLineParser(
+				CommandHelpTest.class,
+				sWriter.createForTesting(new PrintStream(os), 100),
+				new Description()
+					.d("Testing two mandatory arguments")
+					.d("and single optional argument.")
+			);
+		p.add(new Command("do", "Short description for do.") {{
+			description("Description for do command.");
+			add(Integer.class, new Argument<Integer>("TYPE") {{
+				description("Description for TYPE.");
+			}});
+			add(Integer.class, new Argument<Integer>("ACTION") {{
+				optional(1);
+				description("Description for ACTION.");
+			}});
+			add(Integer.class, new Argument<Integer>("LEVEL") {{
+				description("Description for LEVEL.");
+			}});
+		}});
+		TestUtil.replaceExitHandler(p);
+		
+		try {
+			p.parse(
+				new String[] { "--help", "all" }
+			);
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'cmds' | cmd=CMD]\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar CMD CMD-ARGS\n"
+				+ "\n"
+				+ "Description:\n"
+				+ "    Testing two mandatory arguments and single optional argument.\n"
+				+ "\n"
+				+ "CMD:\n"
+				+ "    do TYPE [ACTION] LEVEL\n"
+				+ "        Description for do command.\n"
+				+ "\n"
+				+ "        CMD-ARGS:\n"
+				+ "            TYPE\n"
+				+ "                Description for TYPE.\n"
+				+ "\n"
+				+ "            [ACTION]\n"
+				+ "                Description for ACTION. Argument is optional. Default value is '1'.\n"
+				+ "\n"
+				+ "            LEVEL\n"
+				+ "                Description for LEVEL.\n"
+				+ "\n"
+				+ "Examples:\n"
+				+ "    java -jar cmd-parser.jar -? all\n"
+				+ "    java -jar cmd-parser.jar --help cmd=do\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "\n";
+			assertEquals(os.toString(), hereDoc);
 			return;
 		}
 		fail("Should throw ExitException.");
