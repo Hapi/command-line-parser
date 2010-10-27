@@ -131,6 +131,7 @@ public class ArgumentHelpTest
 			String hereDoc =
 				"Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
 				+ "\n"
@@ -163,6 +164,63 @@ public class ArgumentHelpTest
 	}
 	
 	@Test
+	public void usageHelp()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		try {
+			_parser.parse(
+				new String[] { "--help", "usage" }
+			);
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
+				+ "\n";
+			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	@Test
+	public void examplesHelp()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		try {
+			_parser.parse(
+				new String[] { "--help", "examples" }
+			);
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Examples:\n"
+				+ "    java -jar cmd-parser.jar -? all\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar\n"
+				+ "    java -jar cmd-parser.jar 50001\n"
+				+ "    java -jar cmd-parser.jar 50001 35\n"
+				+ "\n";
+			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	@Test
 	public void completeHelp()
 		throws
 			ConstraintException,
@@ -180,6 +238,7 @@ public class ArgumentHelpTest
 			String hereDoc =
 				"Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
 				+ "\n"
@@ -239,6 +298,7 @@ public class ArgumentHelpTest
 			String hereDoc =
 				"Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
 				+ "\n"
@@ -273,6 +333,7 @@ public class ArgumentHelpTest
 			String hereDoc =
 				"Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
 				+ "\n"
@@ -317,6 +378,7 @@ public class ArgumentHelpTest
 				+ "    \n"
 				+ "Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar [OPTS] ARGS\n"
 				+ "\n";
@@ -358,6 +420,113 @@ public class ArgumentHelpTest
 			String hereDoc =
 				"Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar ARGS\n"
+				+ "\n"
+				+ "Description:\n"
+				+ "    Description\n"
+				+ "\n"
+				+ "ARGS:\n"
+				+ "    TYPE\n"
+				+ "        Description for TYPE. Argument is optional. Default value is an empty string.\n"
+				+ "\n"
+				+ "Examples:\n"
+				+ "    java -jar cmd-parser.jar -? all\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "\n";
+			assertEquals(os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	@Test
+	public void optionalArgumentEmptyStringDefaultValueNotShownHelp()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		SScreenWriter sWriter = Publisher.publish(SScreenWriter.class, ScreenWriter.class);
+		CommandLineParser p =
+			new CommandLineParser(
+				ArgumentHelpTest.class,
+				sWriter.createForTesting(new PrintStream(os), 100),
+				new Description().d("Description")
+			);
+		p.add(String.class, new Argument<String>("TYPE") {{
+			optional("", false);
+			description("Description for TYPE.");
+		}});
+		TestUtil.replaceExitHandler(p);
+		
+		try {
+			p.parse(
+				new String[] { "--help", "all" }
+			);
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar ARGS\n"
+				+ "\n"
+				+ "Description:\n"
+				+ "    Description\n"
+				+ "\n"
+				+ "ARGS:\n"
+				+ "    TYPE\n"
+				+ "        Description for TYPE. Argument is optional.\n"
+				+ "\n"
+				+ "Examples:\n"
+				+ "    java -jar cmd-parser.jar -? all\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "\n";
+			assertEquals(os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	@Test
+	public void optionalArgumentIntegerDefaultValueNotShownHelp()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		SScreenWriter sWriter = Publisher.publish(SScreenWriter.class, ScreenWriter.class);
+		CommandLineParser p =
+			new CommandLineParser(
+				ArgumentHelpTest.class,
+				sWriter.createForTesting(new PrintStream(os), 100),
+				new Description().d("Description")
+			);
+		p.add(Integer.class, new Argument<Integer>("TYPE") {{
+			optional(1, false);
+			description("Description for TYPE.");
+		}});
+		TestUtil.replaceExitHandler(p);
+		
+		try {
+			p.parse(
+				new String[] { "--help", "all" }
+			);
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar ARGS\n"
 				+ "\n"

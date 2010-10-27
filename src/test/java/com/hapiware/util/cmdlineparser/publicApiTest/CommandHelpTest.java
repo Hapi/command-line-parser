@@ -201,6 +201,7 @@ public class CommandHelpTest
 			String hereDoc =
 				"Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'cmds' | cmd=CMD]\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar [OPTS] CMD [CMD-OPTS] CMD-ARGS\n"
 				+ "\n"
@@ -225,6 +226,67 @@ public class CommandHelpTest
 	}
 	
 	@Test
+	public void usageHelp()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		try {
+			_parser.parse(
+				new String[] { "--help", "usage" }
+			);
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'cmds' | cmd=CMD]\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar [OPTS] CMD [CMD-OPTS] CMD-ARGS\n"
+				+ "\n";
+			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	@Test
+	public void examplesHelp()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		try {
+			_parser.parse(
+				new String[] { "--help", "examples" }
+			);
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Examples:\n"
+				+ "    java -jar cmd-parser.jar -? all\n"
+				+ "    java -jar cmd-parser.jar --help cmd=j\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar jobs\n"
+				+ "    java -jar cmd-parser.jar --log l 50001 ^.+\n"
+				+ "    java -jar cmd-parser.jar list 50001 root\n"
+				+ "    java -jar cmd-parser.jar p 50001 ^com\\.hapiware\\..*Worker.*\n"
+				+ "    java -jar cmd-parser.jar set -tJ 50001 ^com\\.hapiware\\..*Worker.* INFO\n"
+				+ "    java -jar cmd-parser.jar set --type 4 50001 .*Test null\n"
+				+ "\n";
+			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	@Test
 	public void completeHelp()
 		throws
 			ConstraintException,
@@ -242,6 +304,7 @@ public class CommandHelpTest
 			String hereDoc =
 				"Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'cmds' | cmd=CMD]\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar [OPTS] CMD [CMD-OPTS] CMD-ARGS\n"
 				+ "\n"
@@ -366,6 +429,7 @@ public class CommandHelpTest
 			String hereDoc =
 				"Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'cmds' | cmd=CMD]\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar [OPTS] CMD [CMD-OPTS] CMD-ARGS\n"
 				+ "\n"
@@ -595,6 +659,7 @@ public class CommandHelpTest
 				+ "    \n"
 				+ "Usage:\n"
 				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'cmds' | cmd=CMD]\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
 				+ "    java -jar cmd-parser.jar --version\n"
 				+ "    java -jar cmd-parser.jar [OPTS] CMD [CMD-OPTS] CMD-ARGS\n"
 				+ "\n";

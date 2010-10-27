@@ -15,7 +15,7 @@ import com.hapiware.util.cmdlineparser.Util;
  * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
  *
  */
-public final class ScreenWriter
+public class ScreenWriter
 	implements
 		Writer
 {

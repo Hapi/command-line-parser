@@ -42,6 +42,8 @@ public final class CommandLineParser
 	private enum HelpType { OPTIONS, ARGUMENTS, COMMANDS, COMMAND_OPTIONS, COMMAND_ARGUMENTS };
 	
 	private static final String COMPLETE_HELP_COMMAND = "all";
+	private static final String USAGE_HELP_COMMAND = "usage";
+	private static final String EXAMPLES_HELP_COMMAND = "examples";
 	private static final String OPTS_HELP_COMMAND = "opts";
 	private static final String CMDS_HELP_COMMAND = "cmds";
 	private static final String CMD_HELP_COMMAND = "cmd=";
@@ -208,13 +210,6 @@ public final class CommandLineParser
 			throw
 				new ConfigurationException("Argument name '" + internal.name() + "' must be unique.");
 
-		
-		if(internal.optional() && !internal.hasDefaultValueForOptional()) {
-			String msg =
-				"When annotations are used then optional arguments must have a default value "
-					+ "('" + internal.name() + "').";
-			throw new ConfigurationException(msg);
-		}
 		
 		for(Constraint<?> constraint : internal.constraints())
 			if(!constraint.typeCheck(argumentType)) {
@@ -609,6 +604,14 @@ public final class CommandLineParser
 				printCompleteHelp();
 				_exitHandler.exit(0);
 			}
+			if(helpCommand.equals(USAGE_HELP_COMMAND)) {
+				printUsageHelp();
+				_exitHandler.exit(0);
+			}
+			if(helpCommand.equals(EXAMPLES_HELP_COMMAND)) {
+				printExamplesHelp();
+				_exitHandler.exit(0);
+			}
 			if(_definedGlobalOptions.size() > 0 && helpCommand.equals(OPTS_HELP_COMMAND)) {
 				printGlobalOptionsHelp();
 				_exitHandler.exit(0);
@@ -802,6 +805,20 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 	
+	public void printUsageHelp()
+	{
+		_writer.header();
+		printUsage();
+		_writer.footer();
+	}
+	
+	public void printExamplesHelp()
+	{
+		_writer.header();
+		printExamples();
+		_writer.footer();
+	}
+	
 	private void printShortHelpWithoutHeaders()
 	{
 		printUsage();
@@ -916,7 +933,9 @@ public final class CommandLineParser
 	
 	private void printUsage()
 	{
-		String helpCommand = " -? | --help ['" + COMPLETE_HELP_COMMAND + "'";
+		String usageExamplesHelpCommand =
+			" -? | --help ['" + USAGE_HELP_COMMAND + "' | '" + EXAMPLES_HELP_COMMAND + "']";
+		String helpCommand = " -? | --help ['" + COMPLETE_HELP_COMMAND + "'"; 
 		helpCommand +=
 			_definedArgumentTypes.contains(HelpType.OPTIONS) ? " | '" + OPTS_HELP_COMMAND + "'" : "";
 		helpCommand +=
@@ -935,6 +954,7 @@ public final class CommandLineParser
 		_writer.level1Begin("Usage:");
 		_writer.codeBegin(Level.L1);
 		_writer.codeLine(_javaCommand + helpCommand);
+		_writer.codeLine(_javaCommand + usageExamplesHelpCommand);
 		_writer.codeLine(_javaCommand + " --version");
 		_writer.codeLine(_javaCommand + command);
 		_writer.codeEnd();

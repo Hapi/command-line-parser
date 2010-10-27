@@ -20,14 +20,14 @@ public class Argument<T>
 	private ElementBase _argument = new ElementBase();
 	private List<Constraint<T>> _constraints = new LinkedList<Constraint<T>>();
 	private boolean _hasEnumConstraint = false;
-	private boolean _optional;
-	private T _defaultForOptional;
+	private boolean _showDefaultValueDescription = true;
+	private T _defaultForOptional = null;
 	
 	private Argument(Argument<T> argument)
 	{
 		_argument = new ElementBase(argument._argument);
-		_optional = argument._optional;
 		_defaultForOptional = argument._defaultForOptional;
+		_showDefaultValueDescription = argument._showDefaultValueDescription;
 		_constraints.addAll(argument._constraints);
 	}
 	
@@ -136,14 +136,19 @@ public class Argument<T>
 	
 	public Argument<T> optional(T defaultValue)
 	{
+		return optional(defaultValue, true);
+	}
+	
+	public Argument<T> optional(T defaultValue, boolean showDefaultValueDescription)
+	{
 		if(defaultValue == null)
 			throw
-				new ConfigurationException(
-					"'defaultValue' for '" + _argument.name() + "' cannot be null."
-				);
+			new ConfigurationException(
+				"'defaultValue' for '" + _argument.name() + "' cannot be null."
+			);
 		
 		_defaultForOptional = defaultValue;
-		_optional = true;
+		_showDefaultValueDescription = showDefaultValueDescription;
 		return this;
 	}
 	
@@ -314,10 +319,6 @@ public class Argument<T>
 		}
 		public boolean optional()
 		{
-			return _outer._optional;
-		}
-		public boolean hasDefaultValueForOptional()
-		{
 			return _outer._defaultForOptional != null;
 		}
 		public String defaultValueAsString()
@@ -326,14 +327,15 @@ public class Argument<T>
 		}
 		public String defaultValueDescription()
 		{
-			if(hasDefaultValueForOptional() && defaultValueAsString().length() > 0)
+			if(optional() && _outer._showDefaultValueDescription)
 				return 
-					new Description()
-						.d("Default value is ")
-						.b(defaultValueAsString())
-						.d(".")
-						.toParagraphs()
-						.get(0);
+					new Description() {{
+						d("Default value is ");
+						if(defaultValueAsString().length() > 0)
+							b(defaultValueAsString()).d(".");
+						else
+							d("an empty string.");
+					}}.toParagraphs().get(0);
 			else
 				return "";
 		}

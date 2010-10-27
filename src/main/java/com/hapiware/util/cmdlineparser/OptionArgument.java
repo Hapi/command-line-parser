@@ -60,6 +60,12 @@ public class OptionArgument<T>
 		return this;
 	}
 	
+	public OptionArgument<T> optional(T defaultValue, boolean showDefaultValueDescription)
+	{
+		super.optional(defaultValue, showDefaultValueDescription);
+		return this;
+	}
+	
 	public OptionArgument<T> constraint(Constraint<T> constraint)
 	{
 		super.constraint(constraint);

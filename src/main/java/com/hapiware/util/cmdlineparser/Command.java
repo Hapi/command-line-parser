@@ -242,13 +242,6 @@ public class Command
 						+ _command.name() +"' must be unique."
 				);
 
-		if(internal.optional() && !internal.hasDefaultValueForOptional()) {
-			String msg =
-				"When annotations are used then optional arguments must have a default value "
-					+ "(command '" + _command.name() + "', argument '" + internal.name() + "').";
-			throw new ConfigurationException(msg);
-		}
-		
 		for(Constraint<?> constraint : internal.constraints())
 			if(!constraint.typeCheck(argumentType)) {
 				String msg =
