@@ -38,12 +38,12 @@ public class CommandHelpTest
 
 	private interface SScreenWriter
 	{
-		public ScreenWriter createForTesting(PrintStream stream, int screenWidth);
+		public ScreenWriter createForTesting(PrintStream stream);
 	}
 
 	static {
 		SScreenWriter sWriter = Publisher.publish(SScreenWriter.class, ScreenWriter.class);
-		_writer = sWriter.createForTesting(new PrintStream(_os), 100);
+		_writer = sWriter.createForTesting(new PrintStream(_os));
 	}
 	
 	@AfterMethod
@@ -676,7 +676,7 @@ public class CommandHelpTest
 		CommandLineParser p =
 			new CommandLineParser(
 				CommandHelpTest.class,
-				sWriter.createForTesting(new PrintStream(os), 100),
+				sWriter.createForTesting(new PrintStream(os)),
 				new Description()
 					.d("Testing two mandatory arguments")
 					.d("and single optional argument.")

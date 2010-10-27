@@ -6,11 +6,23 @@ public class GitHubWriter
 	implements
 		Writer
 {
-	private final static PrintStream STREAM = System.out;
+	private final PrintStream _printStream;
 
+	
+	private GitHubWriter(PrintStream printStream)
+	{
+		_printStream = printStream;
+	}
+	
+	@SuppressWarnings("unused")
+	private static GitHubWriter createForTesting(PrintStream stream)
+	{
+		return new GitHubWriter(stream);
+	}
+	
 	public GitHubWriter()
 	{
-		// Does nothing.
+		_printStream = System.out;
 	}
 	
 	public void header()
@@ -20,7 +32,7 @@ public class GitHubWriter
 
 	public void level1Begin(String text)
 	{
-		STREAM.println("# " + text);
+		_printStream.println("# " + text);
 	}
 
 	public void level1End()
@@ -30,7 +42,7 @@ public class GitHubWriter
 
 	public void level2Begin(String text)
 	{
-		STREAM.println("## " + text);
+		_printStream.println("## " + text);
 	}
 
 	public void level2End()
@@ -40,7 +52,7 @@ public class GitHubWriter
 
 	public void level3Begin(String text)
 	{
-		STREAM.println("### " + text);
+		_printStream.println("### " + text);
 	}
 
 	public void level3End()
@@ -50,7 +62,7 @@ public class GitHubWriter
 
 	public void level4Begin(String text)
 	{
-		STREAM.println("#### " + text);
+		_printStream.println("#### " + text);
 	}
 
 	public void level4End()
@@ -60,7 +72,7 @@ public class GitHubWriter
 
 	public void level5Begin(String text)
 	{
-		STREAM.println("##### " + text);
+		_printStream.println("##### " + text);
 	}
 
 	public void level5End()
@@ -70,13 +82,13 @@ public class GitHubWriter
 
 	public void paragraph(Level headingLevel, String text)
 	{
-		STREAM.println(text);
-		STREAM.println();
+		_printStream.println(text);
+		_printStream.println();
 	}
 
 	public void line(Level headingLevel, String text)
 	{
-		STREAM.println(text);
+		_printStream.println(text);
 	}
 
 	public void listBegin(Level headingLevel)
@@ -86,12 +98,12 @@ public class GitHubWriter
 
 	public void listItem(String text)
 	{
-		STREAM.println("* " + text);
+		_printStream.println("* " + text);
 	}
 
 	public void listEnd()
 	{
-		STREAM.println();
+		_printStream.println();
 	}
 
 	public void codeBegin(Level headingLevel)
@@ -101,12 +113,12 @@ public class GitHubWriter
 
 	public void codeLine(String code)
 	{
-		STREAM.println("\t" + code);
+		_printStream.println("\t" + code);
 	}
 
 	public void codeEnd()
 	{
-		STREAM.println();
+		_printStream.println();
 	}
 
 	public String strongBegin()

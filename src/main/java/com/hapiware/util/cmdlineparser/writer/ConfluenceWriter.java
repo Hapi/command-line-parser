@@ -12,17 +12,29 @@ public class ConfluenceWriter
 	implements
 		Writer
 {
-	private final static PrintStream STREAM = System.out;
+	private final PrintStream _printStream;
+
+	
+	private ConfluenceWriter(PrintStream printStream)
+	{
+		_printStream = printStream;
+	}
+	
+	@SuppressWarnings("unused")
+	private static ConfluenceWriter createForTesting(PrintStream stream)
+	{
+		return new ConfluenceWriter(stream);
+	}
 	
 	
 	public ConfluenceWriter()
 	{
-		// Does nothing.
+		_printStream = System.out;
 	}
 
 	public void level1Begin(String text)
 	{
-		STREAM.println("h1. " + text);
+		_printStream.println("h1. " + text);
 	}
 
 	public void level1End()
@@ -32,7 +44,7 @@ public class ConfluenceWriter
 
 	public void level2Begin(String text)
 	{
-		STREAM.println("h2. " + text);
+		_printStream.println("h2. " + text);
 	}
 
 	public void level2End()
@@ -42,7 +54,7 @@ public class ConfluenceWriter
 
 	public void level3Begin(String text)
 	{
-		STREAM.println("h3. " + text);
+		_printStream.println("h3. " + text);
 	}
 
 	public void level3End()
@@ -52,7 +64,7 @@ public class ConfluenceWriter
 
 	public void level4Begin(String text)
 	{
-		STREAM.println("h4. " + text);
+		_printStream.println("h4. " + text);
 	}
 
 	public void level4End()
@@ -62,7 +74,7 @@ public class ConfluenceWriter
 
 	public void level5Begin(String text)
 	{
-		STREAM.println("h5. " + text);
+		_printStream.println("h5. " + text);
 	}
 
 	public void level5End()
@@ -72,13 +84,13 @@ public class ConfluenceWriter
 
 	public void line(Level level, String text)
 	{
-		STREAM.println(text + " \\\\");
+		_printStream.println(text + " \\\\");
 	}
 
 	public void paragraph(Level level, String text)
 	{
-		STREAM.println(text);
-		STREAM.println();
+		_printStream.println(text);
+		_printStream.println();
 	}
 
 	public String strongBegin()
@@ -98,28 +110,28 @@ public class ConfluenceWriter
 
 	public void listItem(String text)
 	{
-		STREAM.println("* " + text);
+		_printStream.println("* " + text);
 	}
 
 	public void listEnd()
 	{
-		STREAM.println();
+		_printStream.println();
 	}
 
 	public void codeBegin(Level level)
 	{
-		STREAM.println("{code}");
+		_printStream.println("{code}");
 	}
 	
 	public void codeLine(String code)
 	{
-		STREAM.println(code);
+		_printStream.println(code);
 	}
 	
 	public void codeEnd()
 	{
-		STREAM.println("{code}");
-		STREAM.println();
+		_printStream.println("{code}");
+		_printStream.println();
 	}
 	
 	public void footer()

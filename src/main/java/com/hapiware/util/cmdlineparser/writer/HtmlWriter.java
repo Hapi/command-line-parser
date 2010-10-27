@@ -96,7 +96,7 @@ public class HtmlWriter
 
 	public void line(Level level, String text)
 	{
-		println(tab(1) + text);
+		println(tab(1) + "<p>" + text + "</p>");
 	}
 
 	public void paragraph(Level level, String text)

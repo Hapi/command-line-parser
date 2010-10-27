@@ -12,17 +12,28 @@ public class WikidotWriter
 	implements
 		Writer
 {
-	private final static PrintStream STREAM = System.out;
+	private final PrintStream _printStream;
 	
+	
+	private WikidotWriter(PrintStream printStream)
+	{
+		_printStream = printStream;
+	}
+	
+	@SuppressWarnings("unused")
+	private static WikidotWriter createForTesting(PrintStream stream)
+	{
+		return new WikidotWriter(stream);
+	}
 	
 	public WikidotWriter()
 	{
-		// Does nothing.
+		_printStream = System.out;
 	}
 
 	public void level1Begin(String text)
 	{
-		STREAM.println("+ " + text);
+		_printStream.println("+ " + text);
 	}
 
 	public void level1End()
@@ -32,7 +43,7 @@ public class WikidotWriter
 
 	public void level2Begin(String text)
 	{
-		STREAM.println("++ " + text);
+		_printStream.println("++ " + text);
 	}
 
 	public void level2End()
@@ -42,7 +53,7 @@ public class WikidotWriter
 
 	public void level3Begin(String text)
 	{
-		STREAM.println("+++ " + text);
+		_printStream.println("+++ " + text);
 	}
 
 	public void level3End()
@@ -52,7 +63,7 @@ public class WikidotWriter
 
 	public void level4Begin(String text)
 	{
-		STREAM.println("++++ " + text);
+		_printStream.println("++++ " + text);
 	}
 
 	public void level4End()
@@ -62,7 +73,7 @@ public class WikidotWriter
 
 	public void level5Begin(String text)
 	{
-		STREAM.println("+++++ " + text);
+		_printStream.println("+++++ " + text);
 	}
 
 	public void level5End()
@@ -72,13 +83,13 @@ public class WikidotWriter
 
 	public void line(Level level, String text)
 	{
-		STREAM.println(text + " _");
+		_printStream.println(text + " _");
 	}
 
 	public void paragraph(Level level, String text)
 	{
-		STREAM.println(text);
-		STREAM.println();
+		_printStream.println(text);
+		_printStream.println();
 	}
 
 	public String strongBegin()
@@ -98,28 +109,28 @@ public class WikidotWriter
 
 	public void listItem(String text)
 	{
-		STREAM.println("* " + text);
+		_printStream.println("* " + text);
 	}
 
 	public void listEnd()
 	{
-		STREAM.println();
+		_printStream.println();
 	}
 
 	public void codeBegin(Level level)
 	{
-		STREAM.println("[[code]]");
+		_printStream.println("[[code]]");
 	}
 	
 	public void codeLine(String code)
 	{
-		STREAM.println(code);
+		_printStream.println(code);
 	}
 	
 	public void codeEnd()
 	{
-		STREAM.println("[[/code]]");
-		STREAM.println();
+		_printStream.println("[[/code]]");
+		_printStream.println();
 	}
 	
 	public void footer()

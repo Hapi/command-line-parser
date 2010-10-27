@@ -34,18 +34,18 @@ public class ScreenWriter
 	/**
 	 * This constructor is for testing purpouses only.
 	 * 
-	 * @see #createForTesting(PrintStream, int)
+	 * @see #createForTesting(PrintStream)
 	 */
-	private ScreenWriter(PrintStream stream, int screenWidth)
+	private ScreenWriter(PrintStream stream)
 	{
 		_printStream = stream;
-		_screenWidth = screenWidth;
+		_screenWidth = DEFAULT_SCREEN_WIDTH;
 	}
 	
 	@SuppressWarnings("unused")
-	private static ScreenWriter createForTesting(PrintStream stream, int screenWidth)
+	private static ScreenWriter createForTesting(PrintStream stream)
 	{
-		return new ScreenWriter(stream, screenWidth);
+		return new ScreenWriter(stream);
 	}
 	
 	public ScreenWriter()

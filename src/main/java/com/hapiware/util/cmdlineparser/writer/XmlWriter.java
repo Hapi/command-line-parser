@@ -103,7 +103,7 @@ public class XmlWriter
 
 	public void line(Level level, String text)
 	{
-		println(tab(level) + text);
+		println(tab(level) + "<line>" + text + "</line>");
 	}
 
 	public void paragraph(Level level, String text)
