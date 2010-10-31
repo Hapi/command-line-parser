@@ -15,12 +15,23 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.hapiware.util.cmdlineparser.annotation.Id;
 import com.hapiware.util.cmdlineparser.constraint.Constraint;
 import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
 import com.hapiware.util.cmdlineparser.constraint.Enumeration;
+import com.hapiware.util.cmdlineparser.constraint.Length;
+import com.hapiware.util.cmdlineparser.constraint.MaxLength;
+import com.hapiware.util.cmdlineparser.constraint.MaxValue;
+import com.hapiware.util.cmdlineparser.constraint.MinLength;
+import com.hapiware.util.cmdlineparser.constraint.MinValue;
+import com.hapiware.util.cmdlineparser.writer.ConfluenceWriter;
+import com.hapiware.util.cmdlineparser.writer.GitHubWriter;
+import com.hapiware.util.cmdlineparser.writer.HtmlWriter;
 import com.hapiware.util.cmdlineparser.writer.ScreenWriter;
+import com.hapiware.util.cmdlineparser.writer.WikidotWriter;
 import com.hapiware.util.cmdlineparser.writer.Writer;
 import com.hapiware.util.cmdlineparser.writer.Writer.Level;
+import com.hapiware.util.cmdlineparser.writer.XmlWriter;
 
 
 /**
@@ -299,6 +310,47 @@ import com.hapiware.util.cmdlineparser.writer.Writer.Level;
  * }
  * </pre>
  * 
+ * 
+ * 
+ * <h3><a name="cmdlineparser-parsing-command-line">Parsing command line</a></h3>
+ * Parsing is done one of the {@code parse} commands:
+ * 	<ul>
+ * 		<li>{@link #parse(String[])}</li>
+ * 		<li>{@link #parse(Class, String[])}</li>
+ * 		<li>{@link #parse(Object, String[])}</li>
+ * 		<li>{@link #parsec(String[])}</li>
+ * 		<li>{@link #parsec(Class, String[])}</li>
+ * 		<li>{@link #parsec(Object, String[])}</li>
+ * 		<li>{@link #parsech(String[])}</li>
+ * 		<li>{@link #parsech(Class, String[])}</li>
+ * 		<li>{@link #parsech(Object, String[])}</li>
+ * 	</ul>
+ * Parse methods try to parse given arguments according to the configuration and throw
+ * an exception if the parsing fails. Otherwise the execution of the code continues normally.
+ * The difference between {@code parse()}, {@code parsec()} and {@code parsech()} methods is how
+ * they handle exceptions and help messages. {@code parse()} methods throw an exception if
+ * something goes wrong and it is the programmer's responsibility to show error messages and help
+ * texts. To make the usage of {@code CommandLineParser} much easier {@code parsec()} and
+ * {@code parsech()} methods were introduced. Both methods catch all the exceptions and writes
+ * error messages using the current {@link Writer}. They also will call {@link System#exit(int)}
+ * automatically as a part of the exception handling.The difference between {@code parsec()} and
+ * {@code parsech()} methods is that {@code parsech()} writes help texts in addition to error
+ * messages whereas {@code parsec()} does not.
+ * <p>
+ * The next example uses {@link #parsec(String[])} method and is a continuation to an example
+ * introduced in <a href="#cmdlineparser-using-arguments">Using arguments</a>:
+ * <pre>
+ * public static void main(String[] args)
+ * {
+ *     _clp.parsec(args);
+ *     if(_digest.length() == 0)
+ *         createDigest(_algorithm, _iter, _input);
+ *     else
+ *         verifyDigest(_algorithm, _iter, _input, _digest);
+ * }
+ * </pre>
+ * If the command line cannot be parsed properly {@link #parsec(String[])} writes the error message
+ * and then exits using {@link System#exit(int)}. Otherwise the code continues normally.
  * 
  * 
  * <h3><a name="cmdlineparser-coding-style">Coding style</a></h3>
@@ -1119,7 +1171,7 @@ public final class CommandLineParser
 		return _writer;
 	}
 	
-	
+	// TODO: Add documentation
 	public void parse(String[] args)
 		throws
 			ConstraintException,
