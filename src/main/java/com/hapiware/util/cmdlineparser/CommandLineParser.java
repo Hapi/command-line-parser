@@ -11,8 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.hapiware.util.cmdlineparser.constraint.Constraint;
@@ -24,15 +24,581 @@ import com.hapiware.util.cmdlineparser.writer.Writer.Level;
 
 
 /**
- * System property {@code writerclass} overrides the hard coded {@link Writer}. {@code writerclass}
- * must have a full class name implementing {@link Writer} interface and have the default constructor. 
- * {@code writerclass} also recognizes a special format to use internal writer implementations.
- * Internal writers are recognized by their class name prefixes (i.e. Screen, Html, Xml, Wikidot,
- * Confluence, GitHub). The naming convention is that if the package name is
- * {@code com.hapiware.util.cmdlineparser.writer} and the implementation class name ends with word
- * {@code Writer} then the part before word {@code Writer} can be used as a parameter for
- * {@code writer.class}.
+ * {@code CommandLineParser} is an utility class for parsing command line. In addition to just
+ * parse command line arguments {@code CommandLineParser} also has
+ * <a href="#cmdlineparser-built-in-command-line-options">a built-in help system</a> which
+ * handles basic automatically command line arguments like {@code -?} or {@code --help}. Parsed
+ * command line arguments can be directed to member fields by
+ * <a href="#cmdlineparser-annotations">annotations</a>. Also, arguments can have constraints like
+ * minValue, maxValue or value ranges etc. and for defined constraints informative help text
+ * fragments are generated automatically (for more information see
+ * <a href="#cmdlineparser-configuration-elements">Configuration elements</a>).
+ * <p>
+ * All the help texts can be generated to
+ * <a href="#cmdlineparser-writer">HTML and XML as well as to various wiki formats</a> just by
+ * defining a system property (see <a href="#cmdlineparser-system-properties">System properties</a>).
  * 
+ * 
+ * 
+ * <h3><a name="cmdlineparser-requirements">Requirements</a></h3>
+ * <h4>{@code MANIFEST.MF} file</h4>
+ * {@code MANIFEST.MF} file <u>must have the following items</u>:
+ * 	<ul>
+ * 		<li>
+ * 			{@code Implementation-Title:}, which is used for creating usage help texts. This
+ * 			must contain the final name for the .jar file without the .jar extension. For
+ * 			example, if the jar file is {@code utility.jar} then {@code Implementation-Title:}
+ * 			must be {@code utility}.
+ *		</li>
+ * 		<li>
+ * 			{@code Implementation-Version:}, which is used for (built-in) {@code --version}
+ * 			option.
+ * 		</li>
+ * 	</ul>
+ * 
+ * If either of the items is missing a {@link ConfigurationException} is thrown with a descriptive
+ * error message.
+ * 
+ * Also, {@code MANIFEST.MF} file must have {@code Main-Class:} field defined.
+ * 
+ * <h4><a name="cmdlineparser-packaging">Packaging</a></h4>
+ * All the classes in the {@code com.hapiware.util.cmdlineparser} and it's sub-packages must be
+ * included to the final jar file. If you are a Maven user see chapter
+ * <a href="#cmdlineparser-for-maven-users">For Maven users</a>.
+ * 
+ * 
+ * 
+ * <h3><a name="cmdlineparser-command-line-structure">Command line structure</a></h3>
+ * {@code CommandLineParser} can be configured either to use arguments (like {@code ls} utility)
+ * or to handle several commands (like {@code git}).
+ * 
+ * <h4><a name="cmdlineparser-using-arguments">Using arguments</a></h4>
+ * If {@code CommandLineParser} is configured to use arguments the general form is:
+ * <pre>
+ * 	java -jar utilname.jar OPTS ARGS
+ * </pre>
+ * 
+ * where:
+ * 	<ul>
+ * 		<li>
+ * 			{@code OPTS} are options for the utility like {@code -v}, {@code --type}, etc.
+ * 		</li>
+ * 		<li>
+ * 			{@code ARGS} are mandatory and/or optional arguments for the utility like {@code 12},
+ * 			{@code ^.+Writer$}, etc.
+ * 		</li>
+ * 	</ul>
+ * 
+ * Notice that {@code CommandLineParser} is able to handle the situation where some of the options
+ * are given after the arguments. Thus the general form for the arguments confguration is:
+ *
+ * <pre>
+ * 	java -jar utilname.jar OPTS ARGS OPTS
+ * </pre>
+ * 
+ * The order options and arguments are defined (using various {@code add()} methods) is irrelevant.
+ * 
+ * Here is an example of argument definition:
+ * <pre>
+ * private static CommandLineParser _clp;
+ * 
+ * {@code @Id}("ALGORITHM") private static String _algorithm;
+ * {@code @Id}("ITER") private static long _iter;
+ * {@code @Id}("INPUT") private static String _input;
+ * {@code @Id}("DIGEST") private static String _digest;
+ * 
+ * static {
+ *     _clp =
+ *         new CommandLineParser(
+ *             Hash.class,
+ *             new Description()
+ *                 .b("hash").d(" is an utility to create and check hashed strings.")
+ *         );
+ *     _clp.add(String.class, new Argument<String>("ALGORITHM") {{
+ *         description("An algorithm to be used for hashing. Case is irrelevant.");
+ *         constraint(new Enumeration<String>() {{
+ *             valueIgnoreCase("sha", " SHA algorithm. Same as SHA-1.");
+ *             valueIgnoreCase("sha-1", "SHA-1 algorithm. Same as SHA.");
+ *             valueIgnoreCase("md5", "MD5 algorithm.");
+ *         }});
+ *     }});
+ *     _clp.add(Long.class, new Argument<Long>("ITER") {{
+ *         description("Number of iterations.");
+ *         minValue(1l);
+ *     }});
+ *     _clp.add(String.class, new Argument<String>("INPUT") {{
+ *         description("A string to be salt-hashed.");
+ *     }});
+ *     _clp.add(String.class, new Argument<String>("DIGEST") {{
+ *         description("A digest to be tested if defined.");
+ *         optional("", false);
+ *     }});
+ *     _clp.addExampleArguments("sha 1000 password");
+ *     _clp.addExampleArguments("sha 1000 password D16soUrQ0lPaJMO2yy7aN7RZnI6Nx1Zj");
+ * }
+ * </pre>
+ * 
+ * <h4><a name="cmdlineparser-using-commands">Using commands</a></h4>
+ * If {@code CommandLineParser} is configured to use commands the general form is:
+ * <pre>
+ * 	java -jar utilname.jar OPTS CMD CMD-OPTS CMD-ARGS
+ * </pre>
+ * 
+ * where:
+ * 	<ul>
+ * 		<li>
+ * 			{@code OPTS} are global options for the utility like {@code -v}, {@code --log}, etc.
+ * 			Notice the difference between {@code OPTS} and {@code CMD-OPTS}.
+ * 		</li>
+ * 		<li>
+ * 			{@code CMD} is a command name like {@code set}, {@code commit}, {@code list}, etc.
+ * 		</li>
+ * 		<li>
+ * 			{@code CMD-OPTS} are options for the command like {@code -n}, {@code --type}, etc.
+ * 			Notice that each defined command can have its own specific command options. Notice
+ * 			also the difference between {@code CMD-OPTS} and {@code OPTS}.
+ * 		</li>
+ * 		<li>
+ * 			{@code CMD-ARGS} are mandatory and/or optional arguments for the command like
+ * 			{@code 12},	{@code ^.+Writer$}, etc. {@code CMD-ARGS} are command specific.
+ * 		</li>
+ * 	</ul>
+ * 
+ * {@code CommandLineParser} is able to handle the situation where some of the global options and
+ * command options are given after the command arguments. Thus the general form for the command is:
+ *
+ * <pre>
+ * 	java -jar utilname.jar OPTS CMD CMD-OPTS CMD-ARGS CMD-OPTS OPTS
+ * </pre>
+ * 
+ * Notice here that the order between latter {@code CMD-OPTS} and {@code OPTS} is significant.
+ * 
+ * Here is an example of how an utility with multiple commands can be defined:
+ * <pre>
+ * private static CommandLineParser _clp;
+ * static {
+ *     _clp =
+ *         new CommandLineParser(
+ *             CommandHelpTest.class,
+ *             _writer,
+ *             new Description()
+ *                 .d("Lists and sets the logging level of Java Loggers")
+ *                 .d("(java.util.logging.Logger) on the run.")
+ *                 .d("Optionally log4j is also supported but it requires")
+ *                 .d("java.util.logging.LoggingMXBean interface to be implemented for log4j.")
+ *                 .d("See http://www.hapiware.com/jmx-tools.")
+ *         );
+ *     _clp.add(new Option("v") {{
+ *         alternatives("verbose");
+ *         multiple();
+ *         description("Prints more verbose output.");
+ *     }});
+ *     _clp.add(new Option("l") {{
+ *         alternatives("log");
+ *         description("Logs every step of the process.");
+ *     }});
+ *     
+ *     _clp.add(
+ *         new Command(
+ *             "j",
+ *             "Shows running JVMs (jobs).",
+ *             new CommandExecutor() {
+ *                 public void execute(
+ *                     Data command,
+ *                     List<Option.Data> globalOptions)
+ *                 {
+ *                     // Show jobs...
+ *                 }
+ *             }
+ *         ) {{
+ *             alternatives("jobs");
+ *             d("Shows PIDs and names of running JVMs (jobs). PID starting with");
+ *             d("an asterisk (*) means that JMX agent is not runnig on that JVM.");
+ *             d("Start the target JVM with -Dcom.sun.management.jmxremote or");
+ *             d("if you are running JVM 1.6 or later use startjmx service.");
+ *     }});
+ *     
+ *     final Option optionT =
+ *         new Option("t") {{
+ *             alternatives("type");
+ *             description("Type of the logger (i.e. Java logger or log4j logger).");
+ *             set(String.class, new OptionArgument<String>() {{
+ *                 constraint(new Enumeration<String>() {{
+ *                     value("4", "stands for log4j logger.");
+ *                     valueIgnoreCase("j", "stands for Java logger.");
+ *                 }});
+ *             }});
+ *         }};
+ *     
+ *     _clp.add(
+ *         new Command(
+ *             "l",
+ *             "Lists current logging levels.",
+ *             new CommandExecutor() {
+ *                 public void execute(
+ *                     Data command,
+ *                     List<Option.Data> globalOptions)
+ *                 {
+ *                     // List logging levels...
+ *                 }
+ *             }
+ *         ) {{
+ *             alternatives("list");
+ *             add(optionT);
+ *             add(Integer.class, new Argument<Integer>("PID") {{
+ *                 description("Process id of the running JVM.");
+ *             }});
+ *             add(Integer.class, new Argument<Integer>("PATTERN") {{
+ *                 d("Java regular expression for matching logger names.");
+ *                 d("A special value ").b("root").d(" lists only the root logger(s).");
+ *             }});
+ *             d("Lists current logging levels for all loggers matching PATTERN");
+ *             d("in a JVM process identified by PID.");
+ *             d("Logger type is identified by a prefix. ").b("(J)")
+ *                 .d(" for Java loggers and ").b("(4)").d(" for log4j loggers.");
+ *     }});
+ *     
+ *     _clp.add(
+ *         new Command(
+ *             "s",
+ *             "Sets a new logging level.",
+ *             new CommandExecutor() {
+ *                 public void execute(
+ *                     Data command,
+ *                     List<Option.Data> globalOptions)
+ *                 {
+ *                     // Set new logging level...
+ *                 }
+ *             }
+ *         ) {{
+ *             alternatives("set");
+ *             add(optionT);
+ *             add(Integer.class, new Argument<Integer>("PID") {{
+ *                 description("Process id of the running JVM.");
+ *             }});
+ *             add(Integer.class, new Argument<Integer>("PATTERN") {{
+ *                 d("Java regular expression for matching logger names.");
+ *                 d("A special value ").b("root").d(" sets only the root logger(s).");
+ *             }});
+ *             add(String.class, new Argument<String>("LEVEL") {{
+ *                 d("Represents a new logging level for the logger.");
+ *                 d("See logger documentation for further help.");
+ *                 p();
+ *                 d("LEVEL accepts a special value ").b("null").d(" to set the logging level");
+ *                 d("to follow a parent logger's logging level.");
+ *             }});
+ *             d("Sets a new logging level LEVEL for all loggers matching PATTERN");
+ *             d("in a JVM process identified by PID.");
+ *     }});
+ *     
+ *     _clp.addExampleArguments("jobs");
+ *     _clp.addExampleArguments("--log l 50001 ^.+");
+ *     _clp.addExampleArguments("list 50001 root");
+ *     _clp.addExampleArguments("set -tJ 50001 ^com\\.hapiware\\..*Worker.* INFO");
+ *     _clp.addExampleArguments("set --type 4 50001 .*Test null");
+ * }
+ * </pre>
+ * 
+ * 
+ * 
+ * <h3><a name="cmdlineparser-coding-style">Coding style</a></h3>
+ * Argument and command definitions can be defined with two different ways; using double-brace
+ * syntax or by chaining commands. They can be mixed if wanted.
+ * 
+ * The examples above uses mainly the double-brace syntax and here is a copied code fragment: 
+ * <pre>
+ *     _clp.add(String.class, new Argument<String>("ALGORITHM") {{
+ *         description("An algorithm to be used for hashing. Case is irrelevant.");
+ *         constraint(new Enumeration<String>() {{
+ *             valueIgnoreCase("sha", " SHA algorithm. Same as SHA-1.");
+ *             valueIgnoreCase("sha-1", "SHA-1 algorithm. Same as SHA.");
+ *             valueIgnoreCase("md5", "MD5 algorithm.");
+ *         }});
+ *     }});
+ * </pre>
+ * 
+ * Notice that {@code description(String)} method belongs to {@code Argument} class whereas
+ * {@code valueIgnoreCase(T, String)} belongs to {@code Enumeration} class. The same example
+ * could have been written like this by using method chaining:
+ * <pre>
+ *     _clp.add(
+ *         String.class,
+ *         new Argument<String>("ALGORITHM")
+ *             .description("An algorithm to be used for hashing. Case is irrelevant.")
+ *             .constraint(
+ *                 new Enumeration<String>()
+ *                     .valueIgnoreCase("sha", " SHA algorithm. Same as SHA-1.")
+ *                     .valueIgnoreCase("sha-1", "SHA-1 algorithm. Same as SHA.")
+ *                     .valueIgnoreCase("md5", "MD5 algorithm.")
+ *             )
+ *     );
+ * </pre>
+ * 
+ * 
+ * 
+ * <h3><a name="cmdlineparser-built-in-command-line-options">Built-in command line options</a></h3>
+ * {@code CommandLineParser} has two built-in options:
+ * 	<ul>
+ * 		<li>{@code -?}, {@code --help} for showing help.</li>
+ * 		<li>{@code --version} for asking the version number of the utility</li>
+ * 	</ul>
+ * 
+ *  Help option has several subcommands	depending is {@code CommandLineParser} defined to use
+ *  arguments or commands. For argument definition the help commands are:
+ * 	<ul>
+ * 		<li>{@code --help all} for full help.</li>
+ * 		<li>{@code --help usage} for showing just the usage synopsis.</li>
+ * 		<li>{@code --help examples} for showing examples.</li>
+ * 		<li>{@code --help opts} for showing just the options.</li>
+ * 		<li>{@code --help args} for showing just the argumets</li>
+ * 	</ul>
+ *  
+ * For command definition the help commands are:
+ * 	<ul>
+ * 		<li>{@code --help all} for full help.</li>
+ * 		<li>{@code --help usage} for showing just the usage synopsis.</li>
+ * 		<li>{@code --help examples} for showing examples.</li>
+ * 		<li>{@code --help opts} for showing just the options.</li>
+ * 		<li>{@code --help cmds} lists all the commands and their short descriptions.</li>
+ * 		<li>{@code --help cmd=CMD} shows a full help for the single command {@code CMD}.</li>
+ * 	</ul>
+ * 
+ * Here is an example help command call:
+ * <pre>
+ * 	java -jar utility.jar --help all
+ * </pre>
+ * 
+ * Help commands are available automatically depending on only how the {@code CommandLineParser}
+ * has been configured (i.e. no extra programming is needed).
+ * 
+ * 
+ * 
+ * <h3><a name="cmdlineparser-configuration-elements">Configuration elements</a></h3>
+ * {@code CommandLineParser} is configured using the following elements:
+ * 	<ul>
+ * 		<li>
+ * 			<b>Argument</b> is a bare argument for the utility or the command. Arguments are type
+ * 			checked in compile and run time. An argument can be optional. For more information see
+ * 			{@link #add(Class, Argument)}, {@link Command#add(Class, Argument)} and a chapter
+ * 			<a href="#cmdlineparser-using-arguments">Using arguments</a>.
+ * 		</li>
+ * 		<li>
+ * 			<b>Option</b> is an optional command line argument which is identified either by
+ * 			preceding minus (-) or minus-minus (--). For more information see {@link #add(Option)}
+ * 			and {@link Command#add(Option)}.
+ * 		</li>
+ * 		<li>
+ * 			<b>Option argument</b> is an argument for the option when needed. Option arguments are
+ * 			also type checked in compile and run time. For more information see
+ * 			{@link Option#set(Class, OptionArgument)}.
+ * 		</li>
+ * 		<li>
+ * 			<b>Command</b> elements are used for defining multiple tasks for the same command line
+ * 			utility. For more information see {@link #add(Command)} and a chapter
+ * 			<a href="#cmdlineparser-using-commands">Using commands</a>.
+ * 		</li>
+ * 		<li>
+ * 			<b>Description</b> element is used to create help texts. The idea to use a separate
+ * 			class for creating help texts instead of using {@code String} is flexibility. With
+ * 			description elements a programmer does not need to care about screen width or other
+ * 			formatting aspects. For more information see {@link Description}.
+ * 		</li>
+ * 		<li>
+ * 			<b>Constraint</b> elements can be used to set constraints for arguments (or option
+ * 			arguments). Constraints	also will create help text fragments automatically. There are
+ * 			several built-in constraints but own constraints can be created by implementing
+ * 			{@link Constraint} interface. Built in constraints are:
+ * 			<ul>
+ * 				<li>{@link Length}</li>
+ * 				<li>{@link MinLength}</li>
+ * 				<li>{@link MaxLength}</li>
+ * 				<li>{@link MinValue}</li>
+ * 				<li>{@link MaxValue}</li>
+ * 				<li>{@link Enumeration}</li>
+ * 			</ul>
+ * 			Constraints are set by using {@link Argument#constraint(Constraint)} method but there
+ * 			are also helper methods for all built-in constraints except for {@link Enumeration}.
+ * 			The helper methods are: 
+ * 			<ul>
+ * 				<li>{@link Argument#length(int)} (and {@link OptionArgument#length(int)})</li>
+ * 				<li>{@link Argument#minLength(int)} (and {@link OptionArgument#minLength(int)})</li>
+ * 				<li>{@link Argument#maxLength(int)} (and {@link OptionArgument#maxLength(int)})</li>
+ * 				<li>{@link Argument#minValue(Object)} (and {@link OptionArgument#minValue(Object)})</li>
+ * 				<li>{@link Argument#maxValue(Object)} (and {@link OptionArgument#maxValue(Object)})</li>
+ * 			</ul>
+ * 		</li>
+ * 	</ul>
+ * 
+ * <h4><a name="cmdlineparser-annotations">Annotations</a></h4>
+ * Annotation {@link Id} can be used to mark a member field to have a value automatically from
+ * parsed command line arguments. Values for annotated fields are set for matched {@link Id#value()}
+ * by comparing it to the id (element's name by default) of defined configuration elements. In
+ * general the name of the configuration element is used for {@link Id#value()} to annotate a
+ * member field. There may arise a need to use same names for different elements. For example,
+ * a global option and a command option may have the same short name. This should not be
+ * a common problem but there is a way to get around this by defining a different id for either
+ * of the conflicting element (thus keeping the same name). Now, {@link Id#value()} can be the
+ * just defined id. For more information see:
+ * 	<ul>
+ * 		<li>{@link Argument#Argument(String)} and {@link Argument#id(String)}</li>
+ * 		<li>
+ * 			{@link Option#Option(String)}, {@link Option#alternatives(String...)} and
+ * 			{@link Option#id(String)}
+ * 		</li>
+ * 		<li>
+ * 			{@link Command#Command(String, String)}, {@link Command#alternatives(String...)} and
+ * 			{@link Command#id(String)}
+ * 		</li>
+ * 	</ul> 
+ * 
+ * If the option does not have an argument then the annotated member field must be {@code boolean}.
+ * If {@link Option#multiple()} has been set then the annotated field must be an array of
+ * defined argument types. If there are no defined arguments the the field must be a {@code boolean}
+ * array.
+ * 
+ * <h4><a name="cmdlineparser-command-executors">Command executors</a></h4>
+ * There is two ways to trigger some action depending on what command has been called from the
+ * command line; manual and by using command executors.
+ * <p>
+ * Manually a programmer can either use a combination of {@link Id#value()} and
+ * {@link Command#id(String)} or instead of using annotations use {@link CommandLineParser#getCommand()}.
+ * The other way is to implement {@link CommandExecutor} interface and give the instance of the
+ * implemented class as parameter to {@link Command#Command(String, String, CommandExecutor)}.
+ * 
+ * <h4><a name="cmdlineparser-writer">Writer</a></h4>
+ * {@link Writer} is an interface to format the output of the help texts and error messages.
+ * If no writer is defined for {@code CommandLineParser} {@link ScreenWriter} is used as a default
+ * {@link Writer}.
+ * <p>
+ * The main reason for the existence of {@link Writer} interface is the ability to reformat already
+ * defined help texts for the command line tool's home page, for example.
+ * <p>
+ * It is also possible to use the current writer for writing the normal output of the command
+ * line utility. The current writer can be fetched by calling {@link CommandLineParser#getWriter()}.
+ * <p>
+ * There are several built-in {@link Writer} implementations:
+ * 	<ul>
+ * 		<li>{@link ScreenWriter} (the default writer if nothing else is defined)</li>
+ * 		<li>{@link WikidotWriter}</li>
+ * 		<li>{@link ConfluenceWriter}</li>
+ * 		<li>{@link GitHubWriter}</li>
+ * 		<li>{@link HtmlWriter}</li>
+ * 		<li>
+ * 			{@link XmlWriter} is mainly for demonstrating the internal structure of the
+ * 			built-in help system.
+ * 		</li>
+ * 	</ul>
+ * 
+ * See also <a href="#cmdlineparser-system-properties">System properties</a>.
+ * 
+ * 
+ * 
+ * <h3><a name="cmdlineparser-configuration-principles">Configuration principles</a></h3>
+ * The most important parameters for configuration elements are name and description which are
+ * required. Also, for commands a short description is required. Options and commands can have
+ * multiple alternative names. The use of {@link CommandLineParser#addExampleArguments(String)}
+ * is not forced but highly recommended.
+ * 
+ * <h4><a name="cmdlineparser-configuration-naming-conventions">Naming conventions</a></h4>
+ * Names are must have a certain pattern (see {@link Util#checkName(String)} and for options
+ * there are some additional considerations. If the option name (or alternative name) is just
+ * a single character then it is interpreted as a short option and is identified from the command
+ * line arguments by a single minus (-) character. For example {@code -v}. On the other hand if
+ * the option name is two or more characters long then it is interpreted as a long option and is
+ * identified by two minus (--) characters. For example {@code --type}.
+ * 
+ * 
+ * 
+ * <h3><a name="cmdlineparser-system-properties">System properties</a></h3>
+ * System property {@code writerclass} overrides the hard coded {@link Writer}. {@code writerclass}
+ * must have a full class name of a class implementing {@link Writer} interface. The implementation
+ * must have a default constructor. {@code writerclass} also recognizes a special format to use
+ * built-in writer implementations. Internal writers are recognized by their class name prefixes
+ * (case does matter) and are:
+ * 	<ul>
+ * 		<li>Screen (default, if nothing is hard coded)</li>
+ * 		<li>Wikidot</li>
+ * 		<li>Confluence</li>
+ * 		<li>GitHub</li>
+ * 		<li>Html</li>
+ * 		<li>Xml</li>
+ * 	</ul>
+ * 
+ * See also {@link ScreenWriter} for it's system property.
+ * 
+ * 
+ * 
+ * <h3><a name="cmdlineparser-for-maven-users">For Maven users</a></h3>
+ * Here is an example {@code pom.xml} showing all the necessary elements to package
+ * {@code CommandLineParser} correctly:
+ * <xmp>
+ * <?xml version="1.0" encoding="UTF-8"?>
+ * <project
+ *     xmlns="http://maven.apache.org/POM/4.0.0"
+ *     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+ * >
+ *     <modelVersion>4.0.0</modelVersion>
+ *     <groupId>com.hapiware.util</groupId>
+ *     <artifactId>hash</artifactId>
+ *     <version>1.0.0</version>
+ *     <build>
+ *         <finalName>hash</finalName>
+ *         <plugins>
+ *             <plugin>
+ *                 <groupId>org.apache.maven.plugins</groupId>
+ *                 <artifactId>maven-compiler-plugin</artifactId>
+ *                 <configuration>
+ *                     <source>1.5</source>
+ *                     <target>1.5</target>
+ *                 </configuration>
+ *             </plugin>
+ *             <plugin>
+ *                 <groupId>org.apache.maven.plugins</groupId>
+ *                 <artifactId>maven-shade-plugin</artifactId>
+ *                 <executions>
+ *                     <execution>
+ *                         <phase>package</phase>
+ *                         <goals>
+ *                             <goal>shade</goal>
+ *                         </goals>
+ *                         <configuration>
+ *                             <artifactSet>
+ *                                 <includes>
+ *                                     <include>com.hapiware.util:command-line-parser</include>
+ *                                 </includes>
+ *                             </artifactSet>
+ *                         </configuration>
+ *                     </execution>
+ *                 </executions>
+ *             </plugin>
+ *             <plugin>
+ *                 <groupId>org.apache.maven.plugins</groupId>
+ *                 <artifactId>maven-jar-plugin</artifactId>
+ *                 <configuration>
+ *                     <archive>
+ *                         <manifest>
+ *                             <mainClass>com.hapiware.util.Hash</mainClass>
+ *                         </manifest>
+ *                         <manifestEntries>
+ *                             <Implementation-Title>${build.finalName}</Implementation-Title> 
+ *                             <Implementation-Version>${project.version}</Implementation-Version>
+ *                             <Implementation-Vendor>http://www.hapiware.com</Implementation-Vendor>
+ *                         </manifestEntries>
+ *                     </archive>
+ *                 </configuration>
+ *             </plugin>
+ *         </plugins>
+ *     </build>
+ *     <dependencies>
+ *         <dependency>
+ *             <groupId>com.hapiware.util</groupId>
+ *             <artifactId>command-line-parser</artifactId>
+ *             <version>[1.0.0,)</version>
+ *         </dependency>
+ *     </dependencies>
+ * </project>
+ * </xmp>
  * 
  * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
  *
@@ -80,17 +646,65 @@ public final class CommandLineParser
 			}
 		};
 	
-	
+	/**
+	 * Creates a command line parser with {@link ScreenWriter} as a default {@link Writer}.
+	 * 
+	 * @param mainClass
+	 * 		The class which is defined to {@code MANIFEST.MF} as {@code Main-Class}. Usually
+	 * 		the class which is used to configure {@code CommandLineParser}.
+	 * 
+	 * @param description
+	 * 		A description of the command line utility.
+	 * 
+	 * @throws ConfigurationException
+	 * 		If any of the parameters is {@code null} or {@code MANIFEST.MF} is missing items.
+	 * 		The exception has a descriptive error message.
+	 */
 	public CommandLineParser(Class<?> mainClass, Description description)
 	{
 		this(mainClass, new ScreenWriter(), description);
 	}
 	
+	/**
+	 * Creates a command line parser with {@link ScreenWriter} as a default {@link Writer}
+	 * 
+	 * @param mainClass
+	 * 		The class which is defined to {@code MANIFEST.MF} as {@code Main-Class}. Usually
+	 * 		the class which is used to configure {@code CommandLineParser}.
+	 * 
+	 * @param screenWidth
+	 * 		A width of the "screen" in number of characters. More precisely the width of
+	 * 		the print area. See also {@link ScreenWriter} documentation.
+	 * 
+	 * @param description
+	 * 		A description of the command line utility.
+	 * 
+	 * @throws ConfigurationException
+	 * 		If any of the parameters is {@code null} or {@code MANIFEST.MF} is missing items.
+	 * 		The exception has a descriptive error message.
+	 */
 	public CommandLineParser(Class<?> mainClass, int screenWidth, Description description)
 	{
 		this(mainClass, new ScreenWriter(screenWidth), description);
 	}
 	
+	/**
+	 * Creates a command line parser with a user defined {@link Writer}.
+	 * 
+	 * @param mainClass
+	 * 		The class which is defined to {@code MANIFEST.MF} as {@code Main-Class}. Usually
+	 * 		the class which is used to configure {@code CommandLineParser}.
+	 * 
+	 * @param writer
+	 * 		A writer to be used.
+	 * 
+	 * @param description
+	 * 		A description of the command line utility.
+	 * 
+	 * @throws ConfigurationException
+	 * 		If any of the parameters is {@code null} or {@code MANIFEST.MF} is missing items.
+	 * 		The exception has a descriptive error message.
+	 */
 	public CommandLineParser(
 		Class<?> mainClass,
 		Writer writer,
@@ -115,6 +729,20 @@ public final class CommandLineParser
 		_description = description;
 	}
 	
+	/**
+	 * Adds a new option for {@code CommandLineParser}.
+	 * 
+	 * @param option
+	 * 		An option object to be added.
+	 * 
+	 * @throws ConfigurationException
+	 * 		<ul>
+	 * 			<li>{@code option} is {@code null}.</li>
+	 * 			<li>{@code option} does not have a name or it is not unique.</li>
+	 * 			<li>any of the alternative names for the {@code option} is not unique.</li>
+	 * 			<li>{@code option} description is missing.</li>
+	 * 		</ul>
+	 */
 	public void add(Option option)
 	{
 		if(option == null)
@@ -142,7 +770,27 @@ public final class CommandLineParser
 		
 		_definedArgumentTypes.add(HelpType.OPTIONS);
 	}
-	
+
+	/**
+	 * Adds a new command for {@code CommandLineParser}. Using {@code add(Command)} also means
+	 * that {@code CommandLineParser} is configured to use commands and (global) arguments
+	 * cannot be used.
+	 * 
+	 * @param command
+	 * 		A command object to be added.
+	 * 
+	 * @throws ConfigurationException
+	 * 		<ul>
+	 * 			<li>
+	 * 				an argument is already configured (i.e. {@code CommandLineParser} is
+	 * 				already configured to use arguments instead of commands).
+	 * 			</li>
+	 * 			<li>{@code command} is {@code null}.</li>
+	 * 			<li>{@code command} does not have a name or it is not unique.</li>
+	 * 			<li>any of the alternative names for the {@code command} is not unique.</li>
+	 * 			<li>{@code description} description is missing.</li>
+	 * 		</ul>
+	 */
 	public void add(Command command)
 	{
 		if(_definedArguments.size() > 0)
@@ -188,6 +836,37 @@ public final class CommandLineParser
 			_definedArgumentTypes.add(HelpType.COMMAND_ARGUMENTS);
 	}
 	
+	/**
+	 * Adds a new argument for {@code CommandLineParser}. Using {@code add(Class, Argument)} also
+	 * means that {@code CommandLineParser} is configured to use (global) arguments and commands
+	 * cannot be used.
+	 * <p>
+	 * Type for the argument is defined twice. Generics are used for compile time type checking
+	 * and thus making it easier for programmer to keep type safety. {@code CommandLineParser}
+	 * also checks type in run time and thus the type must be set as a class also.
+	 * 
+	 * @param <T>
+	 * 		A type of the argument.
+	 * 
+	 * @param argumentType
+	 * 		A type of the argument as {@code Class<T>}.
+	 * 
+	 * @param argument
+	 * 		An argument object to be added.
+	 * 
+	 * @throws ConfigurationException
+	 * 		<ul>
+	 * 			<li>
+	 * 				a command is already configured (i.e. {@code CommandLineParser} is
+	 * 				already configured to use commands instead of arguments).
+	 * 			</li>
+	 * 			<li>{@code argument} is {@code null}.</li>
+	 * 			<li>{@code argument} does not have a name or it is not unique.</li>
+	 * 			<li>{@code argument} description is missing.</li>
+	 * 			<li>there is a constraint type mismatch.</li>
+	 * 			<li>optional arguments are misplaced</li>
+	 * 		</ul>
+	 */
 	public <T> void add(Class<T> argumentType, Argument<T> argument)
 	{
 		if(_definedCommands.size() > 0)
@@ -237,6 +916,13 @@ public final class CommandLineParser
 		_definedArgumentTypes.add(HelpType.ARGUMENTS);
 	}
 
+	/**
+	 * Adds a line of example command line arguments. Example arguments are used by the help
+	 * system. The use of example arguments is not required but highly recommended.
+	 * 
+	 * @param exampleArguments
+	 * 		Just the command line arguments for the command line utility.
+	 */
 	public void addExampleArguments(String exampleArguments)
 	{
 		if(exampleArguments == null)
@@ -245,6 +931,15 @@ public final class CommandLineParser
 		_exampleArguments.add(exampleArguments);
 	}
 	
+	/**
+	 * Checks if the option exists among the command line arguments.
+	 * 
+	 * @param name
+	 * 		A name (or alternative name) of the option.
+	 * 
+	 * @return
+	 * 		{@code true} if the option exists.
+	 */
 	public boolean optionExists(String name)
 	{
 		for(Option.Internal option : _cmdLineGlobalOptions)
@@ -254,6 +949,16 @@ public final class CommandLineParser
 		return false;
 	}
 	
+	/**
+	 * Returns the option if exists on the command line.
+	 * 
+	 * @param name
+	 * 		A name (or alternative name) of the option.
+	 * 
+	 * @return
+	 * 		The option object if exists on the command line. {@code null} if the option does not
+	 * 		exist or does not have an argument.
+	 */
 	public Option.Data getOption(String name)
 	{
 		try {
@@ -264,6 +969,19 @@ public final class CommandLineParser
 		}
 	}
 	
+	/**
+	 * Returns the value of the option if exists on the command line.
+	 * 
+	 * @param <T>
+	 * 		A type of the option argument.
+	 * 
+	 * @param name
+	 * 		A name (or alternative name) of the option.
+	 * 		
+	 * @return
+	 * 		The option value if the option exists on the command line. {@code null} if the option
+	 * 		does not exist or does not have an argument.
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getOptionValue(String name)
 	{
@@ -274,6 +992,16 @@ public final class CommandLineParser
 			return null;
 	}
 	
+	/**
+	 * Returns an array of options if exists on the command line. The first option is the
+	 * left-most option on the command line.
+	 * 
+	 * @param name
+	 * 		A name (or alternative name) of the option.
+	 * 
+	 * @return
+	 * 		An array of option objects.
+	 */
 	public Option.Data[] getOptions(String name)
 	{
 		List<Option.Data> options = new ArrayList<Option.Data>();
@@ -284,6 +1012,12 @@ public final class CommandLineParser
 		return options.toArray(new Option.Data[0]);
 	}
 	
+	/**
+	 * Returns all the options found from the command line.
+	 * 
+	 * @return
+	 * 		An array of option objects.
+	 */
 	public Option.Data[] getAllOptions()
 	{
 		List<Option.Data> options = new ArrayList<Option.Data>();
@@ -293,6 +1027,16 @@ public final class CommandLineParser
 		return options.toArray(new Option.Data[0]);
 	}
 	
+	/**
+	 * Returns an argument from the command line if exists. Notice that only optional arguments
+	 * can be missing.
+	 * 
+	 * @param name
+	 * 		A name of the argument.
+	 * 
+	 * @return
+	 * 		An argument object if exist on the command line.
+	 */
 	public Argument.Data<?> getArgument(String name)
 	{
 		for(Argument.Internal<?> argument : _cmdLineArguments)
@@ -302,6 +1046,18 @@ public final class CommandLineParser
 		return null;
 	}
 	
+	/**
+	 * Returns the value of the argument if exists on the command line.
+	 * 
+	 * @param <T>
+	 * 		A type of the argument.
+	 * 
+	 * @param name
+	 * 		A name of the argument.
+	 * 		
+	 * @return
+	 * 		The argument value if the argument exists on the command line. {@code null} otherwise.
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getArgumentValue(String name)
 	{
@@ -312,6 +1068,12 @@ public final class CommandLineParser
 			return null;
 	}
 	
+	/**
+	 * Returns all the arguments found from the command line.
+	 * 
+	 * @return
+	 * 		An array of argument objects.
+	 */
 	public Argument.Data<?>[] getAllArguments()
 	{
 		List<Argument.Data<?>> arguments = new ArrayList<Argument.Data<?>>();
@@ -321,20 +1083,42 @@ public final class CommandLineParser
 		return arguments.toArray(new Argument.Data[0]);
 	}
 	
+	/**
+	 * Checks if the command exists among the command line arguments.
+	 * 
+	 * @param name
+	 * 		A name (or alternative name) of the command.
+	 * 
+	 * @return
+	 * 		{@code true} if the command exists.
+	 */
 	public boolean commandExists(String name)
 	{
 		return _definedCommandAlternatives.containsKey(name);
 	}
 	
+	/**
+	 * Returns the command found from the command line.
+	 * 
+	 * @return
+	 * 		The found command object. 
+	 */
 	public Command.Data getCommand()
 	{
 		return new Command.Data(_cmdLineCommand);
 	}
 	
+	/**
+	 * Returns the current {@link Writer} implementation.
+	 * 
+	 * @return
+	 * 		A writer currently in use.
+	 */
 	public Writer getWriter()
 	{
 		return _writer;
 	}
+	
 	
 	public void parse(String[] args)
 		throws
@@ -1250,6 +2034,15 @@ public final class CommandLineParser
 		_writer.level1End();
 	}
 	
+	/**
+	 * Creates a writer based on the system property. First the property value is tried for
+	 * class creation. If it does not succeed then the shorter form is attempted. For the short
+	 * form the class name is created by combining the {@link Writer}'s package name, the property
+	 * value and a word {@code Writer}.
+	 * 
+ 	 * @return
+ 	 * 		The writer based on the system property. {@code null} if the writer cannot be created.
+	 */
 	private static Writer createSystemPropertyWriter()
 	{
 		String propertyClassName = "";

@@ -8,6 +8,27 @@
 	<groupId>com.hapiware.util</groupId>
 	<artifactId>command-line-parser</artifactId>
 	<version>1.0.0</version>
+	<description>
+		'command-line-parser' is a Java utility library for creating command line tools with Java.
+	</description>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://github.com/Hapi/command-line-parser/raw/master/src/main/resources/LICENSE</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>http://github.com/Hapi/command-line-parser</url>
+		<connection>scm:git:http://github.com/Hapi/command-line-parser</connection>
+	</scm>
+	<developers>
+		<developer>
+			<id>hapi</id>
+			<name>Hapi</name>
+			<email>hapi@hapiware.com</email>
+		</developer>
+	</developers>
 	
 	<build>
 		<plugins>
@@ -26,6 +47,18 @@
 				<executions>
 					<execution>
 						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach</id>
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -106,4 +139,33 @@
 			</plugin>
 		</plugins>
 	</reporting>
+	
+	<profiles>
+		<profile>
+			<id>sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

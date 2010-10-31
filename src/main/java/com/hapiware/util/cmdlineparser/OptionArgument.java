@@ -12,10 +12,12 @@ public class OptionArgument<T>
 		// Does nothing.
 	}
 	
+	/**
+	 * Do not call this method because the id cannot be set for {@code OptionArgument}.
+	 */
 	public OptionArgument<T> id(String id)
 	{
-		super.id(id);
-		return this;
+		throw new ConfigurationException("'id' cannot be set for OptionArgument");
 	}
 	
 	public OptionArgument<T> description(String description)
@@ -100,5 +102,10 @@ public class OptionArgument<T>
 	{
 		super.maxValue(maxValue);
 		return this;
+	}
+	
+	void setId(String id)
+	{
+		super.id(id);
 	}
 }

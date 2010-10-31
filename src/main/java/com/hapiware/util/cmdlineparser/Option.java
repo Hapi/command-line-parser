@@ -159,7 +159,7 @@ public class Option
 		if(argument == null)
 			throw new ConfigurationException("'argument' must have a value.");
 		
-		argument.id(removeOptionMinusFromId(_option.id()));
+		argument.setId(removeOptionMinusFromId(_option.id()));
 		_definedArgument = new Argument.Internal<T>(argument, argumentType);
 		if(_definedArgument.name() != null)
 			throw
