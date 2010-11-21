@@ -140,6 +140,13 @@
 		</plugins>
 	</reporting>
 	
+	<distributionManagement>
+		<repository>
+			<id>hapiware-repo</id>
+			<url>scp://hapi.github.com/maven2</url>
+		</repository>
+	</distributionManagement>
+	
 	<profiles>
 		<profile>
 			<id>sign-artifacts</id>
