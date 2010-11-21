@@ -2,13 +2,24 @@ package com.hapiware.util.cmdlineparser.constraint;
 
 import com.hapiware.util.cmdlineparser.Description;
 
-
+/**
+ * {@code MinLength} is used to add a minimum length constraint for {@link String} arguments.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ */
 public class MinLength
 	implements
 		Constraint<String>
 {
 	private final int _minLength;
 	
+	/**
+	 * Constructs a {@code MinLength} constraint for a {@link String} argument.
+	 * 
+	 * @param minLength
+	 * 		A minimum length of {@link String}.
+	 */
 	public MinLength(int minLength)
 	{
 		_minLength = minLength;

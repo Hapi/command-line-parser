@@ -38,7 +38,7 @@ public class Util
 	
 	/**
 	 * Writes right justified and left indented {@code text} to an output stream (usually
-	 * {@link System.out}) creating new lines when necessary. Indenting the left side is done
+	 * {@code System.out}) creating new lines when necessary. Indenting the left side is done
 	 * by adding space characters until the left {@code column} is reached. {@code width} tells
 	 * the width of the write area (e.g. screen).
 	 * <p>
@@ -56,7 +56,7 @@ public class Util
 	 * 		Width of the write area in characters.
 	 * 
 	 * @param outStream
-	 * 		A stream where the justified text is to be written. Most usually {@link System.out}.
+	 * 		A stream where the justified text is to be written. Most usually {@code System.out}.
 	 * 
 	 * @throws RuntimeException
 	 * 		If something goes wrong with writing to {@code outStream}. In practice this just
@@ -70,7 +70,7 @@ public class Util
 	
 	/**
 	 * Writes right justified and left indented {@code text} to an output stream (usually
-	 * {@link System.out}) creating new lines when necessary. The first line can have different
+	 * {@code System.out}) creating new lines when necessary. The first line can have different
 	 * indentation column than the remainder of lines. Indenting the left side is done by adding
 	 * space characters until the left {@code columnFirstLine} or {@code columnRemainderLines}
 	 * are reached. {@code width} tells the width of the write area (e.g. screen).
@@ -96,7 +96,7 @@ public class Util
 	 * 		Width of the write area in characters.
 	 * 
 	 * @param outStream
-	 * 		A stream where the justified text is to be written. Most usually {@link System.out}.
+	 * 		A stream where the justified text is to be written. Most usually {@code System.out}.
 	 * 
 	 * @throws RuntimeException
 	 * 		If something goes wrong with writing to {@code outStream}. In practice this just
@@ -188,8 +188,8 @@ public class Util
 
 	
 	/**
-	 * Checks the name pattern.
-	 * {@code name} must match this RE pattern: <code>^\\p{Alpha}[-_\\p{Alnum}]*$</code>.
+	 * Checks the name pattern. {@code name} must match this RE pattern:
+	 * <code>^\\p{Alpha}[-_\\p{Alnum}]*$</code>.
 	 * 
 	 * @param name
 	 * 		A name to be checked.
@@ -427,9 +427,10 @@ public class Util
 			if(obj == null) {
 				String msg =
 					"Object reference for the field annotated '" + valueId + "' "
-						+ "is missing while required. Most probably the default parse() "
-						+ "method failed finding the correct object reference. Use either "
-						+ "parse(Object,String[]) or parse(Class<?>,String[]).";
+						+ "is missing while required. Most probably the default parse(String[]), "
+						+ "parsec(String[]) or parsech(String[]) method failed finding the correct "
+						+ "object reference. Use either parse[ch](Object,String[]) or "
+						+ "parse[ch](Class<?>,String[]).";
 				throw new AnnotatedFieldSetException(msg, e);
 			}
 			else

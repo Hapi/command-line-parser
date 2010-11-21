@@ -3,12 +3,24 @@ package com.hapiware.util.cmdlineparser.constraint;
 import com.hapiware.util.cmdlineparser.Description;
 
 
+/**
+ * {@code MaxLength} is used to add a maximum length constraint for {@link String} arguments.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ */
 public class MaxLength
 	implements
 		Constraint<String>
 {
 	private final int _maxLength;
 	
+	/**
+	 * Constructs a {@code MaxLength} constraint for a {@link String} argument.
+	 * 
+	 * @param maxLength
+	 * 		A maximum length of {@link String}.
+	 */
 	public MaxLength(int maxLength)
 	{
 		_maxLength = maxLength;

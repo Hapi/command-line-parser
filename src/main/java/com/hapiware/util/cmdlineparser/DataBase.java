@@ -77,6 +77,7 @@ public abstract class DataBase
 	 * Returns alternative names for the data element.
 	 * 
 	 * @return
+	 * 		Set of alternative names.
 	 */
 	protected Set<String> getAlternatives()
 	{

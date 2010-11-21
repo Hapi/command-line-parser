@@ -4,12 +4,26 @@ import com.hapiware.util.cmdlineparser.ConfigurationException;
 import com.hapiware.util.cmdlineparser.Description;
 
 
+/**
+ * {@code MaxValue} is used to create a maximum value constraint for arguments.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ * @param <T>
+ * 		Type parameter must be {@link Comparable}.
+ */
 public class MaxValue<T extends Comparable<T>>
 	implements
 		Constraint<T>
 {
 	private final T _maxValue;
 	
+	/**
+	 * Constructs a {@code MaxValue} constraint.
+	 * 
+	 * @param maxValue
+	 * 		A maximum value for the constraint.
+	 */
 	public MaxValue(T maxValue)
 	{
 		if(maxValue == null)

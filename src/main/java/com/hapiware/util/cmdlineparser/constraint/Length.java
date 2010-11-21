@@ -3,12 +3,24 @@ package com.hapiware.util.cmdlineparser.constraint;
 import com.hapiware.util.cmdlineparser.Description;
 
 
+/**
+ * {@code Length} is used to add an exact length constraint for {@link String} arguments.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ */
 public class Length
 	implements
 		Constraint<String>
 {
 	private final int _length;
 	
+	/**
+	 * Constructs a {@code Length} constraint for a {@link String} argument.
+	 * 
+	 * @param length
+	 * 		A length of {@link String}.
+	 */
 	public Length(int length)
 	{
 		_length = length;

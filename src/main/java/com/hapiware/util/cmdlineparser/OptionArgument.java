@@ -3,6 +3,18 @@ package com.hapiware.util.cmdlineparser;
 import com.hapiware.util.cmdlineparser.constraint.Constraint;
 
 
+/**
+ * {@code OptionArgument} is used to define an argument for the option and command option.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ * @param <T>
+ * 		A type parameter for the argument.
+ * 
+ * @see Option#set(Class, OptionArgument)
+ * @see CommandLineParser#add(Option)
+ * @see Command#add(Option)
+ */
 public class OptionArgument<T>
 	extends
 		Argument<T>
@@ -13,7 +25,8 @@ public class OptionArgument<T>
 	}
 	
 	/**
-	 * Do not call this method because the id cannot be set for {@code OptionArgument}.
+	 * Do not call this method because the id cannot be set for {@code OptionArgument}. Calling
+	 * {@link #id(String)} throws {@link ConfigurationException}.
 	 */
 	public OptionArgument<T> id(String id)
 	{
@@ -104,6 +117,13 @@ public class OptionArgument<T>
 		return this;
 	}
 	
+	/**
+	 * This is used to set an id for the {@code OptionArgument}. This method is for the internal
+	 * use only.
+	 * 
+	 * @param id
+	 * 		An id for the option argument.
+	 */
 	void setId(String id)
 	{
 		super.id(id);

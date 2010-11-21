@@ -4,12 +4,26 @@ import com.hapiware.util.cmdlineparser.ConfigurationException;
 import com.hapiware.util.cmdlineparser.Description;
 
 
+/**
+ * {@code MinValue} is used to create a minimum value constraint for arguments.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ * @param <T>
+ * 		Type parameter must be {@link Comparable}.
+ */
 public class MinValue<T extends Comparable<T>>
 	implements
 		Constraint<T>
 {
 	private final T _minValue;
 	
+	/**
+	 * Constructs a {@code MinValue} constraint.
+	 * 
+	 * @param minValue
+	 * 		A minimum value for the constraint.
+	 */
 	public MinValue(T minValue)
 	{
 		if(minValue == null)

@@ -3,10 +3,53 @@ package com.hapiware.util.cmdlineparser.constraint;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.hapiware.util.cmdlineparser.Argument;
 import com.hapiware.util.cmdlineparser.ConfigurationException;
 import com.hapiware.util.cmdlineparser.Description;
+import com.hapiware.util.cmdlineparser.OptionArgument;
 
 
+/**
+ * {@code Enumeration} constraint is used to set individual values and value ranges for
+ * {@link Argument} and {@link OptionArgument} objects. {@code Enumeration} has setters
+ * which can be chained thus allowing builder like usage.
+ * <p>
+ * Values are set with {@link #value(Object, String)} and {@link #valueIgnoreCase(Object, String)}
+ * methods. Notice that {@link #valueIgnoreCase(Object, String)} can only be used for {@link String}
+ * arguments (checked at runtime).
+ * <p>
+ * In addition to individual values value ranges can also be used. Value ranges can be set with
+ * {@link #includeRange(Object, Object, String)} and {@link #excludeRange(Object, Object, String)}
+ * methods.
+ * <p>
+ * The resolve order for include, exclude and value methods is:
+ * 	<ol>
+ * 		<li><b>include</b></li>
+ * 		<li><b>exclude</b></li>
+ * 		<li><b>value</b></li>
+ * 	</ol>
+ * 
+ * This means that {@link #excludeRange(Object, Object, String)} overrides
+ * {@link #includeRange(Object, Object, String)} but {@link #value(Object, String)} (and
+ * {@link #valueIgnoreCase(Object, String)}) overrides excludes. For example:
+ * <pre>
+ * add(Integer.class, new Argument<Integer>("TYPE") {{
+ *     constraint(new Enumeration<Integer>() {{
+ *         value(5, "description for five");
+ *         value(17, "description for seventeen");
+ *         includeRange(1, 10, "description for 1 ... 10");
+ *         excludeRange(3, 6, "description for 3 ... 6");
+ *     }});
+ *     description("Description for TYPE.");
+ * }});
+ * </pre>
+ * all the following integers are valid {@code [1, 2, 5, 7, 8, 9, 10, 17]} while the others are
+ * not.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ * @param <T>
+ */
 public class Enumeration<T>
 	implements
 		Constraint<T>
@@ -15,12 +58,37 @@ public class Enumeration<T>
 	private List<Enum<T>> _includeRanges = new LinkedList<Enum<T>>();
 	private List<Enum<T>> _excludeRanges = new LinkedList<Enum<T>>();
 	
+	/**
+	 * Adds an individual value to the enumeration.
+	 * 
+	 * @param value
+	 * 		A value to add.
+	 * 
+	 * @param description
+	 * 		A description for the value.
+	 * 
+	 * @return
+	 * 		An {@code Enumeration} object for chaining.
+	 */
 	public Enumeration<T> value(T value, String description)
 	{
 		_enumerations.add(new NormalEnum<T>(value, description));
 		return this;
 	}
 	
+	/**
+	 * Adds a {@link String} value to the enumeration. Case is ignored. Notice that the type
+	 * of the value is checked at runtime.  
+	 * 
+	 * @param value
+	 * 		A value to add. Must be {@link String}. Type is checked at runtime.
+	 * 
+	 * @param description
+	 * 		A description for the value.
+	 * 
+	 * @return
+	 * 		An {@code Enumeration} object for chaining.
+	 */
 	@SuppressWarnings("unchecked")
 	public Enumeration<T> valueIgnoreCase(T value, String description)
 	{
@@ -28,6 +96,22 @@ public class Enumeration<T>
 		return this;
 	}
 	
+	/**
+	 * Adds an include range to the enumeration. Type of the arguments must implement
+	 * {@link Comparable} interface (checked at runtime).
+	 * 
+	 * @param lower
+	 * 		Lower limit of the include range.
+	 * 
+	 * @param upper
+	 * 		Upper limit of the include range.
+	 * 
+	 * @param description
+	 * 		A description for the include range.
+	 * 
+	 * @return
+	 * 		An {@code Enumeration} object for chaining.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Enumeration<T> includeRange(T lower, T upper, String description)
 	{
@@ -35,6 +119,22 @@ public class Enumeration<T>
 		return this;
 	}
 
+	/**
+	 * Adds an exclude range to the enumeration. Type of the arguments must implement
+	 * {@link Comparable} interface (checked at runtime).
+	 * 
+	 * @param lower
+	 * 		Lower limit of the exclude range.
+	 * 
+	 * @param upper
+	 * 		Upper limit of the exclude range.
+	 * 
+	 * @param description
+	 * 		A description for the exclude range.
+	 * 
+	 * @return
+	 * 		An {@code Enumeration} object for chaining.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Enumeration<T> excludeRange(T lower, T upper, String description)
 	{
@@ -223,6 +323,10 @@ public class Enumeration<T>
 				throw new ConfigurationException("'upper' must have a value.");
 			if(lower.compareTo(upper) > 0)
 				throw new IllegalArgumentException("'lower' must be lower than 'upper'.");
+			if(!isComparable(lower.getClass()))
+				throw new IllegalArgumentException("'lower' must be Comparable.");
+			if(!isComparable(upper.getClass()))
+				throw new IllegalArgumentException("'upper' must be Comparable.");
 			_lower = lower;
 			_upper = upper;
 		}
@@ -230,7 +334,7 @@ public class Enumeration<T>
 		@Override
 		public boolean typeCheck(Class<?> typeClass)
 		{
-			return typeClass == _lower.getClass();
+			return isComparable(typeClass);
 		}
 
 		@Override
@@ -245,5 +349,12 @@ public class Enumeration<T>
 			return "(" + _lower.toString() + " ... " + _upper.toString() + ")";
 		}
 		
+		private boolean isComparable(Class<?> typeClass)
+		{
+			for(Class<?> i : typeClass.getInterfaces())
+				if(i == Comparable.class)
+					return true;
+			return false;
+		}
 	}
 }

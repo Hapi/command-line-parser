@@ -431,22 +431,22 @@ import com.hapiware.util.cmdlineparser.writer.XmlWriter;
  * 		<li>
  * 			<b>Argument</b> is a bare argument for the utility or the command. Arguments are type
  * 			checked in compile and run time. An argument can be optional. For more information see
- * 			{@link #add(Class, Argument)}, {@link Command#add(Class, Argument)} and a chapter
- * 			<a href="#cmdlineparser-using-arguments">Using arguments</a>.
+ * 			{@link #add(Class, Argument)}, {@link Command#add(Class, Argument)}, {@link Argument}
+ * 			and a chapter <a href="#cmdlineparser-using-arguments">Using arguments</a>.
  * 		</li>
  * 		<li>
  * 			<b>Option</b> is an optional command line argument which is identified either by
  * 			preceding minus (-) or minus-minus (--). For more information see {@link #add(Option)}
- * 			and {@link Command#add(Option)}.
+ * 			,{@link Command#add(Option)} and {@link Option}.
  * 		</li>
  * 		<li>
  * 			<b>Option argument</b> is an argument for the option when needed. Option arguments are
  * 			also type checked in compile and run time. For more information see
- * 			{@link Option#set(Class, OptionArgument)}.
+ * 			{@link Option#set(Class, OptionArgument)} and {@link OptionArgument}.
  * 		</li>
  * 		<li>
  * 			<b>Command</b> elements are used for defining multiple tasks for the same command line
- * 			utility. For more information see {@link #add(Command)} and a chapter
+ * 			utility. For more information see {@link #add(Command)}, {@link Command} and a chapter
  * 			<a href="#cmdlineparser-using-commands">Using commands</a>.
  * 		</li>
  * 		<li>
@@ -576,6 +576,11 @@ import com.hapiware.util.cmdlineparser.writer.XmlWriter;
  * 		<li>Xml</li>
  * 	</ul>
  * 
+ * For example, to use GitHubWriter as a writer for the output:
+ * <pre>
+ * 	java -Dwriterclass=GitHub -jar myutil.jar
+ * </pre>
+ * 
  * See also {@link ScreenWriter} for it's system property.
  * 
  * 
@@ -698,6 +703,7 @@ public final class CommandLineParser
 			}
 		};
 	
+		
 	/**
 	 * Creates a command line parser with {@link ScreenWriter} as a default {@link Writer}.
 	 * 
@@ -716,6 +722,7 @@ public final class CommandLineParser
 	{
 		this(mainClass, new ScreenWriter(), description);
 	}
+	
 	
 	/**
 	 * Creates a command line parser with {@link ScreenWriter} as a default {@link Writer}
@@ -739,6 +746,7 @@ public final class CommandLineParser
 	{
 		this(mainClass, new ScreenWriter(screenWidth), description);
 	}
+	
 	
 	/**
 	 * Creates a command line parser with a user defined {@link Writer}.
@@ -780,6 +788,7 @@ public final class CommandLineParser
 		_javaCommand = "java -jar " + _mainClass.getPackage().getImplementationTitle() + ".jar";
 		_description = description;
 	}
+	
 	
 	/**
 	 * Adds a new option for {@code CommandLineParser}.
@@ -823,6 +832,7 @@ public final class CommandLineParser
 		_definedArgumentTypes.add(HelpType.OPTIONS);
 	}
 
+	
 	/**
 	 * Adds a new command for {@code CommandLineParser}. Using {@code add(Command)} also means
 	 * that {@code CommandLineParser} is configured to use commands and (global) arguments
@@ -887,6 +897,7 @@ public final class CommandLineParser
 		if(internal.definedArguments().size() > 0)
 			_definedArgumentTypes.add(HelpType.COMMAND_ARGUMENTS);
 	}
+	
 	
 	/**
 	 * Adds a new argument for {@code CommandLineParser}. Using {@code add(Class, Argument)} also
@@ -968,6 +979,7 @@ public final class CommandLineParser
 		_definedArgumentTypes.add(HelpType.ARGUMENTS);
 	}
 
+	
 	/**
 	 * Adds a line of example command line arguments. Example arguments are used by the help
 	 * system. The use of example arguments is not required but highly recommended.
@@ -982,6 +994,7 @@ public final class CommandLineParser
 		
 		_exampleArguments.add(exampleArguments);
 	}
+	
 	
 	/**
 	 * Checks if the option exists among the command line arguments.
@@ -1001,8 +1014,9 @@ public final class CommandLineParser
 		return false;
 	}
 	
+	
 	/**
-	 * Returns the option if exists on the command line.
+	 * Returns the option if it exists on the command line.
 	 * 
 	 * @param name
 	 * 		A name (or alternative name) of the option.
@@ -1021,8 +1035,9 @@ public final class CommandLineParser
 		}
 	}
 	
+	
 	/**
-	 * Returns the value of the option if exists on the command line.
+	 * Returns the value of the option if it exists on the command line.
 	 * 
 	 * @param <T>
 	 * 		A type of the option argument.
@@ -1044,6 +1059,7 @@ public final class CommandLineParser
 			return null;
 	}
 	
+	
 	/**
 	 * Returns an array of options if exists on the command line. The first option is the
 	 * left-most option on the command line.
@@ -1064,6 +1080,7 @@ public final class CommandLineParser
 		return options.toArray(new Option.Data[0]);
 	}
 	
+	
 	/**
 	 * Returns all the options found from the command line.
 	 * 
@@ -1078,6 +1095,7 @@ public final class CommandLineParser
 		
 		return options.toArray(new Option.Data[0]);
 	}
+	
 	
 	/**
 	 * Returns an argument from the command line if exists. Notice that only optional arguments
@@ -1097,6 +1115,7 @@ public final class CommandLineParser
 
 		return null;
 	}
+	
 	
 	/**
 	 * Returns the value of the argument if exists on the command line.
@@ -1120,6 +1139,7 @@ public final class CommandLineParser
 			return null;
 	}
 	
+	
 	/**
 	 * Returns all the arguments found from the command line.
 	 * 
@@ -1135,6 +1155,7 @@ public final class CommandLineParser
 		return arguments.toArray(new Argument.Data[0]);
 	}
 	
+	
 	/**
 	 * Checks if the command exists among the command line arguments.
 	 * 
@@ -1149,6 +1170,7 @@ public final class CommandLineParser
 		return _definedCommandAlternatives.containsKey(name);
 	}
 	
+	
 	/**
 	 * Returns the command found from the command line.
 	 * 
@@ -1159,6 +1181,7 @@ public final class CommandLineParser
 	{
 		return new Command.Data(_cmdLineCommand);
 	}
+	
 	
 	/**
 	 * Returns the current {@link Writer} implementation.
@@ -1171,7 +1194,31 @@ public final class CommandLineParser
 		return _writer;
 	}
 	
-	// TODO: Add documentation
+	
+	/**
+	 * Parses given command line arguments. If something goes wrong a proper exeption is thrown.
+	 * Otherwise the method returns and allows the normal program execution. See also
+	 * <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
+	 * 
+	 * @param args
+	 * 		Command line arguments.
+	 * 
+	 * @throws ConstraintException
+	 * 		When a constraint violation is detected.
+	 * 
+	 * @throws AnnotatedFieldSetException
+	 * 		When the parsed value cannot be set to an annotated field.
+	 * 
+	 * @throws CommandNotFoundException
+	 * 		When an undefined command is detected from the command line.
+	 * 
+	 * @throws IllegalCommandLineArgumentException
+	 * 		When a given command line argument cannot be interpreted as an argument, command
+	 * 		argument, option argument or command option argument.
+	 * 
+	 * @see #parsec(String[])
+	 * @see #parsech(String[])
+	 */
 	public void parse(String[] args)
 		throws
 			ConstraintException,
@@ -1184,6 +1231,41 @@ public final class CommandLineParser
 	}
 
 	
+	/**
+	 * Parses given command line arguments. If something goes wrong a proper exeption is thrown.
+	 * Otherwise the method returns and allows the normal program execution.
+	 * <p>
+	 * Notice that this method requires {@code callerObject} as an argument. {@code callerObject}
+	 * is required for setting parsed values to annotated fields. {@link #parse(String[])} tries
+	 * to quess a correct object but if it fails it throws a {@link NullPointerException} with
+	 * a descritive error message and indicates that either this or {@link #parse(Class, String[])}
+	 * method should be used.
+	 * <p>
+	 * See also <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
+	 * 
+	 * @param callerObject
+	 * 		The caller object (or more precisly the object which contains the annotated member
+	 * 		fields).
+	 * 
+	 * @param args
+	 * 		Command line arguments.
+	 * 
+	 * @throws ConstraintException
+	 * 		When a constraint violation is detected.
+	 * 
+	 * @throws AnnotatedFieldSetException
+	 * 		When the parsed value cannot be set to an annotated field.
+	 * 
+	 * @throws CommandNotFoundException
+	 * 		When an undefined command is detected from the command line.
+	 * 
+	 * @throws IllegalCommandLineArgumentException
+	 * 		When a given command line argument cannot be interpreted as an argument, command
+	 * 		argument, option argument or command option argument.
+	 * 
+	 * @see #parsec(Object, String[])
+	 * @see #parsech(Object, String[])
+	 */
 	public void parse(Object callerObject, String[] args)
 		throws
 			ConstraintException,
@@ -1196,8 +1278,43 @@ public final class CommandLineParser
 		
 		parse(callerObject, null, args);
 	}
+
 	
-	
+	/**
+	 * Parses given command line arguments. If something goes wrong a proper exeption is thrown.
+	 * Otherwise the method returns and allows the normal program execution.
+	 * <p>
+	 * Notice that this method requires {@code callerClass} as an argument. {@code callerClass}
+	 * is required for setting parsed values to annotated fields. {@link #parse(String[])} tries
+	 * to quess a correct class but if it fails it throws a {@link NullPointerException} with
+	 * a descritive error message indicating that either this or {@link #parse(Object, String[])}
+	 * method should be used.
+	 * <p>
+	 * See also <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
+	 * 
+	 * @param callerClass
+	 * 		The caller class (or more precisly the class which contains the annotated member
+	 * 		fields).
+	 * 
+	 * @param args
+	 * 		Command line arguments.
+	 * 
+	 * @throws ConstraintException
+	 * 		When a constraint violation is detected.
+	 * 
+	 * @throws AnnotatedFieldSetException
+	 * 		When the parsed value cannot be set to an annotated field.
+	 * 
+	 * @throws CommandNotFoundException
+	 * 		When an undefined command is detected from the command line.
+	 * 
+	 * @throws IllegalCommandLineArgumentException
+	 * 		When a given command line argument cannot be interpreted as an argument, command
+	 * 		argument, option argument or command option argument.
+	 * 
+	 * @see #parsec(Class, String[])
+	 * @see #parsech(Class, String[])
+	 */
 	public void parse(Class<?> callerClass, String[] args)
 		throws
 			ConstraintException,
@@ -1213,10 +1330,15 @@ public final class CommandLineParser
 
 	
 	/**
-	 * Parses command line arguments, catches exceptions, prints error message and shows help.
+	 * Parses given command line arguments. If something goes wrong an error message is printed
+	 * and a (short) help message shown. Otherwise the method returns and allows the normal program
+	 * execution. See also <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
 	 * 
-	 * TODO: Add more information...
 	 * @param args
+	 * 		Command line arguments.
+	 * 
+	 * @see #parse(String[])
+	 * @see #parsec(String[])
 	 */
 	public void parsech(String[] args)
 	{
@@ -1246,7 +1368,30 @@ public final class CommandLineParser
 		}
 	}
 
-	
+
+	/**
+	 * Parses given command line arguments. If something goes wrong an error message is printed
+	 * and a (short) help message shown. Otherwise the method returns and allows the normal program
+	 * execution.
+	 * <p>
+	 * Notice that this method requires {@code callerObject} as an argument. {@code callerObject}
+	 * is required for setting parsed values to annotated fields. {@link #parse(String[])} tries
+	 * to quess a correct object but if it fails it throws a {@link NullPointerException} with
+	 * a descritive error message and indicates that either this or {@link #parse(Class, String[])}
+	 * method should be used.
+	 * <p>
+	 * See also <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
+	 * 
+	 * @param callerObject
+	 * 		The caller object (or more precisly the object which contains the annotated member
+	 * 		fields).
+	 * 
+	 * @param args
+	 * 		Command line arguments.
+	 * 
+	 * @see #parse(Object, String[])
+	 * @see #parsec(Object, String[])
+	 */
 	public void parsech(Object callerObject, String[] args)
 	{
 		try {
@@ -1274,6 +1419,30 @@ public final class CommandLineParser
 		}
 	}
 	
+
+	/**
+	 * Parses given command line arguments. If something goes wrong an error message is printed
+	 * and a (short) help message shown. Otherwise the method returns and allows the normal program
+	 * execution.
+	 * <p>
+	 * Notice that this method requires {@code callerClass} as an argument. {@code callerClass}
+	 * is required for setting parsed values to annotated fields. {@link #parse(String[])} tries
+	 * to quess a correct class but if it fails it throws a {@link NullPointerException} with
+	 * a descritive error message indicating that either this or {@link #parse(Object, String[])}
+	 * method should be used.
+	 * <p>
+	 * See also <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
+	 * 
+	 * @param callerClass
+	 * 		The caller class (or more precisly the class which contains the annotated member
+	 * 		fields).
+	 * 
+	 * @param args
+	 * 		Command line arguments.
+	 * 
+	 * @see #parse(Class, String[])
+	 * @see #parsec(Class, String[])
+	 */
 	public void parsech(Class<?> callerClass, String[] args)
 	{
 		try {
@@ -1303,10 +1472,16 @@ public final class CommandLineParser
 	
 
 	/**
-	 * Parses command line arguments, catches exceptions and prints error message. Does not show help.
+	 * Parses given command line arguments. If something goes wrong an error message is printed
+	 * but a help message <u>is not shown</u>. Otherwise the method returns and allows the normal
+	 * program execution.
+	 * See also <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
 	 * 
-	 * TODO: Add more information...
 	 * @param args
+	 * 		Command line arguments.
+	 * 
+	 * @see #parse(String[])
+	 * @see #parsech(String[])
 	 */
 	public void parsec(String[] args)
 	{
@@ -1336,7 +1511,30 @@ public final class CommandLineParser
 		}
 	}
 
-	
+
+	/**
+	 * Parses given command line arguments. If something goes wrong an error message is printed
+	 * but a help message <u>is not shown</u>. Otherwise the method returns and allows the normal
+	 * program execution.
+	 * <p>
+	 * Notice that this method requires {@code callerObject} as an argument. {@code callerObject}
+	 * is required for setting parsed values to annotated fields. {@link #parse(String[])} tries
+	 * to quess a correct object but if it fails it throws a {@link NullPointerException} with
+	 * a descritive error message and indicates that either this or {@link #parse(Class, String[])}
+	 * method should be used.
+	 * <p>
+	 * See also <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
+	 * 
+	 * @param callerObject
+	 * 		The caller object (or more precisly the object which contains the annotated member
+	 * 		fields).
+	 * 
+	 * @param args
+	 * 		Command line arguments.
+	 * 
+	 * @see #parse(Object, String[])
+	 * @see #parsech(Object, String[])
+	 */
 	public void parsec(Object callerObject, String[] args)
 	{
 		try {
@@ -1364,6 +1562,30 @@ public final class CommandLineParser
 		}
 	}
 	
+
+	/**
+	 * Parses given command line arguments. If something goes wrong an error message is printed
+	 * but a help message <u>is not shown</u>. Otherwise the method returns and allows the normal
+	 * program execution.
+	 * <p>
+	 * Notice that this method requires {@code callerClass} as an argument. {@code callerClass}
+	 * is required for setting parsed values to annotated fields. {@link #parse(String[])} tries
+	 * to quess a correct class but if it fails it throws a {@link NullPointerException} with
+	 * a descritive error message indicating that either this or {@link #parse(Object, String[])}
+	 * method should be used.
+	 * <p>
+	 * See also <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
+	 * 
+	 * @param callerClass
+	 * 		The caller class (or more precisly the class which contains the annotated member
+	 * 		fields).
+	 * 
+	 * @param args
+	 * 		Command line arguments.
+	 * 
+	 * @see #parse(Class, String[])
+	 * @see #parsech(Class, String[])
+	 */
 	public void parsec(Class<?> callerClass, String[] args)
 	{
 		try {
@@ -1622,6 +1844,11 @@ public final class CommandLineParser
 	}
 
 	
+	/**
+	 * Prints a complete help using a selected writer.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 */
 	public void printCompleteHelp()
 	{
 		_writer.header();
@@ -1634,6 +1861,13 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 	
+	
+	/**
+	 * Prints a short help using a selected writer. Short help contains usage, description,
+	 * a possible command list and global arguments.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 */
 	public void printShortHelp()
 	{
 		_writer.header();
@@ -1641,13 +1875,24 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 	
+
+	/**
+	 * Prints just the usage using a selected writer.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 */
 	public void printUsageHelp()
 	{
 		_writer.header();
 		printUsage();
 		_writer.footer();
 	}
-	
+
+	/**
+	 * Prints just all the examples using a selected writer.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 */
 	public void printExamplesHelp()
 	{
 		_writer.header();
@@ -1671,6 +1916,12 @@ public final class CommandLineParser
 		_writer.level1End();
 	}
 	
+	
+	/**
+	 * Prints just all the global options using a selected writer.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 */
 	public void printGlobalOptionsHelp()
 	{
 		_writer.header();
@@ -1678,6 +1929,12 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 	
+	
+	/**
+	 * Prints just the global arguments using a selected writer.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 */
 	public void printGlobalArgumentsHelp()
 	{
 		_writer.header();
@@ -1685,6 +1942,28 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 	
+	
+	/**
+	 * Prints a given <b>unexpected</b> {@link Throwable} using a selected writer. Compare this
+	 * method to {@link #printErrorMessageWithoutHelp(Throwable)}. This method can be used for
+	 * printing errors if the built-in print mechanisms are not enough.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 * 
+	 * @param t
+	 * 		A throwble to be printed.
+	 * 
+	 * @see #printErrorMessageWithoutHelp(Throwable)
+	 * @see #parse(String[])
+	 * @see #parse(Class, String[])
+	 * @see #parse(Object, String[])
+	 * @see #parsec(String[])
+	 * @see #parsec(Class, String[])
+	 * @see #parsec(Object, String[])
+	 * @see #parsech(String[])
+	 * @see #parsech(Class, String[])
+	 * @see #parsech(Object, String[])
+	 */
 	public void printThrowable(Throwable t)
 	{
 		_writer.header();
@@ -1698,6 +1977,26 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 
+	/**
+	 * Prints a given {@link Throwable} with a short help using a selected writer. This method can
+	 * be used for printing errors if the built-in print mechanisms are not enough.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 * 
+	 * @param cause
+	 * 		A throwble to be printed.
+	 * 
+	 * @see #printShortHelp()
+	 * @see #parse(String[])
+	 * @see #parse(Class, String[])
+	 * @see #parse(Object, String[])
+	 * @see #parsec(String[])
+	 * @see #parsec(Class, String[])
+	 * @see #parsec(Object, String[])
+	 * @see #parsech(String[])
+	 * @see #parsech(Class, String[])
+	 * @see #parsech(Object, String[])
+	 */
 	public void printErrorWithShortHelp(Throwable cause)
 	{
 		_writer.header();
@@ -1709,6 +2008,25 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 	
+	/**
+	 * Prints a given {@link Throwable} with a command help using a selected writer. This method can
+	 * be used for printing errors if the built-in print mechanisms are not enough.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 * 
+	 * @param cause
+	 * 		A throwble to be printed.
+	 * 
+	 * @see #parse(String[])
+	 * @see #parse(Class, String[])
+	 * @see #parse(Object, String[])
+	 * @see #parsec(String[])
+	 * @see #parsec(Class, String[])
+	 * @see #parsec(Object, String[])
+	 * @see #parsech(String[])
+	 * @see #parsech(Class, String[])
+	 * @see #parsech(Object, String[])
+	 */
 	public void printErrorWithCommandsHelp(Throwable cause)
 	{
 		_writer.header();
@@ -1720,6 +2038,28 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 	
+	
+	/**
+	 * Prints a given <b>known</b> {@link Throwable} using a selected writer. Compare this
+	 * method to {@link #printThrowable(Throwable)}. This method can be used for printing errors
+	 * if the built-in print mechanisms are not enough.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 * 
+	 * @param cause
+	 * 		A throwble to be printed.
+	 * 
+	 * @see #printThrowable(Throwable)
+	 * @see #parse(String[])
+	 * @see #parse(Class, String[])
+	 * @see #parse(Object, String[])
+	 * @see #parsec(String[])
+	 * @see #parsec(Class, String[])
+	 * @see #parsec(Object, String[])
+	 * @see #parsech(String[])
+	 * @see #parsech(Class, String[])
+	 * @see #parsech(Object, String[])
+	 */
 	public void printErrorMessageWithoutHelp(Throwable cause)
 	{
 		_writer.header();
@@ -1730,6 +2070,11 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 	
+	/**
+	 * Prints a list of commands and their short descriptions using a selected writer.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 */
 	public void printCommandsHelp()
 	{
 		_writer.header();
@@ -1737,6 +2082,15 @@ public final class CommandLineParser
 		_writer.footer();
 	}
 	
+	/**
+	 * Prints help for the selected command using a selected writer. If {@code commandName} does
+	 * not exist an error message is printed instead.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 * 
+	 * @param commandName
+	 * 		A command which help is wanted.
+	 */
 	public void printCommandHelp(String commandName)
 	{
 		Command.Internal command = _definedCommands.get(_definedCommandAlternatives.get(commandName));

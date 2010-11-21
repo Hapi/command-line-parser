@@ -33,8 +33,10 @@ class ElementBase
 	}
 	
 	/**
+	 * Defines alternative names for the {@link ElementBase}.
 	 * 
 	 * @param alternatives
+	 * 		An array of alternative names.
 	 * 
 	 * @return
 	 * 		{@code null} if there were no duplicates. Otherwise the duplicate alternative
@@ -49,6 +51,19 @@ class ElementBase
 		return null;
 	}
 	
+	/**
+	 * An optional {@code id} for annotation matching. If not defined the name given with
+	 * {@link #name()} is used as the id.
+	 * {@link Command#Command(String, String)} or {@link Command#Command(String, String, CommandExecutor)}.
+	 * For more information see
+	 * <a href="CommandLineParser.html#cmdlineparser-annotations">CommandLineParser, chapter Annotations</a>.
+	 * 
+	 * @param id
+	 * 		An id for the command.
+	 * 
+	 * @return
+	 * 		The command object for chaining.
+	 */
 	public void id(String id)
 	{
 		_id = id;

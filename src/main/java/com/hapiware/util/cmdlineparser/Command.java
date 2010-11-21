@@ -14,6 +14,15 @@ import java.util.Map.Entry;
 import com.hapiware.util.cmdlineparser.constraint.Constraint;
 import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
 
+
+/**
+ * {@code Command} is used to define commands for the command line utility. See
+ * <a href="CommandLineParser.html#cmdlineparser-command-line-structure">Command line structure</a>
+ * for more information.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ */
 public class Command
 {
 	private ElementBase _command = new ElementBase();
@@ -84,6 +93,27 @@ public class Command
 		_shortDescription = shortDescription;
 	}
 	
+	/**
+	 * Creates new {@code Command} with a {@link CommandExecutor} object defined for the command.
+	 * {@link CommandExecutor#execute(Command.Data, List)} is run when a parser detects the defined
+	 * command on the command line.
+	 * 
+	 * @param name
+	 * 		Name for the command.
+	 *
+	 * @param shortDescription
+	 * 		A short textual description about the command. This is used by the help system
+	 * 		for listing all commands. See {@link CommandLineParser#printCommandsHelp()}.
+	 * 
+	 *  @param commandExecutor
+	 *  	The command executor to be called when the respective command is detected.
+	 * 
+	 * @throws ConfigurationException
+	 * 		If {@code name} is incorrectly formed, {@code shortDescrption} is missing or
+	 * 		{@link CommandExecutor} is not defined.
+	 * 
+	 * @see Util#checkName(String)
+	 */
 	public Command(String name, String shortDescription, CommandExecutor commandExecutor)
 	{
 		if(name == null || name.trim().length() == 0)
@@ -112,6 +142,16 @@ public class Command
 		_shortDescription = shortDescription;
 	}
 	
+	
+	/**
+	 * Defines alternative names for the {@link Command}.
+	 * 
+	 * @param alternatives
+	 * 		An array of alternative names.
+	 * 
+	 * @return
+	 * 		The command object for chaining.
+	 */
 	public Command alternatives(String...alternatives)
 	{
 		if(alternatives == null || alternatives.length == 0)
@@ -136,7 +176,20 @@ public class Command
 				);
 		return this;
 	}
+
 	
+	/**
+	 * An optional {@code id} for annotation matching. If not defined the name given in
+	 * {@link Command#Command(String, String)} or {@link Command#Command(String, String, CommandExecutor)}
+	 *  is used as the id. For more information see
+	 * <a href="CommandLineParser.html#cmdlineparser-annotations">CommandLineParser, chapter Annotations</a>.
+	 * 
+	 * @param id
+	 * 		An id for the command.
+	 * 
+	 * @return
+	 * 		The command object for chaining.
+	 */
 	public Command id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
@@ -214,6 +267,32 @@ public class Command
 		return this;
 	}
 	
+	
+	/**
+	 * Adds a new argument for {@code Command}.
+	 * <p>
+	 * Type for the argument is defined twice. Generics are used for compile time type checking
+	 * and thus making it easier for programmer to keep type safety. {@code Command} also checks
+	 * type in run time and thus the type must be set as a class also.
+	 * 
+	 * @param <T>
+	 * 		A type of the argument.
+	 * 
+	 * @param argumentType
+	 * 		A type of the argument as {@code Class<T>}.
+	 * 
+	 * @param argument
+	 * 		An argument object to be added.
+	 * 
+	 * @throws ConfigurationException
+	 * 		<ul>
+	 * 			<li>{@code argument} is {@code null}.</li>
+	 * 			<li>{@code argument} does not have a name or it is not unique.</li>
+	 * 			<li>{@code argument} description is missing.</li>
+	 * 			<li>there is a constraint type mismatch.</li>
+	 * 			<li>optional arguments are misplaced</li>
+	 * 		</ul>
+	 */
 	public <T> Command add(Class<T> argumentType, Argument<T> argument)
 	{
 		if(argument == null)
@@ -270,6 +349,21 @@ public class Command
 		return this;
 	}
 	
+	
+	/**
+	 * Adds a new option for {@code Command}.
+	 * 
+	 * @param option
+	 * 		An option object to be added.
+	 * 
+	 * @throws ConfigurationException
+	 * 		<ul>
+	 * 			<li>{@code option} is {@code null}.</li>
+	 * 			<li>{@code option} does not have a name or it is not unique.</li>
+	 * 			<li>any of the alternative names for the {@code option} is not unique.</li>
+	 * 			<li>{@code option} description is missing.</li>
+	 * 		</ul>
+	 */
 	public Command add(Option option)
 	{
 		if(option == null)
@@ -356,10 +450,10 @@ public class Command
 
 		
 		/**
-		 * Returns an array of command options.
+		 * Returns all the command options found from the command line.
 		 * 
 		 * @return
-		 * 		An array of options.
+		 * 		An array of command option objects.
 		 */
 		public Option.Data[] getAllOptions()
 		{
@@ -367,6 +461,15 @@ public class Command
 		}
 		
 		
+		/**
+		 * Checks if the command option exists among the command line arguments.
+		 * 
+		 * @param name
+		 * 		A name (or alternative name) of the command option.
+		 * 
+		 * @return
+		 * 		{@code true} if the command option exists.
+		 */
 		public boolean optionExists(String name)
 		{
 			for(Option.Data option : _options)
@@ -377,6 +480,16 @@ public class Command
 		}
 		
 		
+		/**
+		 * Returns the command option if it exists on the command line.
+		 * 
+		 * @param name
+		 * 		A name (or alternative name) of the command option.
+		 * 
+		 * @return
+		 * 		The command option object if exists on the command line. {@code null} if the command
+		 * 		option does not	exist or does not have an argument.
+		 */
 		public Option.Data getOption(String name)
 		{
 			try {
@@ -387,6 +500,20 @@ public class Command
 			}
 		}
 		
+		
+		/**
+		 * Returns the value of the command option if it exists on the command line.
+		 * 
+		 * @param <T>
+		 * 		A type of the command option argument.
+		 * 
+		 * @param name
+		 * 		A name (or alternative name) of the command option.
+		 * 		
+		 * @return
+		 * 		The command option value if the command option exists on the command line.
+		 * 		{@code null} if	the command option does not exist or does not have an argument.
+		 */
 		@SuppressWarnings("unchecked")
 		public <T> T getOptionValue(String name)
 		{
@@ -401,7 +528,18 @@ public class Command
 				return null;
 			}
 		}
+
 		
+		/**
+		 * Returns an array of command options if exists on the command line. The first command
+		 * option is the left-most command option on the command line.
+		 * 
+		 * @param name
+		 * 		A name (or alternative name) of the command option.
+		 * 
+		 * @return
+		 * 		An array of command option objects.
+		 */
 		public Option.Data[] getOptions(String name)
 		{
 			List<Option.Data> options = new ArrayList<Option.Data>();
@@ -412,6 +550,17 @@ public class Command
 			return options.toArray(new Option.Data[0]);
 		}
 		
+		
+		/**
+		 * Returns a command argument from the command line if exists. Notice that only optional
+		 * command arguments can be missing.
+		 * 
+		 * @param name
+		 * 		A name of the command argument.
+		 * 
+		 * @return
+		 * 		An argument object if exist on the command line.
+		 */
 		public Argument.Data<?> getArgument(String name)
 		{
 			for(Argument.Data<?> argument : _arguments)
@@ -421,6 +570,20 @@ public class Command
 			return null;
 		}
 
+		
+		/**
+		 * Returns the value of the command argument if exists on the command line.
+		 * 
+		 * @param <T>
+		 * 		A type of the command argument.
+		 * 
+		 * @param name
+		 * 		A name of the command argument.
+		 * 		
+		 * @return
+		 * 		The command argument value if the command argument exists on the command line.
+		 * 		{@code null} otherwise.
+		 */
 		@SuppressWarnings("unchecked")
 		public <T> T getArgumentValue(String name)
 		{
@@ -431,11 +594,12 @@ public class Command
 				return null;
 		}
 		
+		
 		/**
-		 * Returns an array of command arguments.
+		 * Returns all the command arguments found from the command line.
 		 * 
 		 * @return
-		 * 		An array of arguments.
+		 * 		An array of argument objects.
 		 */
 		public Argument.Data<?>[] getAllArguments()
 		{

@@ -15,6 +15,20 @@ import com.hapiware.util.cmdlineparser.constraint.MinLength;
 import com.hapiware.util.cmdlineparser.constraint.MinValue;
 
 
+/**
+ * {@code Argument} is used to define an argument for the command line utility itself (see
+ * {@link CommandLineParser#add(Class, Argument)}) or for utility commands (see
+ * {@link Command#add(Class, Argument)} and {@link CommandLineParser#add(Command)})
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ * @param <T>
+ * 		A type parameter for the argument.
+ * 
+ * @see CommandLineParser#add(Class, Argument)
+ * @see Command#add(Class, Argument)
+ * @see CommandLineParser#add(Command)
+ */
 public class Argument<T>
 {
 	private ElementBase _argument = new ElementBase();
@@ -60,6 +74,17 @@ public class Argument<T>
 		_argument.name(name);
 	}
 	
+	/**
+	 * An optional {@code id} for annotation matching. If not defined the name given in
+	 * {@link Argument#Argument(String)} is used as the id. For more information see
+	 * <a href="CommandLineParser.html#cmdlineparser-annotations">CommandLineParser, chapter Annotations</a>.
+	 * 
+	 * @param id
+	 * 		An id for the argument.
+	 * 
+	 * @return
+	 * 		The argument object for chaining.
+	 */
 	public Argument<T> id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
@@ -134,11 +159,35 @@ public class Argument<T>
 		return this;
 	}
 	
+	
+	/**
+	 * Sets the argument to be an optional one. Calling this is exactly the same as calling
+	 * {@code optional(Object, true)}.
+	 * 
+	 * @param defaultValue
+	 * 		A mandatory default value when argument is not found from the command line.
+	 * 
+	 * @return
+	 * 		The argument object for chaining.
+	 */
 	public Argument<T> optional(T defaultValue)
 	{
 		return optional(defaultValue, true);
 	}
 	
+	/**
+	 * Sets the argument to be an optional one.
+	 * 
+	 * @param defaultValue
+	 * 		A mandatory default value when argument is not found from the command line.
+	 * 
+	 * @param showDefaultValueDescription
+	 * 		{@code true} if the automatic help text is to be shown for the set default value.
+	 * 		{@code false} if the help text is not wanted.
+	 * 
+	 * @return
+	 * 		The argument object for chaining.
+	 */
 	public Argument<T> optional(T defaultValue, boolean showDefaultValueDescription)
 	{
 		if(defaultValue == null)
@@ -152,6 +201,15 @@ public class Argument<T>
 		return this;
 	}
 	
+	/**
+	 * Sets the constraint for the argument.
+	 * 
+	 * @param constraint
+	 * 		The constraint to set.
+	 * 
+	 * @return
+	 * 		The argument object for chaining.
+	 */
 	public Argument<T> constraint(Constraint<T> constraint)
 	{
 		String forName = _argument.name() == null ? "" : " for " + _argument.name();
@@ -171,30 +229,86 @@ public class Argument<T>
 		return this;
 	}
 
+	/**
+	 * Sets the exact length (in number of characters) for the argument. This is a shortcut for
+	 * calling {@code constraint(new Length(int))}.
+	 * <p>
+	 * This method is only meaningful for {@link String} arguments. 
+	 * 
+	 * @param length
+	 * 		The length of the {@link String} argument.
+	 * 
+	 * @return
+	 * 		The argument object for chaining.
+	 */
 	@SuppressWarnings("unchecked")
 	public Argument<T> length(int length)
 	{
 		return constraint((Constraint<T>)new Length(length));
 	}
 	
+	/**
+	 * Sets the minimum length (in number of characters) for the argument. This is a shortcut for
+	 * calling {@code constraint(new MinLength(int))}.
+	 * <p>
+	 * This method is only meaningful for {@link String} arguments. 
+	 * 
+	 * @param minLength
+	 * 		The minimum length of the {@link String} argument.
+	 * 
+	 * @return
+	 * 		The argument object for chaining.
+	 */
 	@SuppressWarnings("unchecked")
 	public Argument<T> minLength(int minLength)
 	{
 		return constraint((Constraint<T>)new MinLength(minLength));
 	}
 	
+	/**
+	 * Sets the maximum length (in number of characters) for the argument. This is a shortcut for
+	 * calling {@code constraint(new MaxLength(int))}.
+	 * <p>
+	 * This method is only meaningful for {@link String} arguments. 
+	 * 
+	 * @param maxLength
+	 * 		The maximum length of the {@link String} argument.
+	 * 
+	 * @return
+	 * 		The argument object for chaining.
+	 */
 	@SuppressWarnings("unchecked")
 	public Argument<T> maxLength(int maxLength)
 	{
 		return constraint((Constraint<T>)new MaxLength(maxLength));
 	}
 	
+	/**
+	 * Sets the minimum value for the argument. This is a shortcut for calling
+	 * {@code constraint(new MinValue(Object))}. The value type must be {@link Comparable}.
+	 * 
+	 * @param minValue
+	 * 		The minimum value for the argument.
+	 * 
+	 * @return
+	 * 		The argument object for chaining.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Argument<T> minValue(T minValue)
 	{
 		return constraint(new MinValue((Comparable)minValue));
 	}
 	
+	/**
+	 * Sets the maximum value for the argument. This is a shortcut for calling
+	 * {@code constraint(new MaxValue(Object))}. The value type must be {@link Comparable}.
+	 * 
+	 * @param maxValue
+	 * 		The maximum value for the argument.
+	 * 
+	 * @return
+	 * 		The argument object for chaining.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Argument<T> maxValue(T maxValue)
 	{

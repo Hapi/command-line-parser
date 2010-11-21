@@ -71,7 +71,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<Implementation-Title>${build.finalName}</Implementation-Title> 
+							<Implementation-Title>${project.build.finalName}</Implementation-Title> 
 							<Implementation-Version>${project.version}</Implementation-Version>
 							<Implementation-Vendor>http://www.hapiware.com</Implementation-Vendor>
 						</manifestEntries>

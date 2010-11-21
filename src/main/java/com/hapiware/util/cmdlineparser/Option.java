@@ -7,6 +7,24 @@ import java.util.Set;
 import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
 
 
+/**
+ * {@code Option} is an optional command line argument which is identified either by preceding
+ * minus (-) or minus-minus (--). Minus (-) is for a short option and minus-minus (--) is for
+ * long option.
+ * <p>
+ * Short option is always only a single letter and if defined to have {@link Argument} then the
+ * short option letter and an argument can be written with or without a whitespace. For example
+ * the following options are equivalent: {@code -Ttype} and {@code -T type}. Different short options
+ * cannot be combined together. For example, let's assume options {@code -a} and {@code -b} has been
+ * defined. The combination {@code -ab} is interpreted as {@code -a} having an argument {@code b}
+ * <u>not as {@code -a} and {@code -b}</u>.
+ * <p>
+ * Long options always have at least two letters and their possible arguments must be separated
+ * with a whitespace.
+ * 
+ * @author <a href="http://www.hapiware.com" target="_blank">hapi</a>
+ *
+ */
 public class Option
 {
 	private ElementBase _option = new ElementBase();
@@ -25,7 +43,9 @@ public class Option
 	 * Creates new {@code Option}.
 	 * 
 	 * @param name
-	 * 		Name for the option.
+	 * 		Name for the option. If the name is only a single letter then it is interpreted as
+	 * 		a short option (i.e. starts with -). Otherwise it is interpreted as a long option
+	 * 		(i.e. starts with --). Notice that the name must not have preceding minus(es).
 	 * 
 	 * @throws ConfigurationException
 	 * 		If {@code name} is incorrectly formed.
@@ -48,6 +68,18 @@ public class Option
 		_option.name(addOptionMinus(name));
 	}
 	
+	/**
+	 * Defines alternative names for the {@link Option}.
+	 * 
+	 * @param alternatives
+	 * 		An array of alternative names. If the name is only a single letter then it is
+	 * 		interpreted as a short option (i.e. starts with -). Otherwise it is interpreted
+	 * 		as a long option (i.e. starts with --). Notice that the name must not have preceding
+	 * 		minus(es).
+	 * 
+	 * @return
+	 * 		The option object for chaining.
+	 */
 	public Option alternatives(String...alternatives)
 	{
 		if(alternatives == null || alternatives.length == 0)
@@ -75,6 +107,18 @@ public class Option
 		return this;
 	}
 	
+	
+	/**
+	 * An optional {@code id} for annotation matching. If not defined the name given in
+	 * {@link Option#Option(String)} is used as the id. For more information see
+	 * <a href="CommandLineParser.html#cmdlineparser-annotations">CommandLineParser, chapter Annotations</a>.
+	 * 
+	 * @param id
+	 * 		An id for the option.
+	 * 
+	 * @return
+	 * 		The option object for chaining.
+	 */
 	public Option id(String id)
 	{
 		if(id == null || id.trim().length() == 0)
@@ -152,6 +196,21 @@ public class Option
 		return this;
 	}
 	
+	/**
+	 * Set the argument for the option.
+	 * 
+	 * @param <T>
+	 * 		Argument type (for compile time checking).
+	 * 
+	 * @param argumentType
+	 * 		Argument type for run time checking.
+	 * 
+	 * @param argument
+	 * 		The argument definition.
+	 * 
+	 * @return
+	 * 		The option object for chaining.
+	 */
 	public <T> Option set(Class<T> argumentType, OptionArgument<T> argument)
 	{
 		if(argumentType == null)
@@ -183,12 +242,19 @@ public class Option
 		return this;
 	}
 	
+	/**
+	 * Allows multiple occurrences of the option in the command line.
+	 * 
+	 * @return
+	 * 		The option object for chaining.
+	 */
 	public Option multiple()
 	{
 		_multiple = true;
 		return this;
 	}
 
+	
 	private static String addOptionMinus(String name)
 	{
 		return (name.length() > 1 ? "--" : "-") + name;
