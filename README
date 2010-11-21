@@ -4,8 +4,12 @@ README - command-line-parser
 
 DESCRIPTION
 -----------
-'command-line-parser' is a Java utility library for creating command line tools with Java.
-
+'CommandLineParser' is a Java utility library for creating command line tools with Java.
+In addition to just parse command line arguments CommandLineParser also has a built-in help
+system which handles basic automatically command line arguments like -? or --help. Parsed
+command line arguments can be directed to member fields by annotations. Also, arguments can
+have constraints like minValue, maxValue or value ranges etc. and for defined constraints
+informative help text fragments are generated automatically.
 
 REQUIREMENTS
 ------------
