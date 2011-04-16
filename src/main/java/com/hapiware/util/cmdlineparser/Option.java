@@ -262,10 +262,7 @@ public class Option
 	
 	private static String removeOptionMinusFromId(String id)
 	{
-		if(id.startsWith("-"))
-			return (id.length() > 2 ? id.substring(2) : id.substring(1));
-		else
-			return id;
+		return Util.removeOptionMinusFromId(id);
 	}
 	
 

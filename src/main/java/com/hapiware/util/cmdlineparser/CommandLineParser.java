@@ -3,7 +3,6 @@ package com.hapiware.util.cmdlineparser;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -505,7 +504,7 @@ import com.hapiware.util.cmdlineparser.writer.XmlWriter;
  * 
  * If the option does not have an argument then the annotated member field must be {@code boolean}.
  * If {@link Option#multiple()} has been set then the annotated field must be an array of
- * defined argument types. If there are no defined arguments the the field must be a {@code boolean}
+ * defined argument types. If there are no defined arguments the field must be a {@code boolean}
  * array.
  * 
  * <h4><a name="cmdlineparser-command-executors">Command executors</a></h4>
@@ -552,13 +551,19 @@ import com.hapiware.util.cmdlineparser.writer.XmlWriter;
  * is not forced but highly recommended.
  * 
  * <h4><a name="cmdlineparser-configuration-naming-conventions">Naming conventions</a></h4>
- * Names are must have a certain pattern (see {@link Util#checkName(String)} and for options
+ * Names must have a certain pattern (see {@link Util#checkName(String)}) and for options
  * there are some additional considerations. If the option name (or alternative name) is just
  * a single character then it is interpreted as a short option and is identified from the command
  * line arguments by a single minus (-) character. For example {@code -v}. On the other hand if
  * the option name is two or more characters long then it is interpreted as a long option and is
  * identified by two minus (--) characters. For example {@code --type}.
  * 
+ * <h5><a name="cmdlineparser-configuration-option-definition">Defining options and fetching them</a></h5>
+ * Notice the difference in naming options and fetching them using various {@code getOption()}
+ * methods. The difference is that for definition the option name is given without the preceding
+ * minus characters. The option is interpreted as a short or long option as defined above. However,
+ * <u>when fetching and checking options the preceding minus charactes must be used</u> for short
+ * and long options accordingly (e.g. "-a", "--verbose").
  * 
  * 
  * <h3><a name="cmdlineparser-system-properties">System properties</a></h3>
@@ -1000,13 +1005,19 @@ public final class CommandLineParser
 	 * Checks if the option exists among the command line arguments.
 	 * 
 	 * @param name
-	 * 		A name (or alternative name) of the option.
+	 * 		A name (or alternative name) of the option with preceding
+	 * 		minus characters (- or --). For example: "-a", "--verbose".
 	 * 
 	 * @return
 	 * 		{@code true} if the option exists.
+	 * 
+	 * @throws IllegalArgumentException
+	 * 		When {@code name} does not have preceding minus character(s).
 	 */
 	public boolean optionExists(String name)
 	{
+		Util.checkOptionName(name);
+		
 		for(Option.Internal option : _cmdLineGlobalOptions)
 			if(option.name().equals(_definedGlobalOptionAlternatives.get(name)))
 				return true;
@@ -1019,14 +1030,19 @@ public final class CommandLineParser
 	 * Returns the option if it exists on the command line.
 	 * 
 	 * @param name
-	 * 		A name (or alternative name) of the option.
+	 * 		A name (or alternative name) of the option with preceding
+	 * 		minus characters (- or --). For example: "-a", "--verbose".
 	 * 
 	 * @return
 	 * 		The option object if exists on the command line. {@code null} if the option does not
 	 * 		exist or does not have an argument.
+	 * 
+	 * @throws IllegalArgumentException
+	 * 		When {@code name} does not have preceding minus character(s).
 	 */
 	public Option.Data getOption(String name)
 	{
+		Util.checkOptionName(name);
 		try {
 			return getOptions(name)[0];
 		}
@@ -1043,11 +1059,15 @@ public final class CommandLineParser
 	 * 		A type of the option argument.
 	 * 
 	 * @param name
-	 * 		A name (or alternative name) of the option.
+	 * 		A name (or alternative name) of the option with preceding
+	 * 		minus characters (- or --). For example: "-a", "--verbose".
 	 * 		
 	 * @return
 	 * 		The option value if the option exists on the command line. {@code null} if the option
 	 * 		does not exist or does not have an argument.
+	 * 
+	 * @throws IllegalArgumentException
+	 * 		When {@code name} does not have preceding minus character(s).
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getOptionValue(String name)
@@ -1065,13 +1085,19 @@ public final class CommandLineParser
 	 * left-most option on the command line.
 	 * 
 	 * @param name
-	 * 		A name (or alternative name) of the option.
+	 * 		A name (or alternative name) of the option with preceding
+	 * 		minus characters (- or --). For example: "-a", "--verbose".
 	 * 
 	 * @return
 	 * 		An array of option objects.
+	 * 
+	 * @throws IllegalArgumentException
+	 * 		When {@code name} does not have preceding minus character(s).
 	 */
 	public Option.Data[] getOptions(String name)
 	{
+		Util.checkOptionName(name);
+		
 		List<Option.Data> options = new ArrayList<Option.Data>();
 		for(Option.Internal option : _cmdLineGlobalOptions)
 			if(option.name().equals(_definedGlobalOptionAlternatives.get(name)))
@@ -1826,10 +1852,7 @@ public final class CommandLineParser
 			);
 			Util.setAnnotatedOptions(callerObject, callerClass, _cmdLineCommand.cmdLineOptions());
 			Util.setAnnotatedArguments(callerObject, callerClass, _cmdLineCommand.cmdLineArguments());
-			List<Option.Data> optionData = new ArrayList<Option.Data>();
-			for(Option.Internal internal : _cmdLineGlobalOptions)
-				optionData.add(new Option.Data(internal));
-			_cmdLineCommand.execute(Collections.unmodifiableList(optionData));
+			_cmdLineCommand.execute(_cmdLineGlobalOptions);
 		}
 	}
 

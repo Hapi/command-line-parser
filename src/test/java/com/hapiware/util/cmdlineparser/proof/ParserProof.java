@@ -29,6 +29,8 @@ public class ParserProof
 	@Id("TYPE")
 	private static int _type;
 
+	@Id("TYPE")
+	private static int _type2;
 	
 	public static void main(String[] args) throws Throwable
 	{
@@ -128,6 +130,7 @@ public class ParserProof
 		System.out.println("_numba = " + _numba[0]);
 		System.out.println("cmd = " + _cmd);
 		System.out.println("type = " + _type);
+		System.out.println("type2 = " + _type2);
 		System.out.println("Success.");
 	}
 }

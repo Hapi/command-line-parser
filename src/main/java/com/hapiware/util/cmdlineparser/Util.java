@@ -31,9 +31,13 @@ import com.hapiware.util.cmdlineparser.constraint.ConstraintException;
  */
 public class Util
 {
-	public static final String NEGATIVE_NUMBER_PATTERN = "^-\\p{Digit}+$"; 
-	
+	private static final String BASE_NAME_PATTERN = "\\p{Alpha}[-_\\p{Alnum}]";
 	private static final String CR = "\n";
+
+	public static final String NEGATIVE_NUMBER_PATTERN = "^-\\p{Digit}+$";
+	public static final String NAME_PATTERN = "^" + BASE_NAME_PATTERN + "*$";
+	public static final String OPTION_LONG_NAME_PATTERN = BASE_NAME_PATTERN + "+";
+	
 
 	
 	/**
@@ -199,8 +203,22 @@ public class Util
 	 */
 	public static boolean checkName(String name)
 	{
-		return Pattern.matches("^\\p{Alpha}[-_\\p{Alnum}]*$", name);
+		return Pattern.matches(NAME_PATTERN, name);
 	}
+	
+	static boolean checkOptionNaming(String optionName)
+	{
+		return Pattern.matches("^(-\\p{Alpha}|--" + OPTION_LONG_NAME_PATTERN + ")$", optionName);
+	}
+	
+	static void checkOptionName(String optionName)
+	{
+		if(!checkOptionNaming(optionName)) {
+			String msg = "'" + optionName + "' must have the preceding minus character(s).";
+			throw new IllegalArgumentException(msg);
+		}
+	}
+	
 	
 	static boolean checkOption(
 		String arg,
@@ -338,10 +356,17 @@ public class Util
 						id
 					);
 			}
-			else
+			else {
 				// If an option does not have any arguments defined
-				// then only its existence is marked.
-				Util.setAnnotatedValue(callerObject, callerClass, true, cmdLineOption.id());
+				// then only its existence is marked and in this case
+				// the preceding minus characters must be removed.
+				Util.setAnnotatedValue(
+					callerObject,
+					callerClass,
+					true,
+					removeOptionMinusFromId(cmdLineOption.id())
+				);
+			}
 		}
 		for(Map.Entry<String, List<Object>> multiOption : multipleOptions.entrySet()) {
 			Util.setAnnotatedValue(
@@ -454,6 +479,13 @@ public class Util
 		}
 	}
 	
+	static String removeOptionMinusFromId(String id)
+	{
+		if(id.startsWith("-"))
+			return (id.length() > 2 ? id.substring(2) : id.substring(1));
+		else
+			return id;
+	}
 	
 	static Object valueOf(String valueAsString, Class<?> argumentTypeClass)
 	{

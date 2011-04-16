@@ -192,9 +192,9 @@ public class Argument<T>
 	{
 		if(defaultValue == null)
 			throw
-			new ConfigurationException(
-				"'defaultValue' for '" + _argument.name() + "' cannot be null."
-			);
+				new ConfigurationException(
+					"'defaultValue' for '" + _argument.name() + "' cannot be null."
+				);
 		
 		_defaultForOptional = defaultValue;
 		_showDefaultValueDescription = showDefaultValueDescription;

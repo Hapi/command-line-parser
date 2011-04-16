@@ -465,13 +465,19 @@ public class Command
 		 * Checks if the command option exists among the command line arguments.
 		 * 
 		 * @param name
-		 * 		A name (or alternative name) of the command option.
+		 * 		A name (or alternative name) of the command option with preceding
+		 * 		minus characters (- or --). For example: "-a", "--verbose".
 		 * 
 		 * @return
 		 * 		{@code true} if the command option exists.
+		 * 
+		 * @throws IllegalArgumentException
+		 * 		When {@code name} does not have preceding minus character(s).
 		 */
 		public boolean optionExists(String name)
 		{
+			Util.checkOptionName(name);
+			
 			for(Option.Data option : _options)
 				if(option.getName().equals(name))
 					return true;
@@ -484,14 +490,20 @@ public class Command
 		 * Returns the command option if it exists on the command line.
 		 * 
 		 * @param name
-		 * 		A name (or alternative name) of the command option.
+		 * 		A name (or alternative name) of the command option with preceding
+		 * 		minus characters (- or --). For example: "-a", "--verbose".
 		 * 
 		 * @return
 		 * 		The command option object if exists on the command line. {@code null} if the command
 		 * 		option does not	exist or does not have an argument.
+		 * 
+		 * @throws IllegalArgumentException
+		 * 		When {@code name} does not have preceding minus character(s).
 		 */
 		public Option.Data getOption(String name)
 		{
+			Util.checkOptionName(name);
+			
 			try {
 				return getOptions(name)[0];
 			}
@@ -508,11 +520,15 @@ public class Command
 		 * 		A type of the command option argument.
 		 * 
 		 * @param name
-		 * 		A name (or alternative name) of the command option.
+		 * 		A name (or alternative name) of the command option with preceding
+		 * 		minus characters (- or --). For example: "-a", "--verbose".
 		 * 		
 		 * @return
 		 * 		The command option value if the command option exists on the command line.
 		 * 		{@code null} if	the command option does not exist or does not have an argument.
+		 * 
+		 * @throws IllegalArgumentException
+		 * 		When {@code name} does not have preceding minus character(s).
 		 */
 		@SuppressWarnings("unchecked")
 		public <T> T getOptionValue(String name)
@@ -535,13 +551,19 @@ public class Command
 		 * option is the left-most command option on the command line.
 		 * 
 		 * @param name
-		 * 		A name (or alternative name) of the command option.
+		 * 		A name (or alternative name) of the command option with preceding
+		 * 		minus characters (- or --). For example: "-a", "--verbose".
 		 * 
 		 * @return
 		 * 		An array of command option objects.
+		 * 
+		 * @throws IllegalArgumentException
+		 * 		When {@code name} does not have preceding minus character(s).
 		 */
 		public Option.Data[] getOptions(String name)
 		{
+			Util.checkOptionName(name);
+			
 			List<Option.Data> options = new ArrayList<Option.Data>();
 			for(Option.Data option : _options)
 				if(option.getName().equals(name))
@@ -727,13 +749,20 @@ public class Command
 				
 				return false;
 			}
+
+			if(_outer._mandatoryArguments && !commandArgumentsChecked) {
+				String msg =
+					"Command '" + commandName + "' does not have a mandatory argument.";
+				throw new IllegalCommandLineArgumentException(msg);
+			}
+			
 			
 			// There are no command line arguments and all the arguments are optional.
 			if(
 				_outer._cmdLineArguments.size() == 0
 				&& _outer._definedArguments.size() > 0
-				&& !_outer._mandatoryArguments)
-			{
+				&& !_outer._mandatoryArguments
+			) {
 				Set<Entry<String, Argument.Internal<?>>> entrySet =
 					_outer._definedArguments.entrySet();
 				for(Iterator<?> it = entrySet.iterator(); it.hasNext();) {
@@ -748,10 +777,19 @@ public class Command
 			
 			return true;
 		}
-		public void execute(List<Option.Data> options)
+		public void execute(List<Option.Internal> cmdLineGlobalOptions) throws AnnotatedFieldSetException
 		{
-			if(_outer._commandExecutor != null)
-				_outer._commandExecutor.execute(new Data(this), options);
+			if(_outer._commandExecutor != null) {
+				Class<?> commandExecutorClass = _outer._commandExecutor.getClass();
+				Util.setAnnotatedOptions(_outer._commandExecutor, commandExecutorClass, cmdLineGlobalOptions);
+				Util.setAnnotatedOptions(_outer._commandExecutor, commandExecutorClass, _outer._cmdLineOptions);
+				Util.setAnnotatedArguments(_outer._commandExecutor, commandExecutorClass, _outer._cmdLineArguments);
+				
+				List<Option.Data> optionData = new ArrayList<Option.Data>();
+				for(Option.Internal internal : cmdLineGlobalOptions)
+					optionData.add(new Option.Data(internal));
+				_outer._commandExecutor.execute(new Data(this), Collections.unmodifiableList(optionData));
+			}
 		}
 		
 		@Override

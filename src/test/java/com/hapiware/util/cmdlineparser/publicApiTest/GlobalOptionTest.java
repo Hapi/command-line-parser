@@ -118,23 +118,23 @@ public class GlobalOptionTest
 				maxValue(1000);
 			}});
 		}});
-		p.add(new Option("d") {{
+		p.add(new Option("q") {{
 			description("Description");
 		}});
 		
-		p.parse(this, new String[] { "-d" });
+		p.parse(this, new String[] { "-q" });
 		assertEquals(_n, 0);
 		p.parse(this, new String[] { "-n" });
 		assertEquals(_n, 13);
-		p.parse(this, new String[] { "-n", "-d" });
+		p.parse(this, new String[] { "-n", "-q" });
 		assertEquals(_n, 13);
 		p.parse(this, new String[] { "-n", "1000" });
 		assertEquals(_n, 1000);
-		p.parse(this, new String[] { "-d", "-n" });
+		p.parse(this, new String[] { "-q", "-n" });
 		assertEquals(_n, 13);
-		p.parse(this, new String[] { "-d", "-n", "1000" });
+		p.parse(this, new String[] { "-q", "-n", "1000" });
 		assertEquals(_n, 1000);
-		p.parse(this, new String[] { "-n", "1000", "-d" });
+		p.parse(this, new String[] { "-n", "1000", "-q" });
 		assertEquals(_n, 1000);
 	}
 	
@@ -212,5 +212,30 @@ public class GlobalOptionTest
 			set(Integer.class, new OptionArgument<Integer>());
 		}});
 		p.parse(this, new String[] { "--numbe", "1" });
+	}
+	
+	@Test(
+		expectedExceptions = { IllegalArgumentException.class },
+		expectedExceptionsMessageRegExp =
+			"'number' must have the preceding minus character\\(s\\)\\."
+	)
+	public void wrongOptionName()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		CommandLineParser p =
+			new CommandLineParser(
+				GlobalOptionTest.class,
+				new Description().description("Main description.")
+			);
+		p.add(new Option("number") {{
+			description("Description");
+			set(Integer.class, new OptionArgument<Integer>());
+		}});
+		p.parse(this, new String[] { "--number", "1" });
+		p.getOptionValue("number");
 	}
 }
