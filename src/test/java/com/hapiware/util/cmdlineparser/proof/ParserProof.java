@@ -112,13 +112,19 @@ public class ParserProof
 		System.out.println("-----------------------------------");
 		System.out.println();*/
 		
+		String[] arguments =
+			new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "1000" };
+			//new String[] { "-?" };
+			//new String[] { "--help", "cmd=set" };
+			//new String[] { "-?", "all" };
+			//new String[] { "--version" };
 		
-		p.parsech(
-			new String[] { "-sMorop", "-sMiu", "--moi", "-d", "j", "set", "123", "3", "2", "level", "--number", "1000" }
-			//new String[] { "--help", "cmd=set" }
-			//new String[] { "--help", "all" }
-			//new String[] { "--version" }
-		);
+		p.parseInternalOptions(arguments);
+		
+		// Do something here before the real parsing like reading a configuration file etc.
+		System.out.println("Read a configuration file...\n");
+		
+		p.parsech(arguments);
 		
 		System.out.println(p.optionExists("-m"));
 		System.out.println(p.optionExists("-a"));

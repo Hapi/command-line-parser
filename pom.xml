@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.hapiware.util</groupId>
 	<artifactId>command-line-parser</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<description>
 		'command-line-parser' is a Java utility library for creating command line tools with Java.
 	</description>

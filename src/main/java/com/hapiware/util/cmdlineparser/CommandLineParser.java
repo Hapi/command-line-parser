@@ -323,6 +323,7 @@ import com.hapiware.util.cmdlineparser.writer.XmlWriter;
  * 		<li>{@link #parsech(String[])}</li>
  * 		<li>{@link #parsech(Class, String[])}</li>
  * 		<li>{@link #parsech(Object, String[])}</li>
+ * 		<li>{@link #parseInternalOptions(String[])}</li>
  * 	</ul>
  * Parse methods try to parse given arguments according to the configuration and throw
  * an exception if the parsing fails. Otherwise the execution of the code continues normally.
@@ -350,6 +351,23 @@ import com.hapiware.util.cmdlineparser.writer.XmlWriter;
  * </pre>
  * If the command line cannot be parsed properly {@link #parsec(String[])} writes the error message
  * and then exits using {@link System#exit(int)}. Otherwise the code continues normally.
+ * <p>
+ * {@link #parseInternalOptions(String[])} method differs from the other parse commands in that
+ * it only reacts to internal options by printing a proper message (e.g. help or version number)
+ * and exits using {@link System#exit(int)}. If no internal options are found among given arguments
+ * then the code continues normally after {@link #parseInternalOptions(String[])} call. This is
+ * used in those scenarios where there are something else to do, like reading a configuration file,
+ * before calling the {@code parse()}. For example:
+ * <pre>
+ * public static void main(String[] args)
+ * {
+ *     _clp.parseInternalOptions(args);
+ *     readConfigurationFile();
+ *     generateConfigurationFiles();
+ *     _clp.parsec(args);
+ * }
+ * </pre>
+ * Now, the program can react to internal options without first handling configuration files.
  * 
  * 
  * <h3><a name="cmdlineparser-coding-style">Coding style</a></h3>
@@ -435,8 +453,8 @@ import com.hapiware.util.cmdlineparser.writer.XmlWriter;
  * 		</li>
  * 		<li>
  * 			<b>Option</b> is an optional command line argument which is identified either by
- * 			preceding minus (-) or minus-minus (--). For more information see {@link #add(Option)}
- * 			,{@link Command#add(Option)} and {@link Option}.
+ * 			preceding minus (-) or minus-minus (--). For more information see {@link #add(Option)},
+ * 			{@link Command#add(Option)} and {@link Option}.
  * 		</li>
  * 		<li>
  * 			<b>Option argument</b> is an argument for the option when needed. Option arguments are
@@ -1639,31 +1657,24 @@ public final class CommandLineParser
 		}
 	}
 	
-
-	private void parse(String className, String[] args)
-		throws
-			ConstraintException,
-			AnnotatedFieldSetException,
-			CommandNotFoundException,
-			IllegalCommandLineArgumentException
-	{
-		try {
-			parse(
-				null, 
-				Class.forName(className),
-				args
-			);
-		}
-		catch(ClassNotFoundException e) {
-			String msg = 
-				"'" + className + "' was not found. An attempt to find automatically a defining "
-					+ "class for the annotated fields failed. Use other parse() method call.";
-			throw new RuntimeException(msg, e);
-		}
-	}
 	
-	
-	private void checkInternalCommand(String args[])
+	/**
+	 * Parses given command line arguments for the internal options like --version and --help.
+	 * If an internal option is recognised then the corresponding message is printed and
+	 * {@link System#exit(int)} is called thus ending the execution of the program. On the other
+	 * hand if no internal options are found then the execution continues normally.
+	 * <p>
+	 * This method is useful if there is a need to do something before calling one of
+	 * the {@code parse()} methods. For example, if a configuration file is read before calling
+	 * {@code parse()} a programmer is still able to show version number and help texts without
+	 * reading the configuration file first.
+	 * <p>
+	 * See also <a href="#cmdlineparser-parsing-command-line">Parsing command line</a>.
+	 * 
+	 * @param args
+	 * 		Command line arguments.
+	 */
+	public void parseInternalOptions(String args[])
 	{
 		if(args.length == 1 && args[0].equals("--version"))
 			showVersionAndExit();
@@ -1727,6 +1738,31 @@ public final class CommandLineParser
 			_exitHandler.exit(0);
 		}
 	}
+
+	
+	private void parse(String className, String[] args)
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		try {
+			parse(
+				null, 
+				Class.forName(className),
+				args
+			);
+		}
+		catch(ClassNotFoundException e) {
+			String msg = 
+				"'" + className + "' was not found. An attempt to find automatically a defining "
+					+ "class for the annotated fields failed. Use other parse() method call.";
+			throw new RuntimeException(msg, e);
+		}
+	}
+	
+	
 	
 	private void parse(Object callerObject, Class<?> callerClass, String[] args)
 		throws
@@ -1737,7 +1773,7 @@ public final class CommandLineParser
 	{
 		assert callerObject != null || callerClass != null;
 
-		checkInternalCommand(args);
+		parseInternalOptions(args);
 		
 		// Adds a space character after a short option if missing.
 		List<String> cmdLineArgs = new LinkedList<String>();

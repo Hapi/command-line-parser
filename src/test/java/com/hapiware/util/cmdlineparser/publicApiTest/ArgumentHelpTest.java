@@ -608,4 +608,125 @@ public class ArgumentHelpTest
 		}
 		fail("Should throw ExitException.");
 	}
+
+	
+	@Test
+	public void parseInternalOptionsHelpAll()
+	{
+		try {
+			_parser.parseInternalOptions(new String[] { "--help", "all" });
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar [OPTS] [ARGS]\n"
+				+ "\n"
+				+ "Description:\n"
+				+ "    A small and customisable web server for publishing a directory tree over (local) net. Web root\n"
+				+ "    directory will be the directory where 'fileweb' was started.\n"
+				+ "\n"
+				+ "OPTS:\n"
+				+ "    -v, --verbose\n"
+				+ "        Prints more verbose output. This option can occur several times.\n"
+				+ "\n"
+				+ "    -l, --log\n"
+				+ "        Logs every step of the process.\n"
+				+ "\n"
+				+ "ARGS:\n"
+				+ "    [PORT]\n"
+				+ "        A port number. Argument is optional. Default value is '80'.\n"
+				+ "\n"
+				+ "        Constraints:\n"
+				+ "            * Minimum value is '1'.\n"
+				+ "\n"
+				+ "    [NUM_OF_THREADS]\n"
+				+ "        Maximum number of threads in the thread pool. Argument is optional. Default value is '20'.\n"
+				+ "\n"
+				+ "        Constraints:\n"
+				+ "            * Minimum value is '1'.\n"
+				+ "            * Maximum value is '100'.\n"
+				+ "\n"
+				+ "Examples:\n"
+				+ "    java -jar cmd-parser.jar -? all\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar\n"
+				+ "    java -jar cmd-parser.jar 50001\n"
+				+ "    java -jar cmd-parser.jar 50001 35\n"
+				+ "\n";
+			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	
+	@Test
+	public void parseInternalOptionsCommandsHelp()
+	{
+		try {
+			_parser.parseInternalOptions(new String[] { "--help", "cmds" });
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Help error:\n"
+				+ "    'cmds' is not a valid help command.\n"
+				+ "    \n"
+				+ "Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar [OPTS] [ARGS]\n"
+				+ "\n";
+			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+	
+	
+	@Test
+	public void parseInternalOptionsUsage()
+	{
+		try {
+			_parser.parseInternalOptions(new String[] { "--help", "usage" });
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			String hereDoc =
+				"Usage:\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['all' | 'opts' | 'args']\n"
+				+ "    java -jar cmd-parser.jar -? | --help ['usage' | 'examples']\n"
+				+ "    java -jar cmd-parser.jar --version\n"
+				+ "    java -jar cmd-parser.jar [OPTS] [ARGS]\n"
+				+ "\n";
+			assertEquals(_os.toString(), hereDoc);
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
+
+	
+	@Test
+	public void parseInternalOptionsShowVersion()
+		throws
+			ConstraintException,
+			AnnotatedFieldSetException,
+			CommandNotFoundException,
+			IllegalCommandLineArgumentException
+	{
+		try {
+			_parser.parseInternalOptions(new String[] { "--version" });
+		}
+		catch(ExitException e) {
+			assertEquals(e.exitStatus, 0);
+			assertEquals(_os.toString(), "Version: 1.0.0-for-testing\n");
+			return;
+		}
+		fail("Should throw ExitException.");
+	}
 }
