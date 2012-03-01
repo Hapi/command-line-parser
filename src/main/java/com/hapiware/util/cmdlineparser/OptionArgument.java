@@ -19,9 +19,24 @@ public class OptionArgument<T>
 	extends
 		Argument<T>
 {
+	/**
+	 * Creates new {@code OptionArgument}.
+	 */
 	public OptionArgument()
 	{
-		// Does nothing.
+		this("value");
+	}
+	
+	/**
+	 * Creates new {@code OptionArgument}.
+	 * 
+	 * @param name
+	 * 		A name for the argument value. This is only for the help system and is not used
+	 * 		otherwise.
+	 */
+	public OptionArgument(String name)
+	{
+		super(name);
 	}
 	
 	/**

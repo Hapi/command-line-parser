@@ -458,34 +458,17 @@ public class Argument<T>
 				ConstraintException,
 				IllegalCommandLineArgumentException
 		{
-			boolean defaultValueAdded = false;
-			if(arguments.size() == 0)
+			if(arguments.size() == 0 || Util.checkOptionNaming(arguments.get(0)))
 				if(optional()) {
-					if(defaultValue() != null) {
+					if(defaultValue() != null)
 						((LinkedList<String>)arguments).addFirst(defaultValue().toString());
-						defaultValueAdded = true;
-					}
 					else
 						return true;
 				}
 				else
 					return false;
-			
-			try {
-				value(_argumentTypeClass.cast(valueOf(arguments.get(0), _argumentTypeClass)));
-			}
-			catch(IllegalCommandLineArgumentException e) {
-				if(!optional() || defaultValueAdded)
-					throw e;
-				else {
-					if(defaultValue() != null) {
-						((LinkedList<String>)arguments).addFirst(defaultValue().toString());
-						value(_argumentTypeClass.cast(valueOf(arguments.get(0), _argumentTypeClass)));
-					}
-					else
-						return true;
-				}
-			}
+
+			value(_argumentTypeClass.cast(valueOf(arguments.get(0), _argumentTypeClass)));
 			arguments.remove(0);
 			return true;
 		}

@@ -399,9 +399,7 @@ public class CommandTest
 	@Test(
 		expectedExceptions = {IllegalCommandLineArgumentException.class},
 		expectedExceptionsMessageRegExp =
-			"Command line argument 'level' for command 'set' cannot be interpreted as a proper "
-				+ "command line argument\\. All the arguments must be sequentially positioned\\. "
-				+ "Check that there are no options between arguments\\."
+			"'a' cannot be interpreted as java.lang.Integer for 'TYPE'\\."
 	)
 	public void fullCommandLineAllOptionsArgumentTypeWrongType()
 		throws

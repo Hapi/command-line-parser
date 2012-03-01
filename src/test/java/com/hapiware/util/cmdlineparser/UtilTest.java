@@ -15,6 +15,7 @@ public class UtilTest
 		assertTrue(Util.checkName("abc"));
 		assertTrue(Util.checkName("temp-5-6-check"));
 		assertTrue(Util.checkName("a_five-8"));
+		assertTrue(Util.checkName("miu_mau_mou"));
 	}
 
 	@Test
@@ -26,6 +27,7 @@ public class UtilTest
 		assertFalse(Util.checkName("5-check"));
 		assertFalse(Util.checkName("5_check"));
 		assertFalse(Util.checkName("_miu"));
+		assertFalse(Util.checkName("-miu"));
 	}
 	
 	@Test

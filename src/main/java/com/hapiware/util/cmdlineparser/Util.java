@@ -206,9 +206,19 @@ public class Util
 		return Pattern.matches(NAME_PATTERN, name);
 	}
 	
-	static boolean checkOptionNaming(String optionName)
+	/**
+	 * Checks the option naming. {@code optionName} must match this RE pattern:
+	 * <code>^-\\p{Alpha}|--\\p{Alpha}[-_\\p{Alnum}]+$</code>.
+	 * 
+	 * @param optionName
+	 * 		An option name with preceding minus(es) to be checked.
+	 * 
+	 * @return
+	 * 		{@code true} if {@code optionName} matches the pattern. {@code false} otherwise.
+	 */
+	public static boolean checkOptionNaming(String optionName)
 	{
-		return Pattern.matches("^(-\\p{Alpha}|--" + OPTION_LONG_NAME_PATTERN + ")$", optionName);
+		return Pattern.matches("^-\\p{Alpha}|--" + OPTION_LONG_NAME_PATTERN + "$", optionName);
 	}
 	
 	static void checkOptionName(String optionName)

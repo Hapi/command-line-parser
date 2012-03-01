@@ -220,12 +220,6 @@ public class Option
 		
 		argument.setId(removeOptionMinusFromId(_option.id()));
 		_definedArgument = new Argument.Internal<T>(argument, argumentType);
-		if(_definedArgument.name() != null)
-			throw
-				new ConfigurationException(
-					"Only the option '" + _option.name() + "' can have a name. "
-						+"'argument' must not have a name." 
-				);
 		if(_definedArgument.id() == null || _definedArgument.id().trim().length() == 0)
 			throw 
 				new ConfigurationException(

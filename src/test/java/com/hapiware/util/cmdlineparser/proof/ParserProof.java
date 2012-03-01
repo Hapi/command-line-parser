@@ -63,7 +63,7 @@ public class ParserProof
 		}});
 		p.add(new Option("d") {{
 			description("Description");
-			set(String.class, new OptionArgument<String>() {{
+			set(String.class, new OptionArgument<String>("loggerType") {{
 				//maxLength(5);
 				constraint(new Enumeration<String>() {{
 					valueIgnoreCase("J", "for Java loggers.");
@@ -103,7 +103,7 @@ public class ParserProof
 		}});
 		p.addExampleArguments("set 1234 j ^.+ INFO");
 		
-		//p.printCompleteHelp();
+		p.printCompleteHelp();
 		//p.printShortHelp();
 		//p.printGlobalOptionsHelp();
 		//p.printCommandsHelp();

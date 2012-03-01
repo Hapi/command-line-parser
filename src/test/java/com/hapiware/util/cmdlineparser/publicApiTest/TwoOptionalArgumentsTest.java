@@ -505,7 +505,7 @@ public class TwoOptionalArgumentsTest
 			IllegalCommandLineArgumentException
 	{
 		_parser.parse(
-			new String[] { "-b", "22", "100", "200", "300", "400", "-a", "-c" }
+			new String[] { "100", "200", "300", "400", "-a", "-b", "22", "-c" }
 		);
 		assertEquals(_parser.optionExists("-a"), true);
 		assertEquals(_parser.getOptionValue("-a"), -11);

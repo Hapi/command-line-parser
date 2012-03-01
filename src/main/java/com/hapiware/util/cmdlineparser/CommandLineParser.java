@@ -37,7 +37,7 @@ import com.hapiware.util.cmdlineparser.writer.XmlWriter;
  * {@code CommandLineParser} is an utility class for parsing command line. In addition to just
  * parse command line arguments {@code CommandLineParser} also has
  * <a href="#cmdlineparser-built-in-command-line-options">a built-in help system</a> which
- * handles basic automatically command line arguments like {@code -?} or {@code --help}. Parsed
+ * handles automatically basic command line arguments like {@code -?} or {@code --help}. Parsed
  * command line arguments can be directed to member fields by
  * <a href="#cmdlineparser-annotations">annotations</a>. Also, arguments can have constraints like
  * minValue, maxValue or value ranges etc. and for defined constraints informative help text
@@ -1777,7 +1777,7 @@ public final class CommandLineParser
 		
 		// Adds a space character after a short option if missing.
 		List<String> cmdLineArgs = new LinkedList<String>();
-		Pattern p = Pattern.compile("^-\\p{Alpha}\\p{Alnum}+");
+		Pattern p = Pattern.compile("^-\\p{Alpha}\\p{Graph}+");
 		for(String arg : args) {
 			if(p.matcher(arg).matches()) {
 				cmdLineArgs.add(arg.substring(0, 2));
@@ -2037,6 +2037,36 @@ public final class CommandLineParser
 	}
 
 	/**
+	 * Prints a given error message with a short help using a selected writer. This method can
+	 * be used for printing errors if the built-in print mechanisms are not enough.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 * 
+	 * @param message
+	 * 		A message to be printed.
+	 * 
+	 * @see #printShortHelp()
+	 * @see #parse(String[])
+	 * @see #parse(Class, String[])
+	 * @see #parse(Object, String[])
+	 * @see #parsec(String[])
+	 * @see #parsec(Class, String[])
+	 * @see #parsec(Object, String[])
+	 * @see #parsech(String[])
+	 * @see #parsech(Class, String[])
+	 * @see #parsech(Object, String[])
+	 */
+	public void printErrorWithShortHelp(String message)
+	{
+		_writer.header();
+		_writer.level1Begin("Error:");
+		_writer.paragraph(Level.L1, message);
+		_writer.level1End();
+		printShortHelpWithoutHeaders();
+		_writer.footer();
+	}
+	
+	/**
 	 * Prints a given {@link Throwable} with a short help using a selected writer. This method can
 	 * be used for printing errors if the built-in print mechanisms are not enough.
 	 * <p>
@@ -2058,14 +2088,38 @@ public final class CommandLineParser
 	 */
 	public void printErrorWithShortHelp(Throwable cause)
 	{
+		printErrorWithShortHelp(cause.getMessage());
+	}
+	
+	/**
+	 * Prints a given error message with a command help using a selected writer. This method can
+	 * be used for printing errors if the built-in print mechanisms are not enough.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 * 
+	 * @param message
+	 * 		A message to be printed.
+	 * 
+	 * @see #parse(String[])
+	 * @see #parse(Class, String[])
+	 * @see #parse(Object, String[])
+	 * @see #parsec(String[])
+	 * @see #parsec(Class, String[])
+	 * @see #parsec(Object, String[])
+	 * @see #parsech(String[])
+	 * @see #parsech(Class, String[])
+	 * @see #parsech(Object, String[])
+	 */
+	public void printErrorWithCommandsHelp(String message)
+	{
 		_writer.header();
 		_writer.level1Begin("Error:");
-		//_writer.paragraph(Level.L1, cause.getClass().getName());
-		_writer.paragraph(Level.L1, cause.getMessage());
+		_writer.paragraph(Level.L1, message);
 		_writer.level1End();
-		printShortHelpWithoutHeaders();
+		printShortCommands();
 		_writer.footer();
 	}
+	
 	
 	/**
 	 * Prints a given {@link Throwable} with a command help using a selected writer. This method can
@@ -2088,16 +2142,38 @@ public final class CommandLineParser
 	 */
 	public void printErrorWithCommandsHelp(Throwable cause)
 	{
-		_writer.header();
-		_writer.level1Begin("Error:");
-		//_writer.paragraph(Level.L1, cause.getClass().getName());
-		_writer.paragraph(Level.L1, cause.getMessage());
-		_writer.level1End();
-		printShortCommands();
-		_writer.footer();
+		printErrorWithCommandsHelp(cause.getMessage());
 	}
 	
 	
+	/**
+	 * Prints a given error message using a selected writer. This method can be used for
+	 * printing errors if the built-in print mechanisms are not enough.
+	 * <p>
+	 * For more information about writers see <a href="#cmdlineparser-writer">Writer</a>.
+	 * 
+	 * @param message
+	 * 		A message to be printed.
+	 * 
+	 * @see #parse(String[])
+	 * @see #parse(Class, String[])
+	 * @see #parse(Object, String[])
+	 * @see #parsec(String[])
+	 * @see #parsec(Class, String[])
+	 * @see #parsec(Object, String[])
+	 * @see #parsech(String[])
+	 * @see #parsech(Class, String[])
+	 * @see #parsech(Object, String[])
+	 */
+	public void printErrorMessageWithoutHelp(String message)
+	{
+		_writer.header();
+		_writer.level1Begin("Error:");
+		_writer.paragraph(Level.L1, message);
+		_writer.level1End();
+		_writer.footer();
+	}
+
 	/**
 	 * Prints a given <b>known</b> {@link Throwable} using a selected writer. Compare this
 	 * method to {@link #printThrowable(Throwable)}. This method can be used for printing errors
@@ -2121,12 +2197,7 @@ public final class CommandLineParser
 	 */
 	public void printErrorMessageWithoutHelp(Throwable cause)
 	{
-		_writer.header();
-		_writer.level1Begin("Error:");
-		//_writer.paragraph(Level.L1, cause.getClass().getName());
-		_writer.paragraph(Level.L1, cause.getMessage());
-		_writer.level1End();
-		_writer.footer();
+		printErrorMessageWithoutHelp(cause.getMessage());
 	}
 	
 	/**
@@ -2238,6 +2309,11 @@ public final class CommandLineParser
 			String optionNames = option.name();
 			for(String alternative : option.alternatives())
 				optionNames += ", " + alternative;
+			Argument.Internal<?> argument = option.argument();
+			if(argument != null) {
+				final String argumentName = "<" + argument.name() + ">";
+				optionNames += " " + (argument.optional() ? "[" + argumentName + "]" : argumentName);
+			}
 			if(isCommand)
 				_writer.level4Begin(optionNames);
 			else
